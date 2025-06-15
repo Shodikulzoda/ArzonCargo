@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication2", "WebApplication2\WebApplication2.csproj", "{4A52C16C-3115-4E48-9276-3419484CFFEB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArzonCargo", "ArzonCargo\ArzonCargo.csproj", "{4A52C16C-3115-4E48-9276-3419484CFFEB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

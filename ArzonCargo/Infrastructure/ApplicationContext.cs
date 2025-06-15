@@ -1,8 +1,8 @@
-﻿using ArzonCargo.Models;
+﻿using ArzonCargo.Infrastructure.Configurations;
+using ArzonCargo.Models;
 using Microsoft.EntityFrameworkCore;
-using WebApplication2.Infrastructure.Configurations;
 
-namespace WebApplication2.Infrastructure;
+namespace ArzonCargo.Infrastructure;
 
 public class ApplicationContext(DbContextOptions<ApplicationContext> options) : DbContext(options)
 {
