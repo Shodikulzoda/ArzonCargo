@@ -1,25 +1,26 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Bobo\\Base\\C#\\Cargo\\Domain\\Domain.csproj": {}
+    "C:\\Users\\Alisher Olimov\\RiderProjects\\ArzonCargo\\Domain\\Domain.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Bobo\\Base\\C#\\Cargo\\Domain\\Domain.csproj": {
+    "C:\\Users\\Alisher Olimov\\RiderProjects\\ArzonCargo\\Domain\\Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Bobo\\Base\\C#\\Cargo\\Domain\\Domain.csproj",
+        "projectUniqueName": "C:\\Users\\Alisher Olimov\\RiderProjects\\ArzonCargo\\Domain\\Domain.csproj",
         "projectName": "Domain",
-        "projectPath": "C:\\Users\\Bobo\\Base\\C#\\Cargo\\Domain\\Domain.csproj",
-        "packagesPath": "C:\\Users\\Bobo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Bobo\\Base\\C#\\Cargo\\Domain\\obj\\",
+        "projectPath": "C:\\Users\\Alisher Olimov\\RiderProjects\\ArzonCargo\\Domain\\Domain.csproj",
+        "packagesPath": "C:\\Users\\Alisher Olimov\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Alisher Olimov\\RiderProjects\\ArzonCargo\\Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Bobo\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Alisher Olimov\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -54,17 +55,17 @@
             },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
-              "version": "[9.0.2, )"
+              "version": "[9.0.6, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[9.0.2, )"
+              "version": "[9.0.6, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.2, )"
+              "version": "[9.0.6, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -87,7 +88,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.202/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.205/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
