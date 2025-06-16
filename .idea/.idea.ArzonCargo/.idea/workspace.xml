@@ -14,84 +14,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3c7b22a2-1f9e-4ceb-993b-555550c4df8c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Application/UserData/Queries/UserById/UserByIdQueryHandler.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Application/UserData/Queries/UsersByPagination/UsersByPaginationQueryHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.ArzonCargo/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ArzonCargo/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/Application.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Application.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/obj/Application.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Application/obj/Application.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/obj/Application.csproj.nuget.g.props" beforeDir="false" afterPath="$PROJECT_DIR$/Application/obj/Application.csproj.nuget.g.props" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/obj/Application.csproj.nuget.g.targets" beforeDir="false" afterPath="$PROJECT_DIR$/Application/obj/Application.csproj.nuget.g.targets" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/obj/Debug/net9.0/Application.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/obj/Debug/net9.0/Application.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/obj/Debug/net9.0/Application.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Application/obj/Debug/net9.0/Application.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/obj/Debug/net9.0/Application.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/Application/obj/Debug/net9.0/Application.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/obj/Debug/net9.0/Application.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Application/obj/Debug/net9.0/Application.assets.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/Application/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Application/obj/project.nuget.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Application/obj/project.packagespec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/Application/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Application/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/Application/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/Domain.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/Domain.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/obj/Debug/net9.0/Domain.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/obj/Debug/net9.0/Domain.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/obj/Debug/net9.0/Domain.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/obj/Debug/net9.0/Domain.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/obj/Debug/net9.0/Domain.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/obj/Debug/net9.0/Domain.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/obj/Debug/net9.0/Domain.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/obj/Debug/net9.0/Domain.assets.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/obj/Domain.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/obj/Domain.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/obj/Domain.csproj.nuget.g.props" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/obj/Domain.csproj.nuget.g.props" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/obj/Domain.csproj.nuget.g.targets" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/obj/Domain.csproj.nuget.g.targets" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/obj/project.nuget.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/obj/project.packagespec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Domain/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/Infrastructure.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/Infrastructure.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/obj/Debug/net9.0/Infrastructure.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/obj/Debug/net9.0/Infrastructure.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/obj/Debug/net9.0/Infrastructure.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/obj/Debug/net9.0/Infrastructure.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/obj/Debug/net9.0/Infrastructure.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/obj/Debug/net9.0/Infrastructure.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/obj/Debug/net9.0/Infrastructure.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/obj/Debug/net9.0/Infrastructure.assets.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/obj/Infrastructure.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/obj/Infrastructure.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/obj/Infrastructure.csproj.nuget.g.props" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/obj/Infrastructure.csproj.nuget.g.props" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/obj/Infrastructure.csproj.nuget.g.targets" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/obj/Infrastructure.csproj.nuget.g.targets" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/obj/project.nuget.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/obj/project.packagespec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Infrastructure/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Controllers/OrderItemController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Controllers/OrderItemController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/DependencyInjection.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/DependencyInjection.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Dtos/Request/UserCreate.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Dtos/Request/UserCreate.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Dtos/Response/UserResponse.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Dtos/Response/UserResponse.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Infrastructure/Configurations/OrderConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/Configurations/OrderConfiguration.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Infrastructure/Configurations/OrderItemConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/Configurations/OrderItemConfiguration.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Infrastructure/Configurations/ProductConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/Configurations/ProductConfiguration.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Infrastructure/Configurations/UserConfiguration.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/Configurations/UserConfiguration.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Infrastructure/Data/ApplicationContext.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Infrastructure/Data/ApplicationContext.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Models/Enums/Role.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/Models/Enums/Role.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Models/Enums/Status.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/Models/Enums/Status.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Models/Order.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/Models/Order.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Models/OrderItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/Models/OrderItem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Models/PocketItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/Models/PockedItem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Models/Product.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/Models/Product.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Models/User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Domain/Models/User.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Repository/Interfaces/IOrderItemRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Repository/Interfaces/IOrderItemRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Repository/Interfaces/IOrderRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Repository/Interfaces/IOrderRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Repository/Interfaces/IUserRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Repository/Interfaces/IUserRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Repository/OrderItemRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Repository/OrderItemRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Repository/OrderRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Repository/OrderRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/Repository/UserRepository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/Repository/UserRepository.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/UserData/Commands/CreateUser/CreateUserCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/UserData/Commands/CreateUser/CreateUserCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/UserData/Commands/CreateUser/CreateUserHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/UserData/Commands/CreateUser/CreateUserHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/UserData/Commands/DeleteUser/DeleteUserCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/UserData/Commands/DeleteUser/DeleteUserCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/UserData/Commands/DeleteUser/DeleteUserHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/UserData/Commands/DeleteUser/DeleteUserHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/UserData/Commands/UpdateUser/UpdateUserCommand.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/UserData/Commands/UpdateUser/UpdateUserCommand.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/UserData/Commands/UpdateUser/UpdateUserHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/UserData/Commands/UpdateUser/UpdateUserHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/UserData/Queries/GetUser/GetAllUserHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/UserData/Queries/GetUser/GetAllUserHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/UserData/Queries/GetUser/GetAllUserQuery.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/UserData/Queries/GetUser/GetAllUserQuery.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/UserData/Queries/UserById/UserByIdQuery.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/UserData/Queries/UserById/UserByIdQuery.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/UserData/Queries/UsersByPagination/UsersByPaginationQuery.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Application/UserData/Queries/UsersByPagination/UsersByPaginationQuery.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApi/WebApi.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/WebApi/WebApi.csproj" afterDir="false" />
-    </list>
+    <list default="true" id="3c7b22a2-1f9e-4ceb-993b-555550c4df8c" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -113,8 +36,8 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/ArzonCargo/UserData/Queries/GetUser/GetAllUserHandler.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/WebApplication1/Program.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Application/UserData/Queries/GetUser/GetAllUserHandler.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/Bobo/Base/C#/Cargo/Application/obj/Debug/net9.0/Application.AssemblyInfo.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -125,20 +48,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.ArzonCargo: http">
     <configuration name="ArzonCargo: http" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/WebApi/WebApi.csproj" />
@@ -269,7 +192,7 @@
       <option name="presentableId" value="Default" />
       <updated>1750028232880</updated>
       <workItem from="1750028234066" duration="9460000" />
-      <workItem from="1750094795016" duration="6501000" />
+      <workItem from="1750094795016" duration="6899000" />
     </task>
     <task id="LOCAL-00001" summary="added repositories, removed services, added mediatr and used for user (CreateUserCommand and CreateUserCommandHandler), added requests and responses">
       <option name="closed" value="true" />
@@ -311,7 +234,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750099837138</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="updated clear architecture">
+      <option name="closed" value="true" />
+      <created>1750101756376</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1750101756376</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -325,7 +256,8 @@
     <MESSAGE value="added crud operation for user" />
     <MESSAGE value="added UserByIdQuery, PocketItem and UserByPagination" />
     <MESSAGE value="added clear architecture" />
-    <option name="LAST_COMMIT_MESSAGE" value="added clear architecture" />
+    <MESSAGE value="updated clear architecture" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated clear architecture" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
