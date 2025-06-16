@@ -10,4 +10,5 @@ public interface IUserRepository
     Task<User> Delete(User user);
 
     Task<User?> GetById(int id);
+    Task<IEnumerable<User>> GetUserByPagination(int page, int pageSize, CancellationToken cancellationToken);
 }

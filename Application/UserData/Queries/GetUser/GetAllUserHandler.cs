@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Application.UserData.Queries.GetUser;
 
-
+public record GetAllUserQuery : IRequest<IEnumerable<UserResponse>>;
 
 public class GetAllUserHandler(IUserRepository userRepository, IMapper mapper)
     : IRequestHandler<GetAllUserQuery, IEnumerable<UserResponse>>

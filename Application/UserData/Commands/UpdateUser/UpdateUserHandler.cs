@@ -6,6 +6,13 @@ using MediatR;
 
 namespace Application.UserData.Commands.UpdateUser;
 
+public record UpdateUserCommand : IRequest<UserResponse>
+{
+    public string? Name { get; set; }
+    public string? Phone { get; set; }
+    public string? Address { get; set; }
+}
+
 public class UpdateUserHandler(IUserRepository userRepository, IMapper mapper)
     : IRequestHandler<UpdateUserCommand, UserResponse>
 {

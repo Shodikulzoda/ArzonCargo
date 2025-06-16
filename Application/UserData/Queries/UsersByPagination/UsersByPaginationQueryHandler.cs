@@ -5,19 +5,17 @@ using MediatR;
 
 namespace Application.UserData.Queries.UsersByPagination;
 
-public class UsersByPaginationQueryHandler : IRequestHandler<UsersByPaginationQuery, List<UserResponse>>
+public record UsersByPaginationQuery(int Page, int PageSize) : IRequest<IEnumerable<UserResponse>>;
+
+public class UsersByPaginationQueryHandler(IUserRepository userRepository, IMapper mapper)
+    : IRequestHandler<UsersByPaginationQuery, IEnumerable<UserResponse>>
 {
-    private readonly IMapper _mapper;
-    private readonly IUserRepository _userRepository;
-
-    public UsersByPaginationQueryHandler(IUserRepository userRepository, IMapper mapper)
+    public async Task<IEnumerable<UserResponse>> Handle(UsersByPaginationQuery request,
+        CancellationToken cancellationToken)
     {
-        _mapper = mapper;
-        _userRepository = userRepository;
-    }
+        var users = await userRepository
+            .GetUserByPagination(request.Page, request.PageSize, cancellationToken);
 
-    public Task<List<UserResponse>> Handle(UsersByPaginationQuery request, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
+        return mapper.Map<IEnumerable<UserResponse>>(users);
     }
 }

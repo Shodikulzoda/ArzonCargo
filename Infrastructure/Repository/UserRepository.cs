@@ -44,4 +44,13 @@ public class UserRepository(ApplicationContext context) : IUserRepository
 
         return firstOrDefault;
     }
+
+    public async Task<IEnumerable<User>> GetUserByPagination(int page, int pageSize,
+        CancellationToken cancellationToken)
+    {
+        return await context.Users
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
 }
