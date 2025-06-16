@@ -4,10 +4,9 @@ namespace Application.Interfaces;
 
 public interface IOrderItemRepository
 {
-    OrderItem Add(OrderItem order);
-    IEnumerable<OrderItem> GetAll();
-    OrderItem Update(OrderItem order);
-    bool Delete(int id);
-    
-    OrderItem GetById(int id);
+    Task<OrderItem> Add(OrderItem orderItem);
+    Task<IEnumerable<OrderItem>> GetAll();
+    Task<OrderItem> Update(OrderItem orderItem);
+    Task<OrderItem> Delete(OrderItem orderItem);
+    Task<OrderItem?> GetById(int id);
 }

@@ -1,49 +1,43 @@
 ﻿using Application.Interfaces;
 using Domain.Models;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository;
 
 public class OrderItemRepository(ApplicationContext context) : IOrderItemRepository
 {
-    public IEnumerable<OrderItem> GetAll()
+    public async Task<OrderItem> Add(OrderItem order)
     {
-        return context.OrderItems.ToList();
-    }
-
-    public OrderItem GetById(int id)
-    {
-        var orderItem = context.OrderItems.FirstOrDefault(o => o.Id == id);
-        if (orderItem == null)
-            throw new Exception("OrderItem not found");
-        return orderItem;
-    }
-
-    public OrderItem Add(OrderItem order)
-    {
-        if (order is null)
-            throw new Exception("OrderItem is null");
         var entity = context.OrderItems.Add(order).Entity;
-        context.SaveChanges();
+        await context.SaveChangesAsync();
+
         return entity;
     }
 
-    public OrderItem Update(OrderItem order)
+    public async Task<IEnumerable<OrderItem>> GetAll()
     {
-        if (order is null)
-            throw new Exception("OrderItem is null");
+        return await context.OrderItems.ToListAsync();
+    }
+
+    public async Task<OrderItem?> GetById(int id)
+    {
+        return await context.OrderItems.FirstOrDefaultAsync(o => o.Id == id);
+    }
+
+    public async Task<OrderItem> Update(OrderItem order)
+    {
         context.OrderItems.Update(order);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
+
         return order;
     }
 
-    public bool Delete(int id)
+    public async Task<OrderItem> Delete(OrderItem orderItem)
     {
-        var orderItem = GetById(id);
-        if (orderItem == null)
-            throw new Exception("OrderItem not found");
         context.OrderItems.Remove(orderItem);
-        context.SaveChanges();
-        return true;
+        await context.SaveChangesAsync();
+
+        return orderItem;
     }
 }

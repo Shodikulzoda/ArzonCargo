@@ -1,45 +1,40 @@
 ﻿using Application.Interfaces;
 using Domain.Models;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository;
 
 public class OrderRepository(ApplicationContext context) : IOrderRepository
 {
-    public Order Add(Order order)
+    public async Task<Order> Add(Order order)
     {
         var entity = context.Orders.Add(order).Entity;
-        context.SaveChanges();
+        await context.SaveChangesAsync();
         return entity;
     }
 
-    public IEnumerable<Order> GetAll()
+    public async Task<IEnumerable<Order>> GetAll()
     {
-        throw new NotImplementedException();
+        return await context.Orders.ToListAsync();
     }
-    
-    public Order Update(Order order)
+
+    public async Task<Order> Update(Order order)
     {
         context.Orders.Update(order);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
         return order;
     }
 
-    public bool Delete(int id)
+    public async Task<Order> Delete(Order order)
     {
-        var order = GetById(id);
-        if (order == null)
-            throw new Exception("Order not found");
         context.Orders.Remove(order);
-        context.SaveChanges();
-        return true;
+        await context.SaveChangesAsync();
+        return order;
     }
 
-    public Order GetById(int id)
+    public async Task<Order?> GetById(int id)
     {
-        var order = context.Orders.FirstOrDefault(o => o.Id == id);
-        if (order == null)
-            throw new Exception("Order not found");
-        return order;
+        return await context.Orders.FirstOrDefaultAsync(o => o.Id == id);
     }
 }
