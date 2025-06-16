@@ -3134,11 +3134,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Bobo\\Base\\C#\\Cargo\\Infrastructure\\Infrastructure.csproj",
+      "projectUniqueName": "C:\\Users\\Bobo\\Base\\C#\\ArzonCargo\\Infrastructure\\Infrastructure.csproj",
       "projectName": "Infrastructure",
-      "projectPath": "C:\\Users\\Bobo\\Base\\C#\\Cargo\\Infrastructure\\Infrastructure.csproj",
+      "projectPath": "C:\\Users\\Bobo\\Base\\C#\\ArzonCargo\\Infrastructure\\Infrastructure.csproj",
       "packagesPath": "C:\\Users\\Bobo\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Bobo\\Base\\C#\\Cargo\\Infrastructure\\obj\\",
+      "outputPath": "C:\\Users\\Bobo\\Base\\C#\\ArzonCargo\\Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Bobo\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -3153,11 +3153,11 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\Users\\Bobo\\Base\\C#\\Cargo\\Application\\Application.csproj": {
-              "projectPath": "C:\\Users\\Bobo\\Base\\C#\\Cargo\\Application\\Application.csproj"
+            "C:\\Users\\Bobo\\Base\\C#\\ArzonCargo\\Application\\Application.csproj": {
+              "projectPath": "C:\\Users\\Bobo\\Base\\C#\\ArzonCargo\\Application\\Application.csproj"
             },
-            "C:\\Users\\Bobo\\Base\\C#\\Cargo\\Domain\\Domain.csproj": {
-              "projectPath": "C:\\Users\\Bobo\\Base\\C#\\Cargo\\Domain\\Domain.csproj"
+            "C:\\Users\\Bobo\\Base\\C#\\ArzonCargo\\Domain\\Domain.csproj": {
+              "projectPath": "C:\\Users\\Bobo\\Base\\C#\\ArzonCargo\\Domain\\Domain.csproj"
             }
           }
         }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "HBXjbDZDBms=",
+  "dgSpecHash": "oJmR4ITbw0I=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Bobo\\Base\\C#\\Cargo\\Application\\Application.csproj",
+  "projectFilePath": "C:\\Users\\Bobo\\Base\\C#\\ArzonCargo\\Application\\Application.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Bobo\\.nuget\\packages\\automapper\\14.0.0\\automapper.14.0.0.nupkg.sha512",
     "C:\\Users\\Bobo\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
