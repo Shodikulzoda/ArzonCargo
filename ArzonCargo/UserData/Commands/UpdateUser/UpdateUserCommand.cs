@@ -1,7 +1,7 @@
 ﻿using ArzonCargo.Dtos.Response;
 using MediatR;
 
-namespace ArzonCargo.Infrastructure.User.UpdateUser;
+namespace ArzonCargo.UserData.Commands.UpdateUser;
 
 public class UpdateUserCommand : IRequest<UserResponse>
 {

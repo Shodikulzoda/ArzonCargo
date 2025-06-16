@@ -1,6 +1,6 @@
 ﻿namespace ArzonCargo.Models;
 
-public class OrderItem
+public class PockedItem
 {
     public Guid Id { get; set; }
     public Guid ProductId { get; set; }
@@ -8,5 +8,4 @@ public class OrderItem
     public DateTime CreatedAt { get; set; }
     public Guid OrderId { get; set; }
     public Order? Order { get; set; }
-
 }

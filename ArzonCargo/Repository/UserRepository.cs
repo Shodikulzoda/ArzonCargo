@@ -1,4 +1,4 @@
-﻿using ArzonCargo.Data;
+﻿using ArzonCargo.Infrastructure.Data;
 using ArzonCargo.Models;
 using ArzonCargo.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;

@@ -3,7 +3,7 @@ using ArzonCargo.Repository.Interfaces;
 using AutoMapper;
 using MediatR;
 
-namespace ArzonCargo.Infrastructure.User.DeleteUser;
+namespace ArzonCargo.UserData.Commands.DeleteUser;
 
 public class DeleteUserHandler(IUserRepository userRepository, IMapper mapper)
     : IRequestHandler<DeleteUserCommand, UserResponse>

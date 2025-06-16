@@ -3,7 +3,7 @@ using ArzonCargo.Repository.Interfaces;
 using AutoMapper;
 using MediatR;
 
-namespace ArzonCargo.Infrastructure.User.CreateUser;
+namespace ArzonCargo.UserData.Commands.CreateUser;
 
 public class CreateUserHandler(IUserRepository userRepository, IMapper mapper)
     : IRequestHandler<CreateUserCommand, UserResponse>

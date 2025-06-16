@@ -2,7 +2,7 @@
 using ArzonCargo.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ArzonCargo.Data;
+namespace ArzonCargo.Infrastructure.Data;
 
 public class ApplicationContext(DbContextOptions<ApplicationContext> options) : DbContext(options)
 {

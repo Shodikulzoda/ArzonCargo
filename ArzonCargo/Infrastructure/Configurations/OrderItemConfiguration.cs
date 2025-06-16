@@ -12,8 +12,7 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 
         builder.HasKey(oi => oi.Id);
         builder.Property(oi => oi.Id).HasColumnType("char(36)");
-
-        builder.Property(oi => oi.Weight).HasColumnType("double");
+        
         builder.Property(oi => oi.CreatedAt).HasColumnType("datetime(6)");
 
         builder.Property(oi => oi.ProductId).HasColumnType("char(36)");

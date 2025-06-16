@@ -2,7 +2,7 @@
 using ArzonCargo.Models.Enums;
 using MediatR;
 
-namespace ArzonCargo.Infrastructure.User.CreateUser;
+namespace ArzonCargo.UserData.Commands.CreateUser;
 
 public class CreateUserCommand : IRequest<UserResponse>
 {

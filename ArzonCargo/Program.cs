@@ -1,15 +1,13 @@
-using ArzonCargo.Data;
+using ArzonCargo;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using ArzonCargo.Infrastructure;
-using ArzonCargo.Repository;
-using ArzonCargo.Repository.Interfaces;
-using ArzonCargo.Services;
-using ArzonCargo.Services.Interfaces;
+using ArzonCargo.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+builder.Services.Di();
 
 builder.Services.AddOpenApi();
 var connection = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -19,9 +17,6 @@ builder.Services.AddDbContext<ApplicationContext>((options) =>
     options.UseMySQL(connection!)
         .LogTo(Console.WriteLine, LogLevel.Information);
 });
-
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 
 builder.Services.AddSwaggerGen(c =>
 {

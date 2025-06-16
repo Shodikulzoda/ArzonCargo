@@ -3,7 +3,7 @@ using ArzonCargo.Models;
 using ArzonCargo.Models.Enums;
 using MediatR;
 
-namespace ArzonCargo.Infrastructure.User.GetUser;
+namespace ArzonCargo.UserData.Queries.GetUser;
 
 public class GetAllUserQuery : IRequest<IEnumerable<UserResponse>>
 {

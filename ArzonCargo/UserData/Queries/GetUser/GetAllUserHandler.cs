@@ -1,11 +1,11 @@
 ﻿using ArzonCargo.Dtos.Response;
-using ArzonCargo.Models;
-using ArzonCargo.Models.Enums;
 using ArzonCargo.Repository.Interfaces;
 using AutoMapper;
 using MediatR;
 
-namespace ArzonCargo.Infrastructure.User.GetUser;
+namespace ArzonCargo.UserData.Queries.GetUser;
+
+
 
 public class GetAllUserHandler(IUserRepository userRepository, IMapper mapper)
     : IRequestHandler<GetAllUserQuery, IEnumerable<UserResponse>>
@@ -14,7 +14,7 @@ public class GetAllUserHandler(IUserRepository userRepository, IMapper mapper)
     {
         var users = await userRepository.GetAll();
 
-        var userResponses = users.Select(mapper.Map<UserResponse>);
+        var userResponses = users.Select(((IMapperBase)mapper).Map<UserResponse>);
 
         return userResponses;
     }

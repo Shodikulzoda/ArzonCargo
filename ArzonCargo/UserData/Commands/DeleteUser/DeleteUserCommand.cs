@@ -1,7 +1,7 @@
 ﻿using ArzonCargo.Dtos.Response;
 using MediatR;
 
-namespace ArzonCargo.Infrastructure.User.DeleteUser;
+namespace ArzonCargo.UserData.Commands.DeleteUser;
 
 public class DeleteUserCommand : IRequest<UserResponse>
 {

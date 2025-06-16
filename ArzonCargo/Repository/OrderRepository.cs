@@ -1,9 +1,8 @@
-﻿using ArzonCargo.Data;
-using ArzonCargo.Infrastructure;
+﻿using ArzonCargo.Infrastructure.Data;
 using ArzonCargo.Models;
-using ArzonCargo.Services.Interfaces;
+using ArzonCargo.Repository.Interfaces;
 
-namespace ArzonCargo.Services;
+namespace ArzonCargo.Repository;
 
 public class OrderRepository(ApplicationContext context) : IOrderRepository
 {

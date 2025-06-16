@@ -1,7 +1,6 @@
-﻿using ArzonCargo.Data;
+﻿using ArzonCargo.Infrastructure.Data;
 using ArzonCargo.Models;
 using ArzonCargo.Repository.Interfaces;
-using ArzonCargo.Services.Interfaces;
 
 namespace ArzonCargo.Repository;
 

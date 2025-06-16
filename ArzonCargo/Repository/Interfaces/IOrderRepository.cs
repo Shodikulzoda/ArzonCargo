@@ -1,6 +1,6 @@
 ﻿using ArzonCargo.Models;
 
-namespace ArzonCargo.Services.Interfaces;
+namespace ArzonCargo.Repository.Interfaces;
 
 public interface IOrderRepository
 {
