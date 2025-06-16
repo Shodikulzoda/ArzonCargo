@@ -1,6 +1,6 @@
+using Application.Interfaces;
 using Domain.Models;
 using Infrastructure.Data;
-using Infrastructure.Repository.Interfaces;
 
 namespace Infrastructure.Repository;
 
@@ -11,7 +11,7 @@ public class PocketRepository(ApplicationContext context) : IPocketItemRepositor
         return context.PocketItem.ToList();
     }
 
-    public PocketItem GetById(Guid id)
+    public PocketItem GetById(int id)
     {
         var pocketItem = context.PocketItem.FirstOrDefault(o => o.Id == id);
         if (pocketItem == null)
@@ -19,7 +19,7 @@ public class PocketRepository(ApplicationContext context) : IPocketItemRepositor
         return pocketItem;
     }
 
-    public PocketItem Create(PocketItem pocket)
+    public PocketItem Add(PocketItem pocket)
     {
         var entity = context.PocketItem.Add(pocket).Entity;
         context.SaveChanges();
@@ -36,7 +36,7 @@ public class PocketRepository(ApplicationContext context) : IPocketItemRepositor
         return pocket;
     }
 
-    public bool Delete(Guid id)
+    public bool Delete(int id)
     {
         var pocketItem = GetById(id);
         if (pocketItem == null)

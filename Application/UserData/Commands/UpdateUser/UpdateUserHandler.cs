@@ -1,7 +1,7 @@
 ﻿using Application.Dtos.Response;
+using Application.Interfaces;
 using AutoMapper;
 using Domain.Models;
-using Infrastructure.Repository.Interfaces;
 using MediatR;
 
 namespace Application.UserData.Commands.UpdateUser;

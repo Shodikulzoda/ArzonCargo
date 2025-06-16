@@ -1,13 +1,13 @@
 ﻿using Domain.Models;
 
-namespace Infrastructure.Repository.Interfaces;
+namespace Application.Interfaces;
 
 public interface IOrderItemRepository
 {
-    OrderItem Create(OrderItem order);
+    OrderItem Add(OrderItem order);
     IEnumerable<OrderItem> GetAll();
     OrderItem Update(OrderItem order);
-    bool Delete(Guid id);
+    bool Delete(int id);
     
-    OrderItem GetById(Guid id);
+    OrderItem GetById(int id);
 }

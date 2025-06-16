@@ -1,6 +1,6 @@
+using Application.Interfaces;
 using Domain.Models;
 using Infrastructure.Data;
-using Infrastructure.Repository.Interfaces;
 
 namespace Infrastructure.Repository;
 
@@ -11,7 +11,7 @@ public class ProductRepository(ApplicationContext context) : IProductRepository
         return context.Products.ToList();
     }
 
-    public Product GetById(Guid id)
+    public Product GetById(int id)
     {
         var product = context.Products.FirstOrDefault(o => o.Id == id);
         if (product == null)
@@ -19,7 +19,7 @@ public class ProductRepository(ApplicationContext context) : IProductRepository
         return product;
     }
 
-    public Product Create(Product product)
+    public Product Add(Product product)
     {
         var entity = context.Products.Add(product).Entity;
         context.SaveChanges();
@@ -36,7 +36,7 @@ public class ProductRepository(ApplicationContext context) : IProductRepository
         return product;
     }
 
-    public bool Delete(Guid id)
+    public bool Delete(int id)
     {
         var product = GetById(id);
         if (product == null)

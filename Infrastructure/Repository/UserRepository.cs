@@ -1,6 +1,6 @@
-﻿using Domain.Models;
+﻿using Application.Interfaces;
+using Domain.Models;
 using Infrastructure.Data;
-using Infrastructure.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository;
@@ -38,7 +38,7 @@ public class UserRepository(ApplicationContext context) : IUserRepository
         return user;
     }
 
-    public async Task<User?> GetById(Guid id)
+    public async Task<User?> GetById(int id)
     {
         var firstOrDefault = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
 

@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Application.UserData.Queries.UserById;
 
-public record UserByIdQuery(Guid Id) : IRequest<UserResponse>;
+public record UserByIdQuery(int Id) : IRequest<UserResponse>;

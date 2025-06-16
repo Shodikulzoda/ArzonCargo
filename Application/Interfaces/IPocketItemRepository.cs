@@ -1,13 +1,13 @@
 using Domain.Models;
 
-namespace Infrastructure.Repository.Interfaces;
+namespace Application.Interfaces;
 
 public interface IPocketItemRepository
 {
     IEnumerable<PocketItem> GetAll();
-    PocketItem GetById(Guid id);
-    PocketItem Create(PocketItem pocket);
+    PocketItem GetById(int id);
+    PocketItem Add(PocketItem pocket);
     PocketItem Update(PocketItem pocket);
-    bool Delete(Guid id);
+    bool Delete(int id);
 
 }

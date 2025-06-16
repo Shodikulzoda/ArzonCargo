@@ -1,6 +1,6 @@
 using Application.Dtos.Response;
+using Application.Interfaces;
 using AutoMapper;
-using Infrastructure.Repository.Interfaces;
 using MediatR;
 
 namespace Application.UserData.Queries.UserById;

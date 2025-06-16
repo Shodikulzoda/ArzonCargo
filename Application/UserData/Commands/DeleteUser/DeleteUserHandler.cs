@@ -1,10 +1,15 @@
 ﻿using Application.Dtos.Response;
+using Application.Interfaces;
 using AutoMapper;
 using Domain.Models;
-using Infrastructure.Repository.Interfaces;
 using MediatR;
 
 namespace Application.UserData.Commands.DeleteUser;
+
+public record DeleteUserCommand : IRequest<UserResponse>
+{
+    public int Id { get; set; }
+}
 
 public class DeleteUserHandler(IUserRepository userRepository, IMapper mapper)
     : IRequestHandler<DeleteUserCommand, UserResponse>

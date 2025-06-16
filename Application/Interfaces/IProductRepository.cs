@@ -1,12 +1,12 @@
 using Domain.Models;
 
-namespace Infrastructure.Repository.Interfaces;
+namespace Application.Interfaces;
 
 public interface IProductRepository
 {
     IEnumerable<Product> GetAll();
-    Product GetById(Guid id);
-    Product Create(Product product);
+    Product GetById(int id);
+    Product Add(Product product);
     Product Update(Product product);
-    bool Delete(Guid id);
+    bool Delete(int id);
 }

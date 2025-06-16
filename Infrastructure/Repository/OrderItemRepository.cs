@@ -1,6 +1,6 @@
-﻿using Domain.Models;
+﻿using Application.Interfaces;
+using Domain.Models;
 using Infrastructure.Data;
-using Infrastructure.Repository.Interfaces;
 
 namespace Infrastructure.Repository;
 
@@ -11,7 +11,7 @@ public class OrderItemRepository(ApplicationContext context) : IOrderItemReposit
         return context.OrderItems.ToList();
     }
 
-    public OrderItem GetById(Guid id)
+    public OrderItem GetById(int id)
     {
         var orderItem = context.OrderItems.FirstOrDefault(o => o.Id == id);
         if (orderItem == null)
@@ -19,7 +19,7 @@ public class OrderItemRepository(ApplicationContext context) : IOrderItemReposit
         return orderItem;
     }
 
-    public OrderItem Create(OrderItem order)
+    public OrderItem Add(OrderItem order)
     {
         if (order is null)
             throw new Exception("OrderItem is null");
@@ -37,7 +37,7 @@ public class OrderItemRepository(ApplicationContext context) : IOrderItemReposit
         return order;
     }
 
-    public bool Delete(Guid id)
+    public bool Delete(int id)
     {
         var orderItem = GetById(id);
         if (orderItem == null)

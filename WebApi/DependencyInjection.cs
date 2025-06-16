@@ -1,5 +1,5 @@
+using Application.Interfaces;
 using Infrastructure.Repository;
-using Infrastructure.Repository.Interfaces;
 
 namespace WebApi;
 
