@@ -1,29 +1,27 @@
-using ArzonCargo.Models;
+using ArzonCargo.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using ArzonCargo.Infrastructure;
-using ArzonCargo.Repositories.Interfaces;
+using ArzonCargo.Repository;
+using ArzonCargo.Repository.Interfaces;
 using ArzonCargo.Services;
+using ArzonCargo.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
 builder.Services.AddOpenApi();
 var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<ApplicationContext>((sp, options) =>
+builder.Services.AddDbContext<ApplicationContext>((options) =>
 {
     options.UseMySQL(connection!)
         .LogTo(Console.WriteLine, LogLevel.Information);
-    // .AddInterceptors(sp.GetRequiredService<SavingInterceptor>());
 });
 
-builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<IOrderItemService, OrderItemService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -38,7 +36,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
     app.UseSwagger();
     app.UseSwaggerUI(options => { options.EnableTryItOutByDefault(); });
 }
-
 
 using (var scope = app.Services.CreateScope())
 {

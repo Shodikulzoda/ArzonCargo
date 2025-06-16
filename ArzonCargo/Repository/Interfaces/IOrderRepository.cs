@@ -1,8 +1,8 @@
 ﻿using ArzonCargo.Models;
 
-namespace ArzonCargo.Repositories.Interfaces;
+namespace ArzonCargo.Services.Interfaces;
 
-public interface IOrderService
+public interface IOrderRepository
 {
     IEnumerable<Order> GetAll();
     Order GetById(Guid id);

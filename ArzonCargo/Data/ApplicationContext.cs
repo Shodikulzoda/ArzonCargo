@@ -2,7 +2,7 @@
 using ArzonCargo.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ArzonCargo.Infrastructure;
+namespace ArzonCargo.Data;
 
 public class ApplicationContext(DbContextOptions<ApplicationContext> options) : DbContext(options)
 {
@@ -13,10 +13,8 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var assembly = typeof(UserConfiguration).Assembly;
-        
-        modelBuilder.ApplyConfigurationsFromAssembly(assembly);
-        
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly);
+
         base.OnModelCreating(modelBuilder);
     }
 }

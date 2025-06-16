@@ -1,22 +1,23 @@
-﻿using ArzonCargo.Infrastructure;
+﻿using ArzonCargo.Data;
 using ArzonCargo.Models;
-using ArzonCargo.Repositories.Interfaces;
+using ArzonCargo.Repository.Interfaces;
+using ArzonCargo.Services.Interfaces;
 
-namespace ArzonCargo.Services;
+namespace ArzonCargo.Repository;
 
-public class OrderItemService(ApplicationContext context) : IOrderItemService
+public class OrderItemRepository(ApplicationContext context) : IOrderItemRepository
 {
     public IEnumerable<OrderItem> GetAll()
     {
-      return  context.OrderItems.ToList();
+        return context.OrderItems.ToList();
     }
 
     public OrderItem GetById(Guid id)
     {
-      var orderItem = context.OrderItems.FirstOrDefault(o => o.Id == id);
-      if (orderItem == null) 
-          throw new Exception("OrderItem not found");
-      return orderItem;
+        var orderItem = context.OrderItems.FirstOrDefault(o => o.Id == id);
+        if (orderItem == null)
+            throw new Exception("OrderItem not found");
+        return orderItem;
     }
 
     public OrderItem Create(OrderItem order)

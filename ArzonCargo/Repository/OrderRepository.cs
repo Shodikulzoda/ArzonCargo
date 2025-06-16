@@ -1,10 +1,11 @@
-﻿using ArzonCargo.Infrastructure;
+﻿using ArzonCargo.Data;
+using ArzonCargo.Infrastructure;
 using ArzonCargo.Models;
-using ArzonCargo.Repositories.Interfaces;
+using ArzonCargo.Services.Interfaces;
 
 namespace ArzonCargo.Services;
 
-public class OrderService(ApplicationContext context) : IOrderService
+public class OrderRepository(ApplicationContext context) : IOrderRepository
 {
     public IEnumerable<Order> GetAll()
     {

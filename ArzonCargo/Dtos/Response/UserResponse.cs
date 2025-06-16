@@ -1,8 +1,9 @@
-﻿using ArzonCargo.Models.Enums;
+﻿using ArzonCargo.Models;
+using ArzonCargo.Models.Enums;
 
-namespace ArzonCargo.Models;
+namespace ArzonCargo.Dtos.Response;
 
-public class User
+public class UserResponse
 {
     public Guid Id { get; set; }
     public string? Name { get; set; }
@@ -10,6 +11,5 @@ public class User
     public string? Address { get; set; }
     public Role Role { get; set; }
     public DateTime CreatedAt { get; set; }
-
     public ICollection<Order> Orders { get; set; }
 }

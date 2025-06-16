@@ -5,10 +5,10 @@ namespace ArzonCargo.Models;
 public class Order
 {
     public Guid Id { get; set; }
-    public string BarCode { get; set; }
+    public string? BarCode { get; set; }
     public double TotalAmount { get; set; }
     public double TotalWeight { get; set; }
-    public int Status { get; set; }
+    public Status Status { get; set; }
     public Guid UserId { get; set; }
     public DateTime CreatedAt { get; set; }
 
