@@ -1,48 +1,49 @@
 using Application.Interfaces;
 using Domain.Models;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository;
 
 public class PocketRepository(ApplicationContext context) : IPocketItemRepository
 {
-    public IEnumerable<PocketItem> GetAll()
+    public async Task<IEnumerable<PocketItem>> GetAll()
     {
-        return context.PocketItem.ToList();
+        return await context.PocketItem.ToListAsync();
     }
 
-    public PocketItem GetById(int id)
+    public async Task<PocketItem?> GetById(int id)
     {
-        var pocketItem = context.PocketItem.FirstOrDefault(o => o.Id == id);
-        if (pocketItem == null)
-            throw new Exception("PocketItem not found");
+        var pocketItem = await context.PocketItem.FirstOrDefaultAsync(o => o.Id == id);
+        if (pocketItem is null)
+        {
+            return null;
+        }
+
         return pocketItem;
     }
 
-    public PocketItem Add(PocketItem pocket)
+    public async Task<PocketItem> Add(PocketItem pocketItem)
     {
-        var entity = context.PocketItem.Add(pocket).Entity;
-        context.SaveChanges();
-        return entity;
+        await context.PocketItem.AddAsync(pocketItem);
+        await context.SaveChangesAsync();
+
+        return pocketItem;
     }
 
-    public PocketItem Update(PocketItem pocket)
+    public async Task<PocketItem> Update(PocketItem pocketItem)
     {
-        var existing = GetById(pocket.Id);
-        if (existing == null)
-            throw new Exception("PocketItem not found");
-        context.PocketItem.Update(pocket);
-        context.SaveChanges();
-        return pocket;
+        context.PocketItem.Update(pocketItem);
+        await context.SaveChangesAsync();
+
+        return pocketItem;
     }
 
-    public bool Delete(int id)
+    public async Task<PocketItem> Delete(PocketItem pocketItem)
     {
-        var pocketItem = GetById(id);
-        if (pocketItem == null)
-            throw new Exception("PocketItem not found");
         context.PocketItem.Remove(pocketItem);
-        context.SaveChanges();
-        return true;
+        await context.SaveChangesAsync();
+
+        return pocketItem;
     }
 }

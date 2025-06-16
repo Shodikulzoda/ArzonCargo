@@ -1,48 +1,43 @@
 using Application.Interfaces;
 using Domain.Models;
 using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository;
 
 public class ProductRepository(ApplicationContext context) : IProductRepository
 {
-    public IEnumerable<Product> GetAll()
+    public async Task<Product> Add(Product product)
     {
-        return context.Products.ToList();
-    }
+        await context.Products.AddAsync(product);
+        await context.SaveChangesAsync();
 
-    public Product GetById(int id)
-    {
-        var product = context.Products.FirstOrDefault(o => o.Id == id);
-        if (product == null)
-            throw new Exception("Product not found");
         return product;
     }
 
-    public Product Add(Product product)
+    public async Task<IEnumerable<Product?>> GetAll()
     {
-        var entity = context.Products.Add(product).Entity;
-        context.SaveChanges();
-        return entity;
+        return await context.Products.ToListAsync();
     }
 
-    public Product Update(Product product)
+    public async Task<Product> Update(Product product)
     {
-        var existing = GetById(product.Id);
-        if (existing == null)
-            throw new Exception("Product not found");
         context.Products.Update(product);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
+
         return product;
     }
 
-    public bool Delete(int id)
+    public async Task<Product> Delete(Product product)
     {
-        var product = GetById(id);
-        if (product == null)
-            throw new Exception("Product not found");
         context.Products.Remove(product);
-        context.SaveChanges();
-        return true;
+        await context.SaveChangesAsync();
+
+        return product;
+    }
+
+    public async Task<Product?> GetById(int id)
+    {
+        return await context.Products.FirstOrDefaultAsync(o => o.Id == id);
     }
 }

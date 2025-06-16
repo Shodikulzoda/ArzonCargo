@@ -4,10 +4,11 @@ namespace Application.Interfaces;
 
 public interface IPocketItemRepository
 {
-    IEnumerable<PocketItem> GetAll();
-    PocketItem GetById(int id);
-    PocketItem Add(PocketItem pocket);
-    PocketItem Update(PocketItem pocket);
-    bool Delete(int id);
+    Task<PocketItem> Add(PocketItem pocketItem);
+    Task<IEnumerable<PocketItem>> GetAll();
+    Task<PocketItem> Update(PocketItem pocketItem);
+    Task<PocketItem> Delete(PocketItem pocketItem);
+    
+    Task<PocketItem?> GetById(int id);
 
 }
