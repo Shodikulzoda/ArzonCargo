@@ -3129,36 +3129,35 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Alisher Olimov\\.nuget\\packages\\": {}
+    "C:\\Users\\Bobo\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Alisher Olimov\\RiderProjects\\ArzonCargo\\Infrastructure\\Infrastructure.csproj",
+      "projectUniqueName": "C:\\Users\\Bobo\\Base\\C#\\test\\Infrastructure\\Infrastructure.csproj",
       "projectName": "Infrastructure",
-      "projectPath": "C:\\Users\\Alisher Olimov\\RiderProjects\\ArzonCargo\\Infrastructure\\Infrastructure.csproj",
-      "packagesPath": "C:\\Users\\Alisher Olimov\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Alisher Olimov\\RiderProjects\\ArzonCargo\\Infrastructure\\obj\\",
+      "projectPath": "C:\\Users\\Bobo\\Base\\C#\\test\\Infrastructure\\Infrastructure.csproj",
+      "packagesPath": "C:\\Users\\Bobo\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Bobo\\Base\\C#\\test\\Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Alisher Olimov\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Bobo\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
       ],
       "sources": {
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\Users\\Alisher Olimov\\RiderProjects\\ArzonCargo\\Application\\Application.csproj": {
-              "projectPath": "C:\\Users\\Alisher Olimov\\RiderProjects\\ArzonCargo\\Application\\Application.csproj"
+            "C:\\Users\\Bobo\\Base\\C#\\test\\Application\\Application.csproj": {
+              "projectPath": "C:\\Users\\Bobo\\Base\\C#\\test\\Application\\Application.csproj"
             },
-            "C:\\Users\\Alisher Olimov\\RiderProjects\\ArzonCargo\\Domain\\Domain.csproj": {
-              "projectPath": "C:\\Users\\Alisher Olimov\\RiderProjects\\ArzonCargo\\Domain\\Domain.csproj"
+            "C:\\Users\\Bobo\\Base\\C#\\test\\Domain\\Domain.csproj": {
+              "projectPath": "C:\\Users\\Bobo\\Base\\C#\\test\\Domain\\Domain.csproj"
             }
           }
         }
@@ -3222,7 +3221,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.205/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.202/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
