@@ -5,7 +5,7 @@ using MediatR;
 
 namespace ArzonCargo.Infrastructure.User.CreateUser;
 
-public class CreateUserCommandHandler(IUserRepository userRepository, IMapper mapper)
+public class CreateUserHandler(IUserRepository userRepository, IMapper mapper)
     : IRequestHandler<CreateUserCommand, UserResponse>
 {
     public async Task<UserResponse> Handle(CreateUserCommand request, CancellationToken cancellationToken)

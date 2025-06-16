@@ -19,10 +19,4 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.1" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Infrastructure\User\DeleteUser\" />
-      <Folder Include="Infrastructure\User\GetUser\" />
-      <Folder Include="Infrastructure\User\UpdateUser\" />
-    </ItemGroup>
-
 </Project>

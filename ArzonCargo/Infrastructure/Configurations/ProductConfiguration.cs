@@ -11,10 +11,20 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.ToTable("products");
 
         builder.HasKey(p => p.Id);
-        builder.Property(p => p.Id).HasColumnType("char(36)");
 
-        builder.Property(p => p.BarCode).HasMaxLength(1);
-        builder.Property(p => p.Status).HasColumnType("int");
-        builder.Property(p => p.CreatedAt).HasColumnType("datetime(6)");
+        builder.Property(x => x.Id)
+            .HasColumnType("char(50)");
+
+        builder.Property(x => x.BarCode)
+            .HasColumnType("char(50)");
+
+        builder.Property(p => p.BarCode)
+            .IsRequired();
+
+        builder.Property(p => p.Status)
+            .HasColumnType("int");
+
+        builder.Property(p => p.CreatedAt)
+            .IsRequired();
     }
 }
