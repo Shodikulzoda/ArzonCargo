@@ -10,5 +10,5 @@ public class ProductResponse
     public Status Status { get; set; }
     public DateTime CreatedAt { get; set; }
 
-    public ICollection<OrderItem> OrderItems { get; set; }
+    public ICollection<OrderItemResponse> OrderItems { get; set; }
 }
