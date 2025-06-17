@@ -20,7 +20,7 @@ public class GetOrderByIdHandler(IOrderRepository orderRepository, IMapper mappe
             return null;
         }
 
-        var order = orderRepository.GetById(request.Id);
+        var order = await orderRepository.GetById(request.Id);
 
         return mapper.Map<OrderResponse>(order);
     }
