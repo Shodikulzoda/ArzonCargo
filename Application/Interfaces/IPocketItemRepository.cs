@@ -2,7 +2,7 @@ using Domain.Models;
 
 namespace Application.Interfaces;
 
-public interface IPocketItemRepository
+public interface IPocketItemRepository:IBaseRepository<PocketItem>
 {
     Task<PocketItem> Add(PocketItem pocketItem);
     Task<IEnumerable<PocketItem>> GetAll();

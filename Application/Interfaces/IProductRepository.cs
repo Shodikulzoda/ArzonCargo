@@ -2,7 +2,7 @@ using Domain.Models;
 
 namespace Application.Interfaces;
 
-public interface IProductRepository
+public interface IProductRepository:IBaseRepository<Product>
 {
     Task<Product> Add(Product product);
     Task<IEnumerable<Product?>> GetAll();
