@@ -1,8 +1,9 @@
-﻿using Domain.Models.Enums;
+using Domain.Models;
+using Domain.Models.Enums;
 
-namespace Domain.Models;
+namespace Application.Dtos.Response;
 
-public class Order
+public class OrderResponse
 {
     public int Id { get; set; }
     public string? BarCode { get; set; }

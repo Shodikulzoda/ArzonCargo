@@ -21,8 +21,4 @@
     <ItemGroup>
       <ProjectReference Include="..\Domain\Domain.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="Dtos\Response\ProductResponse.cs" />
-    </ItemGroup>
 </Project>
