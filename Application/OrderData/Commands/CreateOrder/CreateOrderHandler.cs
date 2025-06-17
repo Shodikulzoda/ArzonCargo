@@ -1,6 +1,5 @@
 using Application.Dtos.Response;
 using Application.Interfaces;
-using AutoMapper;
 using Domain.Models;
 using MediatR;
 
@@ -13,7 +12,7 @@ public record CreateOrderCommand : IRequest<OrderResponse>
     public int UserId { get; set; }
 }
 
-public class CreateOrderHandler(IOrderRepository orderRepository, IMapper mapper)
+public class CreateOrderHandler(IOrderRepository orderRepository)
     : IRequestHandler<CreateOrderCommand, OrderResponse?>
 {
     public async Task<OrderResponse?> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -23,10 +22,24 @@ public class CreateOrderHandler(IOrderRepository orderRepository, IMapper mapper
             return null;
         }
 
-        var order = mapper.Map<Order>(request);
+        var order = new Order()
+        {
+            BarCode = request.BarCode,
+            TotalWeight = request.TotalWeight,
+            UserId = request.UserId
+        };
 
-        await orderRepository.Add(order);
+        var add = await orderRepository.Add(order);
 
-        return mapper.Map<OrderResponse>(order);
+        return new OrderResponse()
+        {
+            Id = add.Id,
+            BarCode = add.BarCode,
+            TotalWeight = add.TotalWeight,
+            UserId = add.UserId,
+            CreatedAt = add.CreatedAt,
+            Status = add.Status,
+            TotalAmount = add.TotalAmount,
+        };
     }
 }

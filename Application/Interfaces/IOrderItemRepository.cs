@@ -2,7 +2,7 @@
 
 namespace Application.Interfaces;
 
-public interface IOrderItemRepository
+public interface IOrderItemRepository:IBaseRepository<OrderItem>
 {
     Task<OrderItem> Add(OrderItem orderItem);
     Task<IEnumerable<OrderItem>> GetAll();

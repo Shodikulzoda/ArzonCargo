@@ -1,0 +1,30 @@
+using MediatR;
+using WebApi.Application.Interfaces;
+using WebApi.Domain.Models;
+
+namespace WebApi.Application.OrderItemData.Commands.UpdateOrder;
+
+public record UpdateOrderItemCommand : IRequest<OrderItem>
+{
+    public int ProductId { get; set; }
+    public int OrderId { get; set; }
+}
+
+public class UpdateOrderItemHandler(IOrderItemRepository orderRepository)
+    : IRequestHandler<UpdateOrderItemCommand, OrderItem>
+{
+    public async Task<OrderItem> Handle(UpdateOrderItemCommand request, CancellationToken cancellationToken)
+    {
+        if (request.ProductId <= 0 || request.OrderId <= 0)
+        {
+            return null;
+        }
+
+        var orderItem = orderRepository.Querable
+            .FirstOrDefault(x => x.ProductId == request.ProductId || x.OrderId == request.OrderId);
+        
+        await orderRepository.Update(orderItem);
+
+        return orderItem;
+    }
+}
