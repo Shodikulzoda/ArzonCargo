@@ -5,7 +5,7 @@ using WebApi.Infrastructure.Data;
 
 namespace WebApi.Infrastructure.Repository;
 
-public class PocketRepository(ApplicationContext context) :BaseRepository<PocketItem>(context), IPocketItemRepository
+public class PocketRepository(ApplicationContext context) : BaseRepository<PocketItem>(context), IPocketItemRepository
 {
     public async Task<IEnumerable<PocketItem>> GetAll()
     {
@@ -45,5 +45,19 @@ public class PocketRepository(ApplicationContext context) :BaseRepository<Pocket
         await context.SaveChangesAsync();
 
         return pocketItem;
+    }
+
+    public async Task<int> Count()
+    {
+        return await context.PocketItem.CountAsync();
+    }
+
+    public async Task<IEnumerable<PocketItem>> GetPocketItemByPagination(int page, int pageSize,
+        CancellationToken cancellationToken)
+    {
+        return await context.PocketItem
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
     }
 }

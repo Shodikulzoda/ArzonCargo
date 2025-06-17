@@ -2,13 +2,12 @@ using MediatR;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Models;
 
-namespace WebApi.Application.OrderItemData.Commands.CreateOrder;
+namespace WebApi.Application.OrderItemData.Commands.CreateOrderItem;
 
 public record CreateOrderItemCommand : IRequest<OrderItem?>
 {
     public int ProductId { get; set; }
     public int OrderId { get; set; }
-    
 }
 
 public class CreateOrderItemHandler(IOrderItemRepository orderRepository)
@@ -26,7 +25,7 @@ public class CreateOrderItemHandler(IOrderItemRepository orderRepository)
             ProductId = request.ProductId,
             OrderId = request.OrderId
         };
-        
+
         await orderRepository.Add(order);
 
         return order;

@@ -8,5 +8,8 @@ public interface IOrderItemRepository:IBaseRepository<OrderItem>
     Task<IEnumerable<OrderItem>> GetAll();
     Task<OrderItem> Update(OrderItem orderItem);
     Task<bool> Delete(OrderItem orderItem);
+
     Task<OrderItem?> GetById(int id);
+    Task<int> Count();
+    Task<IEnumerable<OrderItem>> GetOrderItemByPagination(int page, int pageSize, CancellationToken cancellationToken);
 }

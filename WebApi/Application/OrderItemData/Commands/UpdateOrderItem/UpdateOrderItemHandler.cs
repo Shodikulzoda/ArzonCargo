@@ -2,7 +2,7 @@ using MediatR;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Models;
 
-namespace WebApi.Application.OrderItemData.Commands.UpdateOrder;
+namespace WebApi.Application.OrderItemData.Commands.UpdateOrderItem;
 
 public record UpdateOrderItemCommand : IRequest<OrderItem>
 {

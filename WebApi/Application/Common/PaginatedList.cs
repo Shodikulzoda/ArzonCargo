@@ -4,12 +4,12 @@ namespace WebApi.Application.Common;
 
 public class PaginatedList<T>
 {
-    public IReadOnlyCollection<T> Items { get; }
+    public IEnumerable<T> Items { get; }
     public int PageNumber { get; }
     public int TotalPages { get; }
     public int TotalCount { get; }
 
-    public PaginatedList(IReadOnlyCollection<T> items, int count, int pageNumber, int pageSize)
+    public PaginatedList(IEnumerable<T> items, int count, int pageNumber, int pageSize)
     {
         PageNumber = pageNumber;
         TotalPages = (int)Math.Ceiling(count / (double)pageSize);

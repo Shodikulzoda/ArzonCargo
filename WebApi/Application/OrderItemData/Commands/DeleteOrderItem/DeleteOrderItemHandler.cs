@@ -1,7 +1,7 @@
 using MediatR;
 using WebApi.Application.Interfaces;
 
-namespace WebApi.Application.OrderItemData.Commands.DeleteOrder;
+namespace WebApi.Application.OrderItemData.Commands.DeleteOrderItem;
 
 public record DeleteOrderItemCommand : IRequest<bool>
 {

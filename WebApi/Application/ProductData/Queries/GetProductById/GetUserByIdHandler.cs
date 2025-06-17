@@ -2,7 +2,7 @@ using MediatR;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Models;
 
-namespace WebApi.Application.ProductData.Queries.GetUserById;
+namespace WebApi.Application.ProductData.Queries.GetProductById;
 
 public record GetProductByIdQuery : IRequest<Product>
 {
