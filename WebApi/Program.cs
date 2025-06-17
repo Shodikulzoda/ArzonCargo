@@ -2,7 +2,7 @@ using WebApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using WebApi.Application.Interfaces;
-using WebApi.Application.ProductData.Queries.GetUserById;
+using WebApi.Application.ProductData.Queries.GetProductById;
 using WebApi.Application.UserData.Commands.CreateUser;
 using WebApi.Application.UserData.Commands.DeleteUser;
 using WebApi.Application.UserData.Commands.UpdateUser;
@@ -14,7 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.Di();
-builder.Services.AddScoped<IPocketItemRepository,PocketRepository>();
+builder.Services.AddScoped<IPocketItemRepository, PocketRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 

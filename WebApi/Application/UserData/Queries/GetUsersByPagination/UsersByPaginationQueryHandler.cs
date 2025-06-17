@@ -1,6 +1,5 @@
 using MediatR;
 using WebApi.Application.Common;
-using WebApi.Application.Dtos.Response;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Models;
 

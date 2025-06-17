@@ -37,8 +37,6 @@ public class OrderRepository(ApplicationContext context) : BaseRepository<Order>
     {
         return await context.Orders.FirstOrDefaultAsync(o => o.Id == id);
     }
-    
-
 
     public async Task<int> Count()
     {
