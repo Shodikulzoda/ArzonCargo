@@ -37,4 +37,18 @@ public class OrderRepository(ApplicationContext context) : BaseRepository<Order>
     {
         return await context.Orders.FirstOrDefaultAsync(o => o.Id == id);
     }
+
+    public async Task<int> Count()
+    {
+        return await context.Orders.CountAsync();
+    }
+
+    public async Task<IEnumerable<Order>> GetOrderByPagination(int page, int pageSize,
+        CancellationToken cancellationToken)
+    {
+        return await context.Orders
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
 }

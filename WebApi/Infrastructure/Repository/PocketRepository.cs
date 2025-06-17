@@ -46,4 +46,18 @@ public class PocketRepository(ApplicationContext context) : BaseRepository<Pocke
 
         return pocketItem;
     }
+
+    public async Task<int> Count()
+    {
+        return await context.PocketItem.CountAsync();
+    }
+
+    public async Task<IEnumerable<PocketItem>> GetPocketItemByPagination(int page, int pageSize,
+        CancellationToken cancellationToken)
+    {
+        return await context.PocketItem
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
 }

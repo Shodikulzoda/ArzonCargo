@@ -10,4 +10,8 @@ public interface IPocketItemRepository : IBaseRepository<PocketItem>
     Task<PocketItem> Delete(PocketItem pocketItem);
 
     Task<PocketItem?> GetById(int id);
+    Task<int> Count();
+
+    Task<IEnumerable<PocketItem>>
+        GetPocketItemByPagination(int page, int pageSize, CancellationToken cancellationToken);
 }
