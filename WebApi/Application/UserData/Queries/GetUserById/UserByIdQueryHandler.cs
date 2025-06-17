@@ -2,18 +2,18 @@ using MediatR;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Models;
 
-namespace WebApi.Application.UserData.Queries.UserById;
+namespace WebApi.Application.UserData.Queries.GetUserById;
 
 public record UserByIdQuery(int Id) : IRequest<User>;
 
 public class UserByIdQueryHandler(IUserRepository userRepository)
-    : IRequestHandler<UserByIdQuery, User
+    : IRequestHandler<UserByIdQuery, User?
     >
 {
-    public async Task<User> Handle(UserByIdQuery request, CancellationToken cancellationToken)
+    public async Task<User?> Handle(UserByIdQuery request, CancellationToken cancellationToken)
     {
         var user = await userRepository.GetById(request.Id);
 
-        return user;
+        return user ?? null;
     }
 }

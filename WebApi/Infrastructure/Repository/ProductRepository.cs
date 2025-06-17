@@ -40,4 +40,18 @@ public class ProductRepository(ApplicationContext context) : BaseRepository<Prod
     {
         return await context.Products.FirstOrDefaultAsync(o => o.Id == id);
     }
+
+    public async Task<int> Count()
+    {
+        return await context.Products.CountAsync();
+    }
+
+    public async Task<IEnumerable<Product>> GetProductByPagination(int page, int pageSize,
+        CancellationToken cancellationToken)
+    {
+        return await context.Products
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
 }

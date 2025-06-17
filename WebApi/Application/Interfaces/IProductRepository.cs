@@ -2,7 +2,7 @@ using WebApi.Domain.Models;
 
 namespace WebApi.Application.Interfaces;
 
-public interface IProductRepository:IBaseRepository<Product>
+public interface IProductRepository : IBaseRepository<Product>
 {
     Task<Product> Add(Product product);
     Task<IEnumerable<Product?>> GetAll();
@@ -10,4 +10,6 @@ public interface IProductRepository:IBaseRepository<Product>
     Task<Product> Delete(Product product);
 
     Task<Product?> GetById(int id);
+    Task<int> Count();
+    Task<IEnumerable<Product>> GetProductByPagination(int page, int pageSize, CancellationToken cancellationToken);
 }

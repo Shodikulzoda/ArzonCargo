@@ -5,7 +5,7 @@ using WebApi.Infrastructure.Data;
 
 namespace WebApi.Infrastructure.Repository;
 
-public class PocketRepository(ApplicationContext context) :BaseRepository<PocketItem>(context), IPocketItemRepository
+public class PocketRepository(ApplicationContext context) : BaseRepository<PocketItem>(context), IPocketItemRepository
 {
     public async Task<IEnumerable<PocketItem>> GetAll()
     {

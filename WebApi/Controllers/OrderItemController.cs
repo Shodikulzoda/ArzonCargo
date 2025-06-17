@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Application.OrderData.Commands.CreateOrder;
-using WebApi.Application.OrderItemData.Commands.CreateOrder;
+using WebApi.Application.OrderItemData.Commands.CreateOrderItem;
 using WebApi.Domain.Models;
 
 namespace WebApi.Controllers;

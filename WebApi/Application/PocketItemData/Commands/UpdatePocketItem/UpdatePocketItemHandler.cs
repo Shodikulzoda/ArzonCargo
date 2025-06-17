@@ -1,9 +1,8 @@
-
 using MediatR;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Models;
 
-namespace Application.PocketItemData.Commands.UpdatePocketItem;
+namespace WebApi.Application.PocketItemData.Commands.UpdatePocketItem;
 
 public record UpdatePocketItemCommand : IRequest<PocketItem>
 {

@@ -1,7 +1,7 @@
 using MediatR;
 using WebApi.Application.Interfaces;
 
-namespace Appplication.PocketItemData.Commands.DeletePocketItem;
+namespace WebApi.Application.PocketItemData.Commands.DeletePocketItem;
 
 public record DeletePocketItemCommand : IRequest<bool>
 {

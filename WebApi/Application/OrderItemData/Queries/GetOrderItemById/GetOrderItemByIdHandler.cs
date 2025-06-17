@@ -1,7 +1,7 @@
 using MediatR;
 using WebApi.Application.Interfaces;
 
-namespace WebApi.Application.OrderItemData.Queries.GetUserById;
+namespace WebApi.Application.OrderItemData.Queries.GetOrderItemById;
 
 public record GetOrderItemByIdQuery : IRequest<bool>
 {
