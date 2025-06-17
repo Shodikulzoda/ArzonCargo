@@ -4,7 +4,10 @@ using WebApi.Domain.Models;
 
 namespace WebApi.Application.UserData.Queries.UserById;
 
-public record UserByIdQuery(int Id) : IRequest<User>;
+public record UserByIdQuery : IRequest<User>
+{
+    public int Id { get; set; }
+}
 
 public class UserByIdQueryHandler(IUserRepository userRepository)
     : IRequestHandler<UserByIdQuery, User

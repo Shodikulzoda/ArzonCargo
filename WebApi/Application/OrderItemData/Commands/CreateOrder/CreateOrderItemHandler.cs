@@ -4,7 +4,7 @@ using WebApi.Domain.Models;
 
 namespace WebApi.Application.OrderItemData.Commands.CreateOrder;
 
-public record CreateOrderItemCommand : IRequest<OrderItem>
+public record CreateOrderItemCommand : IRequest<OrderItem?>
 {
     public int ProductId { get; set; }
     public int OrderId { get; set; }
@@ -12,7 +12,7 @@ public record CreateOrderItemCommand : IRequest<OrderItem>
 }
 
 public class CreateOrderItemHandler(IOrderItemRepository orderRepository)
-    : IRequestHandler<CreateOrderItemCommand, OrderItem>
+    : IRequestHandler<CreateOrderItemCommand, OrderItem?>
 {
     public async Task<OrderItem?> Handle(CreateOrderItemCommand request, CancellationToken cancellationToken)
     {

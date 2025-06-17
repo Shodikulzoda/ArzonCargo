@@ -9,5 +9,7 @@ public static class DependencyInjection
     {
         collection.AddScoped<IOrderRepository, OrderRepository>();
         collection.AddScoped<IOrderItemRepository, OrderItemRepository>();
+        collection.AddScoped<IUserRepository, UserRepository>();
+        
     }
 }

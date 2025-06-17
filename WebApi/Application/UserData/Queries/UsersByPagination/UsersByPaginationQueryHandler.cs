@@ -1,16 +1,16 @@
 using MediatR;
 using WebApi.Application.Common;
-using WebApi.Application.Dtos.Response;
 using WebApi.Application.Interfaces;
+using WebApi.Domain.Models;
 
 namespace WebApi.Application.UserData.Queries.UsersByPagination;
 
-public record UsersByPaginationQuery(int Page, int PageSize) : IRequest<PaginatedList<UserResponse>>;
+public record UsersByPaginationQuery(int Page, int PageSize) : IRequest<PaginatedList<User>>;
 
 public class UsersByPaginationQueryHandler(IUserRepository userRepository)
-    : IRequestHandler<UsersByPaginationQuery, PaginatedList<UserResponse>>
+    : IRequestHandler<UsersByPaginationQuery, PaginatedList<User>>
 {
-    public async Task<PaginatedList<UserResponse>> Handle(UsersByPaginationQuery request,
+    public async Task<PaginatedList<User>> Handle(UsersByPaginationQuery request,
         CancellationToken cancellationToken)
     {
         var users = await userRepository
@@ -18,16 +18,17 @@ public class UsersByPaginationQueryHandler(IUserRepository userRepository)
 
         var totalCount = await userRepository.Count();
 
-        List<UserResponse> userResponses = users
-            .Select(user => new UserResponse
+        List<User> userResponses = users
+            .Select(user => new User
             {
+                Id = user.Id,
                 Address = user.Address,
                 Phone = user.Phone,
                 Name = user.Name,
                 Role = user.Role
             })
             .ToList();
-        
-        return new PaginatedList<UserResponse>(userResponses, totalCount, request.Page, request.PageSize);
+
+        return new PaginatedList<User>(userResponses, totalCount, request.Page, request.PageSize);
     }
 }

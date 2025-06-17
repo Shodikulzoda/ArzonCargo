@@ -25,7 +25,7 @@ public class OrderItemController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetOrderItem(Guid id)
+    public IActionResult GetOrderItem(int id)
     {
         return Ok(id);
     }
@@ -36,6 +36,12 @@ public class OrderItemController : ControllerBase
         return Ok();
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetById(int id)
+    {
+        return Ok(await _mediator.Send(id));
+    }
+    
     [HttpPut]
     public IActionResult UpdateOrderItem(OrderItem orderItem)
     {
@@ -43,7 +49,7 @@ public class OrderItemController : ControllerBase
     }
 
     [HttpDelete]
-    public IActionResult DeleteOrderItem(Guid id)
+    public IActionResult DeleteOrderItem(int id)
     {
         return Ok(id);
     }

@@ -18,7 +18,6 @@ public class CreateUserHandler(IUserRepository userRepository)
 {
     public async Task<User> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
-
         var user = new User()
         {
             Name = request.Name,

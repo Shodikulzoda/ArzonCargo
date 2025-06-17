@@ -1,11 +1,10 @@
 using MediatR;
-using WebApi.Application.Dtos.Response;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Models;
 
 namespace WebApi.Application.OrderData.Commands.CreateOrder;
 
-public record CreateOrderCommand : IRequest<OrderResponse>
+public record CreateOrderCommand : IRequest<Order>
 {
     public string? BarCode { get; set; }
     public double TotalWeight { get; set; }
@@ -13,9 +12,9 @@ public record CreateOrderCommand : IRequest<OrderResponse>
 }
 
 public class CreateOrderHandler(IOrderRepository orderRepository)
-    : IRequestHandler<CreateOrderCommand, OrderResponse?>
+    : IRequestHandler<CreateOrderCommand, Order>
 {
-    public async Task<OrderResponse?> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+    public async Task<Order> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(request.BarCode))
         {
@@ -31,15 +30,6 @@ public class CreateOrderHandler(IOrderRepository orderRepository)
 
         var add = await orderRepository.Add(order);
 
-        return new OrderResponse()
-        {
-            Id = add.Id,
-            BarCode = add.BarCode,
-            TotalWeight = add.TotalWeight,
-            UserId = add.UserId,
-            CreatedAt = add.CreatedAt,
-            Status = add.Status,
-            TotalAmount = add.TotalAmount,
-        };
+        return add;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebApi.Application.Interfaces;
+using WebApi.Application.UserData.Queries.UserById;
 using WebApi.Domain.Models;
 using WebApi.Infrastructure.Data;
 
@@ -9,9 +10,10 @@ public class UserRepository(ApplicationContext context) : BaseRepository<User>(c
 {
     public async Task<User> Add(User user)
     {
-        context.Users.Add(user);
+        await context.Users.AddAsync(user);
         await context.SaveChangesAsync();
 
+        
         return user;
     }
 

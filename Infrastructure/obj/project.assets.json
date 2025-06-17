@@ -1017,6 +1017,23 @@
           "buildTransitive/net6.0/_._": {}
         }
       },
+      "Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "Domain": "1.0.0",
+          "MediatR": "12.5.0",
+          "Microsoft.AspNetCore.OpenApi": "9.0.6",
+          "Microsoft.EntityFrameworkCore": "9.0.6",
+          "Swashbuckle.AspNetCore": "9.0.1"
+        },
+        "compile": {
+          "bin/placeholder/Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Application.dll": {}
+        }
+      },
       "Domain/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
@@ -3055,6 +3072,11 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "Application/1.0.0": {
+      "type": "project",
+      "path": "../Application/Application.csproj",
+      "msbuildProject": "../Application/Application.csproj"
+    },
     "Domain/1.0.0": {
       "type": "project",
       "path": "../Domain/Domain.csproj",
@@ -3063,7 +3085,7 @@
   },
   "projectFileDependencyGroups": {
     "net9.0": [
-      "C:\\Users\\Alisher Olimov\\RiderProjects\\ArzonCargo\\Application\\Application.csproj",
+      "Application >= 1.0.0",
       "Domain >= 1.0.0",
       "MediatR >= 12.5.0",
       "Microsoft.AspNetCore.OpenApi >= 9.0.6",
@@ -3165,16 +3187,5 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.205/PortableRuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1105",
-      "level": "Error",
-      "message": "Unable to find project information for 'C:\\Users\\Alisher Olimov\\RiderProjects\\ArzonCargo\\Application\\Application.csproj'. If you are using Visual Studio, this may be because the project is unloaded or not part of the current solution so run a restore from the command-line. Otherwise, the project file may be invalid or missing targets required for restore.",
-      "libraryId": "C:\\Users\\Alisher Olimov\\RiderProjects\\ArzonCargo\\Application\\Application.csproj",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    }
-  ]
+  }
 }

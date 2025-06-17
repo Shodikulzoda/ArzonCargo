@@ -1,10 +1,11 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Models;
 
 namespace WebApi.Application.UserData.Commands.UpdateUser;
 
-public record UpdateUserCommand : IRequest<User>
+public record UpdateUserCommand(int Id) : IRequest<User>
 {
     public string? Name { get; set; }
     public string? Phone { get; set; }
@@ -12,17 +13,18 @@ public record UpdateUserCommand : IRequest<User>
 }
 
 public class UpdateUserHandler(IUserRepository userRepository)
-    : IRequestHandler<UpdateUserCommand, User>
+    : IRequestHandler<UpdateUserCommand, User?>
 {
-    public async Task<User> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+    public async Task<User?> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
-        var user = new User()
-        {
-            Name = request.Name,
-            Phone = request.Phone,
-            Address = request.Address
-        };
-        
+        var user = await userRepository.GetById(request.Id);
+        if (user is null)
+            return null;
+
+        user.Name = request.Name;
+        user.Phone = request.Phone;
+        user.Address = request.Address;
+
         await userRepository.Update(user);
 
         return user;

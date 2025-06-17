@@ -33,11 +33,11 @@ public class OrderItemRepository(ApplicationContext context) : BaseRepository<Or
         return order;
     }
 
-    public async Task<OrderItem> Delete(OrderItem orderItem)
+    public async Task<bool> Delete(OrderItem orderItem)
     {
         context.OrderItems.Remove(orderItem);
         await context.SaveChangesAsync();
 
-        return orderItem;
+        return true;
     }
 }
