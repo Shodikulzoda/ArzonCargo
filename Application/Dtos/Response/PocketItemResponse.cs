@@ -1,0 +1,13 @@
+using Domain.Models;
+
+namespace Application.Dtos.Response;
+
+public class PocketItemResponse
+{
+    public int Id { get; set; }
+    public int ProductId { get; set; }
+    public Product? Product { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public int OrderId { get; set; }
+    public Order? Order { get; set; }
+}

@@ -14,5 +14,5 @@ public class OrderResponse
     public User? User { get; set; }
     public DateTime CreatedAt { get; set; }
     public ICollection<PocketItem> PocketItem { get; set; }
-    public ICollection<OrderItem> OrderItems { get; set; }
+    public ICollection<OrderItemResponse> OrderItems { get; set; }
 }

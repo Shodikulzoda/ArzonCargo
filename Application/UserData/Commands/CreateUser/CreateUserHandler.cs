@@ -20,6 +20,7 @@ public class CreateUserHandler(IUserRepository userRepository, IMapper mapper)
 {
     public async Task<UserResponse> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
+        
         var user = mapper.Map<User>(request);
 
         await userRepository.Add(user);
