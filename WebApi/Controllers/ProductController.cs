@@ -12,11 +12,13 @@ namespace WebApi.Controllers;
 [Route("[controller]/[action]")]
 public class ProductController(IMediator mediator) : ControllerBase
 {
+    [HttpPost]
     public async Task<IActionResult> Add(CreateProductCommand createProductCommand)
     {
         return Ok(await mediator.Send(createProductCommand));
     }
 
+    [HttpGet]
     public async Task<IActionResult> GetAll()
     {
         return Ok(await mediator.Send(new GetAllProductQuery()));

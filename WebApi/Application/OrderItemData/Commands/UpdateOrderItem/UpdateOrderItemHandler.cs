@@ -12,9 +12,9 @@ public record UpdateOrderItemCommand : IRequest<OrderItem>
 }
 
 public class UpdateOrderItemHandler(IOrderItemRepository orderRepository)
-    : IRequestHandler<UpdateOrderItemCommand, OrderItem>
+    : IRequestHandler<UpdateOrderItemCommand, OrderItem?>
 {
-    public async Task<OrderItem> Handle(UpdateOrderItemCommand request, CancellationToken cancellationToken)
+    public async Task<OrderItem?> Handle(UpdateOrderItemCommand request, CancellationToken cancellationToken)
     {
         if (request.ProductId <= 0 || request.OrderId <= 0)
         {
@@ -22,7 +22,7 @@ public class UpdateOrderItemHandler(IOrderItemRepository orderRepository)
         }
 
         var orderItem = orderRepository.Querable
-            .FirstOrDefault(x => x.ProductId == request.ProductId || x.OrderId == request.OrderId);
+            .FirstOrDefault(x => x.ProductId == request.ProductId && x.OrderId == request.OrderId);
         
         await orderRepository.Update(orderItem);
 

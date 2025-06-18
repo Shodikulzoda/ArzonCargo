@@ -11,28 +11,24 @@ public record CreateOrderItemCommand : IRequest<OrderItem?>
     public int OrderId { get; set; }
 }
 
-public class CreateOrderItemHandler : IRequestHandler<CreateOrderItemCommand, OrderItem?>
+public class CreateOrderItemHandler(IOrderItemRepository orderRepository, IProductRepository productRepository)
+    : IRequestHandler<CreateOrderItemCommand, OrderItem?>
 {
-    private readonly IOrderItemRepository _orderRepository;
-    private readonly IMediator _mediator;
-
-    public CreateOrderItemHandler(IOrderItemRepository orderRepository, IMediator mediator)
-    {
-        _orderRepository = orderRepository;
-        _mediator = mediator;
-    }
-
     public async Task<OrderItem?> Handle(CreateOrderItemCommand request, CancellationToken cancellationToken)
     {
-        await _mediator.Send(new GetProductByIdQuery { Id = request.ProductId }, cancellationToken);
+        var product = await productRepository.GetById(request.ProductId);
+        if (product is null)
+        {
+            return null;
+        }
 
-        var order = new OrderItem()
+        var order = new OrderItem
         {
             ProductId = request.ProductId,
             OrderId = request.OrderId
         };
 
-        await _orderRepository.Add(order);
+        await orderRepository.Add(order);
 
         return order;
     }

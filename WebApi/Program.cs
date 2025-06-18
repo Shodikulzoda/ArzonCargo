@@ -1,16 +1,11 @@
 using System.Text.Json.Serialization;
-using WebApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using WebApi.Application.Interfaces;
 using WebApi.Application.OrderData.Commands.CreateOrder;
-using WebApi.Application.OrderData.Commands.DeleteOrder;
-using WebApi.Application.OrderData.Commands.UpdateOrder;
-using WebApi.Application.OrderData.Queries.GetOrderById;
-using WebApi.Application.ProductData.Queries.GetProductById;
+using WebApi.Application.OrderItemData.Commands.CreateOrderItem;
+using WebApi.Application.ProductData.Commands.CreateProduct;
 using WebApi.Application.UserData.Commands.CreateUser;
-using WebApi.Application.UserData.Commands.DeleteUser;
-using WebApi.Application.UserData.Commands.UpdateUser;
+using WebApi.Extensions;
 using WebApi.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -11,48 +11,41 @@ namespace WebApi.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
-public class OrderController : ControllerBase
+public class OrderController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
-
-    public OrderController(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-
     [HttpPost]
     public async Task<IActionResult> CreateOrder(CreateOrderCommand order)
     {
-        return Ok(await _mediator.Send(order));
+        return Ok(await mediator.Send(order));
     }
 
     [HttpGet]
     public async Task<IActionResult> GetOrders()
     {
-        return Ok(await _mediator.Send(new GetAllOrderQuery()));
+        return Ok(await mediator.Send(new GetAllOrderQuery()));
     }
 
     [HttpGet]
     public async Task<IActionResult> GetOrderById([FromQuery] GetOrderByIdQuery query)
     {
-        return Ok(await _mediator.Send(query));
+        return Ok(await mediator.Send(query));
     }
 
     [HttpPost]
     public async Task<IActionResult> OrderByPagination(OrderByPaginationQuery query)
     {
-        return Ok(await _mediator.Send(query));
+        return Ok(await mediator.Send(query));
     }
 
     [HttpPut]
     public async Task<IActionResult> UpdateOrder(UpdateOrderCommand order)
     {
-        return Ok(await _mediator.Send(order));
+        return Ok(await mediator.Send(order));
     }
 
     [HttpDelete]
     public async Task<IActionResult> DeleteOrder([FromQuery] DeleteOrderCommand order)
     {
-        return Ok(await _mediator.Send(order));
+        return Ok(await mediator.Send(order));
     }
 }
