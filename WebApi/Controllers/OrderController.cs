@@ -6,7 +6,6 @@ using WebApi.Application.OrderData.Commands.UpdateOrder;
 using WebApi.Application.OrderData.Queries.GetAllUser;
 using WebApi.Application.OrderData.Queries.GetOrderById;
 using WebApi.Application.OrderData.Queries.OrderByPagination;
-using WebApi.Domain.Models;
 
 namespace WebApi.Controllers;
 
@@ -40,9 +39,9 @@ public class OrderController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> OrderByPagination(OrderByPaginationQuery query,CancellationToken cancellation)
+    public async Task<IActionResult> OrderByPagination(OrderByPaginationQuery query)
     {
-        return Ok(await _mediator.Send(query,cancellation));
+        return Ok(await _mediator.Send(query));
     }
 
     [HttpPut]
@@ -52,7 +51,7 @@ public class OrderController : ControllerBase
     }
 
     [HttpDelete]
-    public async Task<IActionResult> DeleteOrder([FromQuery]DeleteOrderCommand order)
+    public async Task<IActionResult> DeleteOrder([FromQuery] DeleteOrderCommand order)
     {
         return Ok(await _mediator.Send(order));
     }

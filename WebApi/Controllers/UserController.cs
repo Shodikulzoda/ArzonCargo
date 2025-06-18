@@ -27,7 +27,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetUsers()
     {
         return Ok(await _mediator.Send(new GetAllUserQuery()));
     }
@@ -39,9 +39,9 @@ public class UserController : ControllerBase
     }
     
     [HttpPost]
-    public async Task<IActionResult> UserPagination(UsersByPaginationQuery user, CancellationToken cancellationToken)
+    public async Task<IActionResult> UserPagination(UsersByPaginationQuery user)
     {
-        return Ok(await _mediator.Send(user, cancellationToken));
+        return Ok(await _mediator.Send(user));
     }
 
     [HttpPut]

@@ -11,9 +11,9 @@ using WebApi.Application.OrderItemData.Queries.GetOrderItemById;
 using WebApi.Application.OrderItemData.Queries.OrderItemByPagination;
 
 namespace WebApi.Controllers;
+
 [ApiController]
 [Route("[controller]/[action]")]
-
 public class OrderItemController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -36,11 +36,11 @@ public class OrderItemController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetOrderItemById([FromQuery]GetOrderItemByIdQuery query)
+    public async Task<IActionResult> GetOrderItemById([FromQuery] GetOrderItemByIdQuery query)
     {
         return Ok(await _mediator.Send(query));
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> OrderPagination([FromBody] OrderItemByPaginationQuery query)
     {
@@ -58,5 +58,4 @@ public class OrderItemController : ControllerBase
     {
         return Ok(await _mediator.Send(order));
     }
-    
 }
