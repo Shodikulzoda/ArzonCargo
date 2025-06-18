@@ -5,7 +5,7 @@ using WebApi.Domain.Models;
 
 namespace WebApi.Application.OrderItemData.Queries.OrderItemByPagination;
 
-public record OrderItemByPaginationQuery(int PageNumber, int PageSize) : IRequest<PaginatedList<OrderItem>>;
+public record OrderItemByPaginationQuery(int Page, int PageSize) : IRequest<PaginatedList<OrderItem>>;
 
 public class OrdersByPaginationQueryHandler(IOrderItemRepository orderItemRepository)
     : IRequestHandler<OrderItemByPaginationQuery, PaginatedList<OrderItem>>
@@ -14,9 +14,9 @@ public class OrdersByPaginationQueryHandler(IOrderItemRepository orderItemReposi
         CancellationToken cancellationToken)
     {
         var orderItem = await orderItemRepository
-            .GetOrderItemByPagination(request.PageNumber, request.PageSize, cancellationToken);
+            .GetOrderItemByPagination(request.Page, request.PageSize, cancellationToken);
 
-        var totalCount = await orderItemRepository.Count();
+        var orderCount = await orderItemRepository.Count();
 
         var orderResponse = orderItem.Select(x => new OrderItem
         {
@@ -25,7 +25,6 @@ public class OrdersByPaginationQueryHandler(IOrderItemRepository orderItemReposi
             CreatedAt = x.CreatedAt
         }).ToList();
 
-        return new PaginatedList<OrderItem>(orderResponse, count: totalCount, pageNumber: request.PageNumber,
-            pageSize: request.PageSize);
+        return new PaginatedList<OrderItem>(orderResponse, orderCount, request.Page, request.PageSize);
     }
 }
