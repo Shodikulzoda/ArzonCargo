@@ -14,11 +14,11 @@ public class GetOrderByIdHandler(IOrderRepository orderRepository)
 {
     public async Task<Order> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
     {
-        if (request.Id==0)
+        var result= await orderRepository.GetById(request.Id);
+        if (result is null)
         {
-            return null;
+            throw new Exception("Order not found");
         }
-        
-        return  await orderRepository.GetById(request.Id);
+        return result;
     }
 }

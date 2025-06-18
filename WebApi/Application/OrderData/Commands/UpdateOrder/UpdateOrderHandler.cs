@@ -1,13 +1,17 @@
 using MediatR;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Models;
+using WebApi.Domain.Models.Enums;
 
 namespace WebApi.Application.OrderData.Commands.UpdateOrder;
 
 public record UpdateOrderCommand : IRequest<Order>
 {
+    public int Id { get; set; }
     public string? BarCode { get; set; }
     public double TotalWeight { get; set; }
+    public double TotalAmount { get; set; }
+    public Status Status { get; set; }
     public int UserId { get; set; }
 }
 
@@ -20,13 +24,14 @@ public class UpdateOrderHandler(IOrderRepository orderRepository)
         {
             return null;
         }
-        
-        var order=orderRepository.Querable.FirstOrDefault(x=>x.BarCode==request.BarCode);
 
-        if (order == null)
-        {
+        var order = await orderRepository.GetById(request.Id);
+        if (order is null)
             return null;
-        }
+        
+        order.TotalWeight = request.TotalWeight;
+        order.UserId = request.UserId;
+        order.BarCode = request.BarCode;
 
         await orderRepository.Update(order);
 

@@ -40,9 +40,7 @@ public class UserRepository(ApplicationContext context) : BaseRepository<User>(c
 
     public async Task<User?> GetById(int id)
     {
-        var firstOrDefault = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
-
-        return firstOrDefault;
+        return await context.Users.FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<int> Count()

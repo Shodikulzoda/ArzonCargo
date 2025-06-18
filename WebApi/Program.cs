@@ -1,22 +1,25 @@
+using System.Text.Json.Serialization;
 using WebApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using WebApi.Application.Interfaces;
+using WebApi.Application.OrderData.Commands.CreateOrder;
+using WebApi.Application.OrderData.Commands.DeleteOrder;
+using WebApi.Application.OrderData.Commands.UpdateOrder;
+using WebApi.Application.OrderData.Queries.GetOrderById;
 using WebApi.Application.ProductData.Queries.GetProductById;
 using WebApi.Application.UserData.Commands.CreateUser;
 using WebApi.Application.UserData.Commands.DeleteUser;
 using WebApi.Application.UserData.Commands.UpdateUser;
 using WebApi.Infrastructure.Data;
-using WebApi.Infrastructure.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 builder.Services.Di();
-builder.Services.AddScoped<IPocketItemRepository, PocketRepository>();
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-
 
 builder.Services.AddOpenApi();
 var connection = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -35,11 +38,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(CreateUserHandler).Assembly);
-    cfg.RegisterServicesFromAssembly(typeof(GetUserByIdHandler).Assembly);
-    cfg.RegisterServicesFromAssembly(typeof(UpdateUserHandler).Assembly);
-    cfg.RegisterServicesFromAssembly(typeof(DeleteUserHandler).Assembly);
 });
-
 
 var app = builder.Build();
 

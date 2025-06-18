@@ -1,18 +1,19 @@
 using MediatR;
 using WebApi.Application.Interfaces;
+using WebApi.Domain.Models;
 
 namespace WebApi.Application.OrderItemData.Queries.GetOrderItemById;
 
-public record GetOrderItemByIdQuery : IRequest<bool>
+public record GetOrderItemByIdQuery : IRequest<OrderItem>
 {
-    public int Id { get; }
+    public int Id { get; set; }
 }
 
-public class GetOrderItemByIdHandler(IOrderItemRepository orderRepository)
-    : IRequestHandler<GetOrderItemByIdQuery, bool>
+public class GetOrderItemByIdHandler(IOrderItemRepository orderItemRepository)
+    : IRequestHandler<GetOrderItemByIdQuery, OrderItem>
 {
-    public async Task<bool> Handle(GetOrderItemByIdQuery request, CancellationToken cancellationToken)
+    public async Task<OrderItem> Handle(GetOrderItemByIdQuery request, CancellationToken cancellationToken)
     {
-       return await orderRepository.Delete(request.Id);
+       return await orderItemRepository.GetById(request.Id) ?? throw new Exception("OrderItem not found");
     }
 }

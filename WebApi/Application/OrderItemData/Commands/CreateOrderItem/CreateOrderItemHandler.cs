@@ -1,5 +1,6 @@
 using MediatR;
 using WebApi.Application.Interfaces;
+using WebApi.Application.ProductData.Queries.GetProductById;
 using WebApi.Domain.Models;
 
 namespace WebApi.Application.OrderItemData.Commands.CreateOrderItem;
@@ -10,15 +11,20 @@ public record CreateOrderItemCommand : IRequest<OrderItem?>
     public int OrderId { get; set; }
 }
 
-public class CreateOrderItemHandler(IOrderItemRepository orderRepository)
-    : IRequestHandler<CreateOrderItemCommand, OrderItem?>
+public class CreateOrderItemHandler : IRequestHandler<CreateOrderItemCommand, OrderItem?>
 {
+    private readonly IOrderItemRepository _orderRepository;
+    private readonly IMediator _mediator;
+
+    public CreateOrderItemHandler(IOrderItemRepository orderRepository, IMediator mediator)
+    {
+        _orderRepository = orderRepository;
+        _mediator = mediator;
+    }
+
     public async Task<OrderItem?> Handle(CreateOrderItemCommand request, CancellationToken cancellationToken)
     {
-        if (request.ProductId <= 0 || request.OrderId <= 0)
-        {
-            return null;
-        }
+        await _mediator.Send(new GetProductByIdQuery { Id = request.ProductId }, cancellationToken);
 
         var order = new OrderItem()
         {
@@ -26,7 +32,7 @@ public class CreateOrderItemHandler(IOrderItemRepository orderRepository)
             OrderId = request.OrderId
         };
 
-        await orderRepository.Add(order);
+        await _orderRepository.Add(order);
 
         return order;
     }
