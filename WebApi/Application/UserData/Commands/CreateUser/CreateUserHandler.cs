@@ -24,7 +24,6 @@ public class CreateUserHandler(IUserRepository userRepository)
             Phone = request.Phone,
             Address = request.Address,
             Role = request.Role,
-            CreatedAt = DateTime.Now,
         };
 
         await userRepository.Add(user);

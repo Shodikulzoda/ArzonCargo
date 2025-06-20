@@ -1,9 +1,6 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using WebApi.Application.OrderData.Commands.CreateOrder;
-using WebApi.Application.OrderItemData.Commands.CreateOrderItem;
-using WebApi.Application.ProductData.Commands.CreateProduct;
 using WebApi.Application.UserData.Commands.CreateUser;
 using WebApi.Extensions;
 using WebApi.Infrastructure.Data;
@@ -19,11 +16,8 @@ builder.Services.Di();
 builder.Services.AddOpenApi();
 var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<ApplicationContext>((options) =>
-{
-    options.UseMySQL(connection!)
-        .LogTo(Console.WriteLine, LogLevel.Information);
-});
+builder.Services.AddDbContext<ApplicationContext>(options =>
+    options.UseNpgsql(connection));
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -47,7 +41,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
-    dbContext.Database.EnsureDeleted();
     dbContext.Database.EnsureCreated();
 }
 
