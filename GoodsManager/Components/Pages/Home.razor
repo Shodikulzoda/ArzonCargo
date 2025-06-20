@@ -1,0 +1,46 @@
+﻿@using WebApi.Domain.Models
+@inject HttpClient httpClient
+@page "/"
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>First name</th>
+        <th>Last name</th>
+        <th>Birthdate</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (User user in users)
+    {
+        <tr>
+            <td>
+                @user.Name
+            </td>
+            <td>
+                @user.Phone
+            </td>
+            <td>
+                @user.Orders
+            </td>
+            <td>
+                @user.Address
+            </td>
+            <td>
+                @user.CreatedAt.ToString("yyyy-MM-dd")
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@code{
+    List<User>? users = [];
+    protected override async Task OnInitializedAsync()
+    {
+        users = await httpClient.GetFromJsonAsync<List<User>>("User/GetUsers");
+    }
+}
