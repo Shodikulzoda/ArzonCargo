@@ -1,4 +1,4 @@
-namespace WebApi.Domain.Models;
+namespace ReferenceClass.Models;
 
 public abstract class BaseEntity
 {

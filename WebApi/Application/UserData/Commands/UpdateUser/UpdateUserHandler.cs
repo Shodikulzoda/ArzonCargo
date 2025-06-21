@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ReferenceClass.Models;
 using WebApi.Application.Interfaces;
-using WebApi.Domain.Models;
 
 namespace WebApi.Application.UserData.Commands.UpdateUser;
 

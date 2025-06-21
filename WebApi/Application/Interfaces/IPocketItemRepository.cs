@@ -1,4 +1,4 @@
-using WebApi.Domain.Models;
+using ReferenceClass.Models;
 
 namespace WebApi.Application.Interfaces;
 

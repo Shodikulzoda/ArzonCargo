@@ -1,5 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ReferenceClass.Models;
 using WebApi.Application.UserData.Commands.CreateUser;
 using WebApi.Application.UserData.Commands.DeleteUser;
 using WebApi.Application.UserData.Commands.UpdateUser;
@@ -31,10 +33,15 @@ public class UserController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(user));
     }
 
-    [HttpPost]
-    public async Task<IActionResult> UserPagination(UsersByPaginationQuery user)
+    [HttpGet]
+    public async Task<ActionResult<UserDto>> UserPagination([FromQuery] UsersByPaginationQuery user)
     {
-        return Ok(await mediator.Send(user));
+        var person = new UserDto();
+        var paginatedList = await mediator.Send(user);
+        person.Users = paginatedList.Items;
+        person.TotalCount = paginatedList.TotalCount;
+
+        return Ok(person);
     }
 
     [HttpPut]

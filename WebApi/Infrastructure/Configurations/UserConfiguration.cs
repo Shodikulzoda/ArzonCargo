@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using WebApi.Domain.Models;
+using ReferenceClass.Models;
 
 namespace WebApi.Infrastructure.Configurations;
 

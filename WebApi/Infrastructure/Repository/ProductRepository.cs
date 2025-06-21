@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using ReferenceClass.Models;
 using WebApi.Application.Interfaces;
-using WebApi.Domain.Models;
 using WebApi.Infrastructure.Data;
 
 namespace WebApi.Infrastructure.Repository;

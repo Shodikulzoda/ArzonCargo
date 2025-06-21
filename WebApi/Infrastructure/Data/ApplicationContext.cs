@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WebApi.Domain.Models;
+using ReferenceClass.Models;
 using WebApi.Infrastructure.Configurations;
 
 namespace WebApi.Infrastructure.Data;

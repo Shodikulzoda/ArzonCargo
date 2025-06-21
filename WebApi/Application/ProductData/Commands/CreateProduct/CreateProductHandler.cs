@@ -1,6 +1,6 @@
 using MediatR;
+using ReferenceClass.Models;
 using WebApi.Application.Interfaces;
-using WebApi.Domain.Models;
 
 namespace WebApi.Application.ProductData.Commands.CreateProduct;
 

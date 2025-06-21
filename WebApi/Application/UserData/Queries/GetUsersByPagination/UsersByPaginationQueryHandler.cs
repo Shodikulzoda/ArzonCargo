@@ -1,7 +1,7 @@
 using MediatR;
+using ReferenceClass.Models;
 using WebApi.Application.Common;
 using WebApi.Application.Interfaces;
-using WebApi.Domain.Models;
 
 namespace WebApi.Application.UserData.Queries.GetUsersByPagination;
 

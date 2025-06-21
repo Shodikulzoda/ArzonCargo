@@ -1,4 +1,4 @@
-﻿namespace WebApi.Domain.Models.Enums;
+﻿namespace ReferenceClass.Models.Enums;
 
 public enum Role
 {

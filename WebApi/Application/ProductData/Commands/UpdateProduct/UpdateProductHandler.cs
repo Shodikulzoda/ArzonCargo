@@ -1,7 +1,7 @@
 using MediatR;
+using ReferenceClass.Models;
+using ReferenceClass.Models.Enums;
 using WebApi.Application.Interfaces;
-using WebApi.Domain.Models;
-using WebApi.Domain.Models.Enums;
 
 namespace WebApi.Application.ProductData.Commands.UpdateProduct;
 

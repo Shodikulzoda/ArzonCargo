@@ -1,6 +1,6 @@
-﻿using WebApi.Domain.Models.Enums;
+﻿using ReferenceClass.Models.Enums;
 
-namespace WebApi.Domain.Models;
+namespace ReferenceClass.Models;
 
 public class User : BaseEntity
 {

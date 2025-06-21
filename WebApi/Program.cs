@@ -5,6 +5,7 @@ using WebApi.Application.UserData.Commands.CreateUser;
 using WebApi.Extensions;
 using WebApi.Infrastructure.Data;
 
+var MyOption = "_myOptions";
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -19,15 +20,21 @@ var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationContext>(options =>
     options.UseNpgsql(connection));
 
+builder.Services.AddCors(x =>
+{
+    x.AddPolicy("_myOptions",
+        policyBuilder => policyBuilder
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Bank application APIs", Version = "v1" });
 });
 
-builder.Services.AddMediatR(cfg =>
-{
-    cfg.RegisterServicesFromAssembly(typeof(CreateUserHandler).Assembly);
-});
+builder.Services.AddMediatR(cfg => { cfg.RegisterServicesFromAssembly(typeof(CreateUserHandler).Assembly); });
 
 var app = builder.Build();
 
@@ -41,7 +48,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
-    dbContext.Database.EnsureCreated();
+    dbContext.Database.Migrate();
 }
 
 if (app.Environment.IsDevelopment())
@@ -50,6 +57,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(MyOption);
 
 app.UseAuthorization();
 
