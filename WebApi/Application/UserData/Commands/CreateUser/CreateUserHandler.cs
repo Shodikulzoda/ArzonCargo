@@ -25,7 +25,6 @@ public class CreateUserHandler(IUserRepository userRepository)
             Address = request.Address,
             Role = request.Role,
         };
-
         await userRepository.Add(user);
 
         return user;
