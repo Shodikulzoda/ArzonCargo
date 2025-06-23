@@ -1,5 +1,6 @@
 ﻿@page "/test"
 @using ReferenceClass.Models
+@rendermode InteractiveServer
 @inject HttpClient Http
 
 <PageTitle>Weather forecast</PageTitle>
@@ -50,20 +51,27 @@ else
         }
 
         <input type="button" class="btn btn-secondary ms-2" @onclick="NextPage" value="Next" disabled="@(!CanGoNext)"/>
-
-        <button class="btn btn-primary" @onclick="Increment">Click me</button>
     </div>
 
     <p>test: @CurPage</p>
 }
 
-@code {
-    private static int CurPage = 1;
+<p role="status">Current count: @currentCount</p>
+<p>test: @CurPage</p>
 
-    private void Increment()
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click your</button>
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
     {
-        CurPage++;
+        currentCount++;
     }
+
+
+    private int CurPage = 1;
 
     public IEnumerable<User> Users { get; set; } = [];
     public UserDto? UserDto = new();
@@ -98,7 +106,6 @@ else
 
     public async Task ShowPage()
     {
-        CurPage++;
         UserDto = await Http.GetFromJsonAsync<UserDto>
             ($"http://localhost:5191/User/UserPagination?Page={CurPage}&PageSize=5");
         Users = UserDto.Users;
