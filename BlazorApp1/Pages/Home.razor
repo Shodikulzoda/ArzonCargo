@@ -1,38 +1,84 @@
-﻿@page "/counter"
+﻿@page "/"
 @using ReferenceClass.Models
 @inject HttpClient Http
 
+@using MudBlazor
 
-<PageTitle>Counter</PageTitle>
-
-<h1>Counter</h1>
-
-<table class="table">
-    <thead>
-    <tr>
-        <th>Id</th>
-        <th>Name</th>
-        <th>Address</th>
-        <th>Phone</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var value in Users)
-    {
-        <tr>
-            <td>@value.Id</td>
-            <td>@value.Name</td>
-            <td>@value.Address</td>
-            <td>@value.Phone</td>
-        </tr>
+<style>
+    .table-wrapper {
+        background-color: #fdfdfd;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin: 40px auto;
+        max-width: 1000px;
     }
-    </tbody>
-</table>
 
-<button class="btn btn-primary" @onclick="Decrement">back</button>
-<p role="status">@CurrentPage - @TotalPages</p>
-<button class="btn btn-primary" @onclick="Increment">next</button>
+    .mud-table {
+        border-radius: 10px;
+        overflow: hidden;
+    }
 
+    .mud-table thead {
+        background-color: #1976d2; /* MudBlazor Primary color */
+        color: white;
+        font-weight: bold;
+    }
+
+    .mud-table td {
+        padding: 12px;
+    }
+
+    .pagination-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .pagination-buttons .mud-button {
+        min-width: 120px;
+        border-radius: 8px;
+    }
+
+    .page-indicator {
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+</style>
+
+<div class="table-wrapper">
+
+    <MudTable Items="Users" Class="mud-table" Striped="true" Hover="true" Bordered="true" Dense="true">
+        <HeaderContent>
+            <MudTh>Id</MudTh>
+            <MudTh>Name</MudTh>
+            <MudTh>Address</MudTh>
+            <MudTh>Phone</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Address">@context.Address</MudTd>
+            <MudTd DataLabel="Phone">@context.Phone</MudTd>
+        </RowTemplate>
+    </MudTable>
+
+    <div class="pagination-buttons">
+        <MudButton OnClick="Decrement" Color="Color.Secondary" Variant="Variant.Filled"
+                   StartIcon="@Icons.Material.Filled.ArrowBack" Disabled="@(CurrentPage == 1)">
+            Back
+        </MudButton>
+
+        <MudText Class="page-indicator">@CurrentPage - @TotalPages</MudText>
+
+        <MudButton OnClick="Increment" Color="Color.Primary" Variant="Variant.Filled"
+                   EndIcon="@Icons.Material.Filled.ArrowForward" Disabled="@(CurrentPage == TotalPages)">
+            Next
+        </MudButton>
+    </div>
+
+</div>
 
 @code {
     public IEnumerable<User> Users { get; set; } = [];
