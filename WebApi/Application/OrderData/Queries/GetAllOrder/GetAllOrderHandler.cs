@@ -2,7 +2,7 @@ using MediatR;
 using ReferenceClass.Models;
 using WebApi.Application.Interfaces;
 
-namespace WebApi.Application.OrderData.Queries.GetAllUser;
+namespace WebApi.Application.OrderData.Queries.GetAllOrder;
 
 public record GetAllOrderQuery : IRequest<IEnumerable<Order>>
 {

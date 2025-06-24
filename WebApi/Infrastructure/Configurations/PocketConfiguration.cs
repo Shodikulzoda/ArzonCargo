@@ -4,18 +4,16 @@ using ReferenceClass.Models;
 
 namespace WebApi.Infrastructure.Configurations;
 
-public class PocketConfiguration: IEntityTypeConfiguration<PocketItem>
+public class PocketConfiguration : IEntityTypeConfiguration<Pocket>
 {
-    public void Configure(EntityTypeBuilder<PocketItem> builder)
+    public void Configure(EntityTypeBuilder<Pocket> builder)
     {
-        builder.HasKey(p => p.Id);
-
         builder.Property(x => x.Id)
             .ValueGeneratedOnAdd();
-        
-        builder.HasOne(x=>x.Order)
-            .WithMany(x=>x.PocketItem)
-            .HasForeignKey(x=>x.OrderId)
+
+        builder.HasOne(o => o.User)
+            .WithMany(u => u.Pockets)
+            .HasForeignKey(o => o.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

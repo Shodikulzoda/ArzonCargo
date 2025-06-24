@@ -1,10 +1,17 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Application.PocketItemData.Commands.CreatePocketItem;
-using WebApi.Application.PocketItemData.Commands.DeletePocketItem;
-using WebApi.Application.PocketItemData.Commands.UpdatePocketItem;
-using WebApi.Application.PocketItemData.Queries.GetPocketItem;
-using WebApi.Application.PocketItemData.Queries.GetPocketItemByPagination;
+using WebApi.Application.OrderData.Commands.CreateOrder;
+using WebApi.Application.OrderData.Commands.DeleteOrder;
+using WebApi.Application.OrderData.Commands.UpdateOrder;
+using WebApi.Application.OrderData.Queries.GetAllOrder;
+using WebApi.Application.OrderData.Queries.GetOrderById;
+using WebApi.Application.OrderData.Queries.OrderByPagination;
+using WebApi.Application.PocketData.Commands.Createpocket;
+using WebApi.Application.PocketData.Commands.DeletePocket;
+using WebApi.Application.PocketData.Commands.Updatepocket;
+using WebApi.Application.PocketData.Queries.GetAllPocket;
+using WebApi.Application.PocketData.Queries.GetPocketById;
+using WebApi.Application.PocketData.Queries.GetPocketByPagination;
 
 namespace WebApi.Controllers;
 
@@ -13,32 +20,38 @@ namespace WebApi.Controllers;
 public class PocketController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Add(CreatePocketItemCommand createPocketItemCommand)
+    public async Task<IActionResult> CreatePocket(CreatePocketCommand pocketCommand)
     {
-        return Ok(await mediator.Send(createPocketItemCommand));
+        return Ok(await mediator.Send(pocketCommand));
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetPockets()
     {
-        return Ok(await mediator.Send(new GetAllPocketItemQuery()));
+        return Ok(await mediator.Send(new GetAllPocketQuery()));
     }
 
-    [HttpPut]
-    public async Task<IActionResult> Update(UpdatePocketItemCommand updatePocketItemCommand)
+    [HttpGet]
+    public async Task<IActionResult> GetPocketById([FromQuery] GetPocketByIdQuery pocketByIdQuery)
     {
-        return Ok(await mediator.Send(updatePocketItemCommand));
-    }
-
-    [HttpDelete]
-    public async Task<IActionResult> Delete(DeletePocketItemCommand deletePocketItemCommand)
-    {
-        return Ok(await mediator.Send(deletePocketItemCommand));
+        return Ok(await mediator.Send(pocketByIdQuery));
     }
 
     [HttpPost]
-    public async Task<IActionResult> GetByPagination(GetPocketItemByPaginationQuery getPocketItemByPaginationQuery)
+    public async Task<IActionResult> PocketByPagination(GetPocketByPaginationQuery pocketByPaginationQuery)
     {
-        return Ok(await mediator.Send(getPocketItemByPaginationQuery));
+        return Ok(await mediator.Send(pocketByPaginationQuery));
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdatePocket(UpdatePocketCommand updatePocketCommand)
+    {
+        return Ok(await mediator.Send(updatePocketCommand));
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> DeletePocket([FromQuery] DeletePocketCommand deletePocketCommand)
+    {
+        return Ok(await mediator.Send(deletePocketCommand));
     }
 }

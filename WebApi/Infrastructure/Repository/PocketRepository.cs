@@ -1,62 +1,53 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ReferenceClass.Models;
 using WebApi.Application.Interfaces;
 using WebApi.Infrastructure.Data;
 
 namespace WebApi.Infrastructure.Repository;
 
-public class PocketRepository(ApplicationContext context) : BaseRepository<PocketItem>(context), IPocketItemRepository
+public class PocketRepository(ApplicationContext context) : BaseRepository<Pocket>(context), IPocketRepository
 {
-    public async Task<IEnumerable<PocketItem>> GetAll()
+    public async Task<Pocket> Add(Pocket pocket)
     {
-        return await context.PocketItem.ToListAsync();
-    }
-
-    public async Task<PocketItem?> GetById(int id)
-    {
-        var pocketItem = await context.PocketItem.FirstOrDefaultAsync(o => o.Id == id);
-        if (pocketItem is null)
-        {
-            return null;
-        }
-
-        return pocketItem;
-    }
-
-    public async Task<PocketItem> Add(PocketItem pocketItem)
-    {
-        await context.PocketItem.AddAsync(pocketItem);
+        var entity = context.Pockets.Add(pocket).Entity;
         await context.SaveChangesAsync();
-
-        return pocketItem;
+        return entity;
     }
 
-    public async Task<PocketItem> Update(PocketItem pocketItem)
+    public async Task<IEnumerable<Pocket>> GetAll()
     {
-        context.PocketItem.Update(pocketItem);
-        await context.SaveChangesAsync();
-
-        return pocketItem;
+        return await context.Pockets.ToListAsync();
     }
 
-    public async Task<PocketItem> Delete(PocketItem pocketItem)
+    public async Task<Pocket> Update(Pocket pocket)
     {
-        context.PocketItem.Remove(pocketItem);
+        context.Pockets.Update(pocket);
         await context.SaveChangesAsync();
+        return pocket;
+    }
 
-        return pocketItem;
+    public async Task<Pocket> Delete(Pocket pocket)
+    {
+        context.Pockets.Remove(pocket);
+        await context.SaveChangesAsync();
+        return pocket;
+    }
+
+    public async Task<Pocket?> GetById(int id)
+    {
+        return await context.Pockets.FirstOrDefaultAsync(o => o.Id == id);
     }
 
     public async Task<int> Count()
     {
-        return await context.PocketItem.CountAsync();
+        return await context.Pockets.CountAsync();
     }
 
-    public async Task<IEnumerable<PocketItem>> GetPocketItemByPagination(int page, int pageSize,
+    public async Task<IEnumerable<Pocket>> GetOrderByPagination(int page, int pageSize,
         CancellationToken cancellationToken)
     {
-        return await context.PocketItem
-            .Skip((page - 1) * pageSize)
+        return await context.Pockets
+            .Skip((page) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
     }

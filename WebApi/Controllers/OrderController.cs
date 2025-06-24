@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebApi.Application.OrderData.Commands.CreateOrder;
 using WebApi.Application.OrderData.Commands.DeleteOrder;
 using WebApi.Application.OrderData.Commands.UpdateOrder;
-using WebApi.Application.OrderData.Queries.GetAllUser;
+using WebApi.Application.OrderData.Queries.GetAllOrder;
 using WebApi.Application.OrderData.Queries.GetOrderById;
 using WebApi.Application.OrderData.Queries.OrderByPagination;
 

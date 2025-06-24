@@ -11,6 +11,6 @@ public static class DependencyInjection
         collection.AddScoped<IOrderItemRepository, OrderItemRepository>();
         collection.AddScoped<IUserRepository, UserRepository>();
         collection.AddScoped<IProductRepository, ProductRepository>();
-        collection.AddScoped<IPocketItemRepository, PocketRepository>();
+        collection.AddScoped<IPocketItemRepository, PocketItemRepository>();
     }
 }

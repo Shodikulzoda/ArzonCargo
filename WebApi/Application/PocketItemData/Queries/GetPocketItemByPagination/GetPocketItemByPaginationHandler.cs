@@ -24,8 +24,8 @@ public class
             Id = x.Id,
             ProductId = x.ProductId,
             Product = x.Product,
-            OrderId = x.OrderId,
-            Order = x.Order,
+            PocketId = x.PocketId,
+            Pocket = x.Pocket,
             CreatedAt = x.CreatedAt,
             IsDeleted = x.IsDeleted
         }).ToList();

@@ -29,7 +29,6 @@ public class OrdersByPaginationQueryHandler(IOrderRepository orderRepository)
                 Id = x.Id,
                 CreatedAt = x.CreatedAt,
                 OrderItems = x.OrderItems,
-                PocketItem = x.PocketItem,
             }).ToList();
         
         return new PaginatedList<Order>(orderResponses, totalCount, request.Page, request.PageSize);

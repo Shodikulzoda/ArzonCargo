@@ -7,7 +7,7 @@ namespace WebApi.Application.PocketItemData.Commands.UpdatePocketItem;
 public record UpdatePocketItemCommand : IRequest<PocketItem>
 {
     public int ProductId { get; set; }
-    public int OrderId { get; set; }
+    public int PocketId { get; set; }
 }
 
 public class UpdatePocketItemHandler(IPocketItemRepository pocketItemRepository)
@@ -15,7 +15,7 @@ public class UpdatePocketItemHandler(IPocketItemRepository pocketItemRepository)
 {
     public async Task<PocketItem> Handle(UpdatePocketItemCommand request, CancellationToken cancellationToken)
     {
-        if (request.ProductId <= 0 || request.OrderId <= 0)
+        if (request.ProductId <= 0 || request.PocketId <= 0)
         {
             throw new Exception();
         }
@@ -23,7 +23,7 @@ public class UpdatePocketItemHandler(IPocketItemRepository pocketItemRepository)
         var pocketItem = new PocketItem()
         {
             ProductId = request.ProductId,
-            OrderId = request.OrderId
+            PocketId = request.PocketId
         };
         
         return pocketItem;

@@ -9,4 +9,5 @@ public class User : BaseEntity
     public string? Address { get; set; }
     public Role Role { get; set; }
     public ICollection<Order> Orders { get; set; }
+    public ICollection<Pocket> Pockets { get; set; }
 }

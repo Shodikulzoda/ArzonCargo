@@ -1,0 +1,14 @@
+﻿using ReferenceClass.Models;
+
+namespace WebApi.Application.Interfaces;
+
+public interface IPocketRepository : IBaseRepository<Pocket>
+{
+    Task<Pocket> Add(Pocket pocket);
+    Task<IEnumerable<Pocket>> GetAll();
+    Task<Pocket> Update(Pocket pocket);
+    Task<Pocket> Delete(Pocket pocket);
+    Task<Pocket?> GetById(int id);
+    Task<int> Count();
+    Task<IEnumerable<Pocket>> GetOrderByPagination(int page, int pageSize, CancellationToken cancellationToken);
+}
