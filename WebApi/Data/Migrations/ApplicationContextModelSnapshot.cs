@@ -22,7 +22,7 @@ namespace WebApi.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("WebApi.Domain.Models.Order", b =>
+            modelBuilder.Entity("ReferenceClass.Models.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -58,7 +58,7 @@ namespace WebApi.Data.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("WebApi.Domain.Models.OrderItem", b =>
+            modelBuilder.Entity("ReferenceClass.Models.OrderItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -87,7 +87,7 @@ namespace WebApi.Data.Migrations
                     b.ToTable("OrderItems");
                 });
 
-            modelBuilder.Entity("WebApi.Domain.Models.PocketItem", b =>
+            modelBuilder.Entity("ReferenceClass.Models.PocketItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -116,7 +116,7 @@ namespace WebApi.Data.Migrations
                     b.ToTable("PocketItem");
                 });
 
-            modelBuilder.Entity("WebApi.Domain.Models.Product", b =>
+            modelBuilder.Entity("ReferenceClass.Models.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -139,10 +139,13 @@ namespace WebApi.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BarCode")
+                        .IsUnique();
+
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("WebApi.Domain.Models.User", b =>
+            modelBuilder.Entity("ReferenceClass.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -177,9 +180,9 @@ namespace WebApi.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("WebApi.Domain.Models.Order", b =>
+            modelBuilder.Entity("ReferenceClass.Models.Order", b =>
                 {
-                    b.HasOne("WebApi.Domain.Models.User", "User")
+                    b.HasOne("ReferenceClass.Models.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -188,15 +191,15 @@ namespace WebApi.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WebApi.Domain.Models.OrderItem", b =>
+            modelBuilder.Entity("ReferenceClass.Models.OrderItem", b =>
                 {
-                    b.HasOne("WebApi.Domain.Models.Order", "Order")
+                    b.HasOne("ReferenceClass.Models.Order", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebApi.Domain.Models.Product", "Product")
+                    b.HasOne("ReferenceClass.Models.Product", "Product")
                         .WithMany("OrderItems")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -207,15 +210,15 @@ namespace WebApi.Data.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("WebApi.Domain.Models.PocketItem", b =>
+            modelBuilder.Entity("ReferenceClass.Models.PocketItem", b =>
                 {
-                    b.HasOne("WebApi.Domain.Models.Order", "Order")
+                    b.HasOne("ReferenceClass.Models.Order", "Order")
                         .WithMany("PocketItem")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebApi.Domain.Models.Product", "Product")
+                    b.HasOne("ReferenceClass.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -226,19 +229,19 @@ namespace WebApi.Data.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("WebApi.Domain.Models.Order", b =>
+            modelBuilder.Entity("ReferenceClass.Models.Order", b =>
                 {
                     b.Navigation("OrderItems");
 
                     b.Navigation("PocketItem");
                 });
 
-            modelBuilder.Entity("WebApi.Domain.Models.Product", b =>
+            modelBuilder.Entity("ReferenceClass.Models.Product", b =>
                 {
                     b.Navigation("OrderItems");
                 });
 
-            modelBuilder.Entity("WebApi.Domain.Models.User", b =>
+            modelBuilder.Entity("ReferenceClass.Models.User", b =>
                 {
                     b.Navigation("Orders");
                 });

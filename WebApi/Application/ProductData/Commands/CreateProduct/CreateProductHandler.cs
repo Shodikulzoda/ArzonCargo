@@ -23,7 +23,13 @@ public class CreateProductHandler(IProductRepository productRepository)
         {
             BarCode = request.BarCode
         };
+        var barcode = productRepository.Queryable.FirstOrDefault(x => x.BarCode == request.BarCode);
 
+        if (barcode != null)
+        {
+            throw new Exception("Product with this barcode already exists.");
+        }
+        
         await productRepository.Add(product);
 
         return product;

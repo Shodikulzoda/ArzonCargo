@@ -1,0 +1,116 @@
+@page "/adding-product"
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+@using MudBlazor
+
+<PageTitle>Barcode Scanner</PageTitle>
+
+<MudPaper Class="p-4 mx-auto mt-6" Style="max-width: 600px;">
+    <MudText Typo="Typo.h5" GutterBottom>Barcode Scanner</MudText>
+
+    <MudTextField Label="Enter Barcode"
+                  @bind-Value="Barcode"
+                  Variant="Variant.Filled"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.QrCode"
+                  Immediate="true"
+                  Class="barcode-text"
+                  OnKeyDown="HandleKeyPress"/>
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitBarcode" Class="mt-2">
+        Add
+    </MudButton>
+
+    <MudText Color="Color.Success" Class="mt-2">@Message</MudText>
+</MudPaper>
+
+@if (Products.Any())
+{
+    <MudPaper Class="p-4 mx-auto mt-4" Style="max-width: 600px;">
+        <MudText Typo="Typo.h6">Added Products</MudText>
+
+        <MudTable Items="Products" Elevation="2" Dense="true" Hover="true">
+            <HeaderContent>
+                <MudTh>Barcode</MudTh>
+                <MudTh>Name</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Barcode">@context.Barcode</MudTd>
+                <MudTd DataLabel="Name">@context.Name</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudPaper>
+}
+
+<script>
+    window.focusElement = () => {
+        const el = document.querySelector('.barcode-text input');
+        if (el) {
+            el.focus();
+        }
+    };
+</script>
+
+@code {
+    private string Barcode = "";
+    private string Message = "";
+    private List<Product> Products = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("focusElement");
+        }
+    }
+    private async Task SubmitBarcode()
+    {
+        if (string.IsNullOrWhiteSpace(Barcode))
+        {
+            Message = "Please enter a barcode.";
+            await JS.InvokeVoidAsync("focusElement");
+            return;
+        }
+
+        var response = await Http.PostAsync(
+            $"http://localhost:5191/Product/Add?BarCode={Uri.EscapeDataString(Barcode)}",
+            null
+        );
+
+        if (response.IsSuccessStatusCode)
+        {
+            var product = new Product
+            {
+                Barcode = Barcode,
+                Name = $"Product {Products.Count + 1}"
+            };
+
+            Products.Add(product);
+            Message = "Barcode added successfully!";
+            Barcode = ""; // ✅ Clear input here
+        }
+        else
+        {
+            Message = "Failed to add barcode.";
+        }
+
+        await JS.InvokeVoidAsync("focusElement");
+    }
+
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SubmitBarcode();
+            Barcode = "";
+        }
+    }
+
+    public class Product
+    {
+        public string Barcode { get; set; } = "";
+        public string Name { get; set; } = "";
+    }
+}

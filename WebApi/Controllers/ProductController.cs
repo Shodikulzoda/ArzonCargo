@@ -13,7 +13,7 @@ namespace WebApi.Controllers;
 public class ProductController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> Add(CreateProductCommand createProductCommand)
+    public async Task<IActionResult> Add([FromQuery]CreateProductCommand createProductCommand)
     {
         return Ok(await mediator.Send(createProductCommand));
     }
