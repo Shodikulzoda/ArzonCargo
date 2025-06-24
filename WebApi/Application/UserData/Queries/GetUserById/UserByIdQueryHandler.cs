@@ -10,8 +10,7 @@ public record UserByIdQuery : IRequest<User>
 }
 
 public class UserByIdQueryHandler(IUserRepository userRepository)
-    : IRequestHandler<UserByIdQuery, User?
-    >
+    : IRequestHandler<UserByIdQuery, User?>
 {
     public async Task<User?> Handle(UserByIdQuery request, CancellationToken cancellationToken)
     {

@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferenceClass", "ReferenceClass\ReferenceClass.csproj", "{A2658686-30DE-4921-8D43-4661E1FD4474}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApp1", "BlazorApp1\BlazorApp1.csproj", "{6B7B7A7E-9E1E-4BE9-A8CA-096926808ED6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MudBlazorPR", "MudBlazorPR\MudBlazorPR.csproj", "{2169E8F8-59DC-4F8C-A928-00E5A0613CC0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,9 +20,9 @@ Global
 		{A2658686-30DE-4921-8D43-4661E1FD4474}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2658686-30DE-4921-8D43-4661E1FD4474}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2658686-30DE-4921-8D43-4661E1FD4474}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6B7B7A7E-9E1E-4BE9-A8CA-096926808ED6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6B7B7A7E-9E1E-4BE9-A8CA-096926808ED6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6B7B7A7E-9E1E-4BE9-A8CA-096926808ED6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6B7B7A7E-9E1E-4BE9-A8CA-096926808ED6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2169E8F8-59DC-4F8C-A928-00E5A0613CC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2169E8F8-59DC-4F8C-A928-00E5A0613CC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2169E8F8-59DC-4F8C-A928-00E5A0613CC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2169E8F8-59DC-4F8C-A928-00E5A0613CC0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

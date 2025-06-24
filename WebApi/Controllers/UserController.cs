@@ -7,6 +7,7 @@ using WebApi.Application.UserData.Commands.DeleteUser;
 using WebApi.Application.UserData.Commands.UpdateUser;
 using WebApi.Application.UserData.Queries.GetUser;
 using WebApi.Application.UserData.Queries.GetUserById;
+using WebApi.Application.UserData.Queries.Search;
 using WebApi.Application.UserData.Queries.UsersByPagination;
 
 namespace WebApi.Controllers;
@@ -42,6 +43,12 @@ public class UserController(IMediator mediator) : ControllerBase
         person.TotalCount = paginatedList.TotalCount;
 
         return Ok(person);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Search([FromQuery]SearchQuery query)
+    {
+        return Ok(await mediator.Send(query));
     }
 
     [HttpPut]

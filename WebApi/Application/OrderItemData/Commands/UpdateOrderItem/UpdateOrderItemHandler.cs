@@ -21,7 +21,7 @@ public class UpdateOrderItemHandler(IOrderItemRepository orderRepository)
             return null;
         }
 
-        var orderItem = orderRepository.Querable
+        var orderItem = orderRepository.Queryable
             .FirstOrDefault(x => x.ProductId == request.ProductId && x.OrderId == request.OrderId);
         
         await orderRepository.Update(orderItem);

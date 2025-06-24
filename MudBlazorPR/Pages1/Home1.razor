@@ -1,55 +1,11 @@
-﻿@page "/"
-@using ReferenceClass.Models
+﻿@page "/12"
 @inject HttpClient Http
-
 @using MudBlazor
-
-<style>
-    .table-wrapper {
-        background-color: #fdfdfd;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        margin: 40px auto;
-        max-width: 1000px;
-    }
-
-    .mud-table {
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    .mud-table thead {
-        background-color: #1976d2; /* MudBlazor Primary color */
-        color: white;
-        font-weight: bold;
-    }
-
-    .mud-table td {
-        padding: 12px;
-    }
-
-    .pagination-buttons {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 20px;
-    }
-
-    .pagination-buttons .mud-button {
-        min-width: 120px;
-        border-radius: 8px;
-    }
-
-    .page-indicator {
-        font-weight: bold;
-        font-size: 1.1rem;
-    }
-</style>
-
+@using MudBlazor.Components.Pages
 <div class="table-wrapper">
 
     <MudTable Items="Users" Class="mud-table" Striped="true" Hover="true" Bordered="true" Dense="true">
+     
         <HeaderContent>
             <MudTh>Id</MudTh>
             <MudTh>Name</MudTh>
@@ -81,8 +37,8 @@
 </div>
 
 @code {
-    public IEnumerable<User> Users { get; set; } = [];
-    public UserDto? UserDto = new();
+    public IEnumerable<Weather.User> Users { get; set; } = [];
+    public Weather.UserDto? UserDto = new();
 
     private int CurrentPage = 1;
     private int TotalPages = 1;
@@ -118,9 +74,9 @@
 
         try
         {
-            string url = $"http://localhost:5191/User/UserPagination?Page={CurrentPage}&PageSize={PageSize}";
+            string url = $"http://localhost:5191/User/UserPagination?Page=1&PageSize=11";
 
-            UserDto = await Http.GetFromJsonAsync<UserDto>(url);
+            UserDto = await Http.GetFromJsonAsync<Weather.UserDto>(url);
 
             if (UserDto?.Users != null)
             {
