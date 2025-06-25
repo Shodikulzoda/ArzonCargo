@@ -4,7 +4,7 @@
 @inject IDialogService DialogService
 @using MudBlazor
 @using Microsoft.AspNetCore.Components.Web
-@using MudBlazor.DialogWindows
+@using MudBlazor.Components.DialogWindows
 
 <PageTitle>Users</PageTitle>
 
@@ -42,6 +42,9 @@ else
             <MudTd DataLabel="Address">@context.Address</MudTd>
             <MudTd DataLabel="Phone">@context.Phone</MudTd>
             <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                               Color="Color.Primary"
+                               OnClick="@(() => OpenEditDialog(context))" />
                 <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                Color="Color.Error"
                                OnClick="@(() => ConfirmDelete(context.Id))" />
@@ -64,7 +67,6 @@ else
     private int TotalPages = 1;
     private int PageSize = 10;
     private bool IsLoading = false;
-
     private string SearchQuery = "";
 
     protected override async Task OnInitializedAsync()
@@ -136,6 +138,29 @@ else
             Console.WriteLine("Error deleting user: " + ex.Message);
         }
         IsLoading = false;
+    }
+
+    private async Task OpenEditDialog(User user)
+    {
+        var parameters = new DialogParameters
+        {
+            { "UserModel", new User {
+                Id = user.Id,
+                Name = user.Name,
+                Phone = user.Phone,
+                Address = user.Address
+            }},
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+
+        var dialog = DialogService.Show<EditUserDialog>("Edit User", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadUsers();
+        }
     }
 
     private async Task SearchUsers()
