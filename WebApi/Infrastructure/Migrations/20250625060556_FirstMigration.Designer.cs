@@ -9,11 +9,11 @@ using WebApi.Infrastructure.Data;
 
 #nullable disable
 
-namespace WebApi.Data.Migrations
+namespace WebApi.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250625061826_Initial")]
-    partial class Initial
+    [Migration("20250625060556_FirstMigration")]
+    partial class FirstMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

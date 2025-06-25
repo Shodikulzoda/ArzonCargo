@@ -5,7 +5,7 @@ namespace WebApi.Extensions;
 
 public static class DependencyInjection
 {
-    public static void Di(this IServiceCollection collection)
+    public static void AddDependencyInjection(this IServiceCollection collection)
     {
         collection.AddScoped<IOrderRepository, OrderRepository>();
         collection.AddScoped<IOrderItemRepository, OrderItemRepository>();
