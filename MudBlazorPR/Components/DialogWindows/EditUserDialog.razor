@@ -1,8 +1,9 @@
 @using MudBlazor
+@using MudBlazor.Components.Pages
 @inject HttpClient Http
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
-    [Parameter] public User UserModel { get; set; } = new();
+    [Parameter] public Users.User UserModel { get; set; } = new();
 
     private async Task Submit()
     {
@@ -32,13 +33,3 @@
         <MudButton Color="Color.Primary" OnClick="Submit" Variant="Variant.Filled">Save</MudButton>
     </DialogActions>
 </MudDialog>
-
-@code {
-    public class User
-    {
-        public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Phone { get; set; }
-        public string? Address { get; set; }
-    }
-}
