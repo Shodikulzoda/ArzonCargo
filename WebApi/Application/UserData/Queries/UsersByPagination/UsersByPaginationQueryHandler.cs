@@ -13,22 +13,11 @@ public class UsersByPaginationQueryHandler(IUserRepository userRepository)
     public async Task<PaginatedList<User>> Handle(UsersByPaginationQuery request,
         CancellationToken cancellationToken)
     {
-        var users = await userRepository
-            .GetUserByPagination(request.Page, request.PageSize, cancellationToken);
-
-        var totalCount = await userRepository.Count();
-
-        List<User> userResponses = users
-            .Select(user => new User
-            {
-                Id = user.Id,
-                Address = user.Address,
-                Phone = user.Phone,
-                Name = user.Name,
-                Role = user.Role
-            })
-            .ToList();
-
-        return new PaginatedList<User>(userResponses, totalCount, request.Page, request.PageSize);
+        var userPagination =await PaginatedList<User>.CreateAsync(
+            userRepository.Queryable,
+            request.Page,
+            request.PageSize);
+        
+        return new  PaginatedList<User>(userPagination.Items, userPagination.TotalCount, userPagination.PageNumber, userPagination.TotalPages);
     }
 }
