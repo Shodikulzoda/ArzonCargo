@@ -5,8 +5,9 @@ using WebApi.Application.Interfaces;
 
 namespace WebApi.Application.UserData.Commands.UpdateUser;
 
-public record UpdateUserCommand(int Id) : IRequest<User>
+public record UpdateUserCommand : IRequest<User>
 {
+    public int Id { get; set; }
     public string? Name { get; set; }
     public string? Phone { get; set; }
     public string? Address { get; set; }

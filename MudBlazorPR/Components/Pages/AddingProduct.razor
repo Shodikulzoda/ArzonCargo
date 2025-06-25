@@ -48,9 +48,11 @@
         const el = document.querySelector('.barcode-text input');
         if (el) {
             el.focus();
+            el.value = ''; 
         }
     };
 </script>
+
 
 @code {
     private string Barcode = "";
@@ -88,7 +90,7 @@
 
             Products.Add(product);
             Message = "Barcode added successfully!";
-            Barcode = ""; // ✅ Clear input here
+            Barcode = ""; 
         }
         else
         {

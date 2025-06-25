@@ -1,16 +1,22 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using WebApi.Application.Interfaces;
 using WebApi.Application.UserData.Commands.CreateUser;
-using WebApi.Extensions;
 using WebApi.Infrastructure.Data;
+using WebApi.Infrastructure.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-builder.Services.Di();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IPocketItemRepository, PocketItemRepository>();
+builder.Services.AddScoped<IPocketRepository, PocketRepository>();
 
 builder.Services.AddOpenApi();
 var connection = builder.Configuration.GetConnectionString("DefaultConnection");

@@ -20,11 +20,12 @@ public class SearchQueryHandler(IUserRepository userRepository)
             return new List<User>();
         }
 
+        var search = query.Text.ToLower();
         var listUser = await userRepository.Queryable
-            .Where(x => x.Name.Contains(query.Text)
-                        || x.Phone.Contains(query.Text)
-                        || x.Address.Contains(query.Text)
-                        || x.Id.ToString().Contains(query.Text))
+            .Where(x => x.Name.ToLower().Contains(search)
+                        || x.Phone.ToLower().Contains(search)
+                        || x.Address.ToLower().Contains(search)
+                        || x.Id.ToString().Contains(search))
             .ToListAsync(cancellationToken);
 
         return listUser;
