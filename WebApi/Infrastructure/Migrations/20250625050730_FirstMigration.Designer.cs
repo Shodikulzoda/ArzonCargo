@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebApi.Infrastructure.Data;
 
 #nullable disable
 
-namespace WebApi.Data.Migrations
+namespace WebApi.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20250625050730_FirstMigration")]
+    partial class FirstMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -87,6 +90,42 @@ namespace WebApi.Data.Migrations
                     b.ToTable("OrderItems");
                 });
 
+            modelBuilder.Entity("ReferenceClass.Models.Pocket", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BarCode")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("TotalAmount")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("TotalWeight")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Pockets");
+                });
+
             modelBuilder.Entity("ReferenceClass.Models.PocketItem", b =>
                 {
                     b.Property<int>("Id")
@@ -101,7 +140,7 @@ namespace WebApi.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("OrderId")
+                    b.Property<int>("PocketId")
                         .HasColumnType("integer");
 
                     b.Property<int>("ProductId")
@@ -109,7 +148,7 @@ namespace WebApi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId");
+                    b.HasIndex("PocketId");
 
                     b.HasIndex("ProductId");
 
@@ -210,21 +249,32 @@ namespace WebApi.Data.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("ReferenceClass.Models.Pocket", b =>
+                {
+                    b.HasOne("ReferenceClass.Models.User", "User")
+                        .WithMany("Pockets")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ReferenceClass.Models.PocketItem", b =>
                 {
-                    b.HasOne("ReferenceClass.Models.Order", "Order")
-                        .WithMany("PocketItem")
-                        .HasForeignKey("OrderId")
+                    b.HasOne("ReferenceClass.Models.Pocket", "Pocket")
+                        .WithMany("PocketItems")
+                        .HasForeignKey("PocketId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ReferenceClass.Models.Product", "Product")
-                        .WithMany()
+                        .WithMany("PocketItems")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Order");
+                    b.Navigation("Pocket");
 
                     b.Navigation("Product");
                 });
@@ -232,18 +282,25 @@ namespace WebApi.Data.Migrations
             modelBuilder.Entity("ReferenceClass.Models.Order", b =>
                 {
                     b.Navigation("OrderItems");
+                });
 
-                    b.Navigation("PocketItem");
+            modelBuilder.Entity("ReferenceClass.Models.Pocket", b =>
+                {
+                    b.Navigation("PocketItems");
                 });
 
             modelBuilder.Entity("ReferenceClass.Models.Product", b =>
                 {
                     b.Navigation("OrderItems");
+
+                    b.Navigation("PocketItems");
                 });
 
             modelBuilder.Entity("ReferenceClass.Models.User", b =>
                 {
                     b.Navigation("Orders");
+
+                    b.Navigation("Pockets");
                 });
 #pragma warning restore 612, 618
         }

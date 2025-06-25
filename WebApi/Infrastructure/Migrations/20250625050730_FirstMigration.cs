@@ -4,10 +4,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace WebApi.Data.Migrations
+namespace WebApi.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class FirstMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -72,6 +72,31 @@ namespace WebApi.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Pockets",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    BarCode = table.Column<string>(type: "text", nullable: true),
+                    TotalAmount = table.Column<double>(type: "double precision", nullable: false),
+                    TotalWeight = table.Column<double>(type: "double precision", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pockets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Pockets_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OrderItems",
                 columns: table => new
                 {
@@ -106,7 +131,7 @@ namespace WebApi.Data.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ProductId = table.Column<int>(type: "integer", nullable: false),
-                    OrderId = table.Column<int>(type: "integer", nullable: false),
+                    PocketId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
@@ -114,9 +139,9 @@ namespace WebApi.Data.Migrations
                 {
                     table.PrimaryKey("PK_PocketItem", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PocketItem_Orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Orders",
+                        name: "FK_PocketItem_Pockets_PocketId",
+                        column: x => x.PocketId,
+                        principalTable: "Pockets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -143,14 +168,25 @@ namespace WebApi.Data.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PocketItem_OrderId",
+                name: "IX_PocketItem_PocketId",
                 table: "PocketItem",
-                column: "OrderId");
+                column: "PocketId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PocketItem_ProductId",
                 table: "PocketItem",
                 column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pockets_UserId",
+                table: "Pockets",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_BarCode",
+                table: "Products",
+                column: "BarCode",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -164,6 +200,9 @@ namespace WebApi.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Pockets");
 
             migrationBuilder.DropTable(
                 name: "Products");

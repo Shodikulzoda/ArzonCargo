@@ -6,6 +6,6 @@ public class Product : BaseEntity
 {
     public string? BarCode { get; set; }
     public Status Status { get; set; } 
-    public ICollection<OrderItem> OrderItems { get; set; }
-    public ICollection<PocketItem> PocketItems { get; set; }
+    public IEnumerable<OrderItem> OrderItems { get; set; }
+    public IEnumerable<PocketItem> PocketItems { get; set; }
 }

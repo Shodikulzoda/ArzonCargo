@@ -1,7 +1,6 @@
 using MediatR;
 using ReferenceClass.Models;
 using WebApi.Application.Interfaces;
-using WebApi.Application.ProductData.Queries.GetProductById;
 
 namespace WebApi.Application.OrderItemData.Commands.CreateOrderItem;
 

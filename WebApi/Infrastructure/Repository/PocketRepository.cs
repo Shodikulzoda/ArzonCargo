@@ -38,6 +38,18 @@ public class PocketRepository(ApplicationContext context) : BaseRepository<Pocke
         return await context.Pockets.FirstOrDefaultAsync(o => o.Id == id);
     }
 
+    public async Task<Pocket> GetByUserId(int id)
+    {
+        var firstOrDefaultAsync = await context.Pockets.Include(x => x.PocketItems)
+            .FirstOrDefaultAsync(x => x.UserId == id);
+        if (firstOrDefaultAsync is null)
+        {
+            return null;
+        }
+
+        return firstOrDefaultAsync;
+    }
+
     public async Task<int> Count()
     {
         return await context.Pockets.CountAsync();

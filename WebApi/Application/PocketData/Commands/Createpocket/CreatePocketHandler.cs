@@ -30,7 +30,7 @@ public class CreatePocketHandler(IPocketRepository pocketRepository, IUserReposi
             BarCode = request.BarCode,
             TotalWeight = request.TotalWeight,
             UserId = request.UserId,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.UtcNow
         };
 
         return await pocketRepository.Add(pocket);

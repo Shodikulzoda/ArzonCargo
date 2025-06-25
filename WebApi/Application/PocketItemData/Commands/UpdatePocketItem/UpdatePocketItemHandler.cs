@@ -25,7 +25,9 @@ public class UpdatePocketItemHandler(IPocketItemRepository pocketItemRepository)
             ProductId = request.ProductId,
             PocketId = request.PocketId
         };
-        
+
+        await pocketItemRepository.Update(pocketItem);
+
         return pocketItem;
     }
 }

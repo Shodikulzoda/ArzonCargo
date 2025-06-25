@@ -8,6 +8,6 @@ public class User : BaseEntity
     public string? Phone { get; set; }
     public string? Address { get; set; }
     public Role Role { get; set; }
-    public ICollection<Order> Orders { get; set; }
-    public ICollection<Pocket> Pockets { get; set; }
+    public IEnumerable<Order> Orders { get; set; }
+    public IEnumerable<Pocket> Pockets { get; set; }
 }

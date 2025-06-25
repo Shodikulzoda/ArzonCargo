@@ -10,5 +10,5 @@ public class Order : BaseEntity
     public Status Status { get; set; }
     public int UserId { get; set; }
     public User? User { get; set; }
-    public ICollection<OrderItem> OrderItems { get; set; }
+    public IEnumerable<OrderItem> OrderItems { get; set; }
 }

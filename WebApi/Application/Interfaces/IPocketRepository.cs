@@ -9,6 +9,9 @@ public interface IPocketRepository : IBaseRepository<Pocket>
     Task<Pocket> Update(Pocket pocket);
     Task<Pocket> Delete(Pocket pocket);
     Task<Pocket?> GetById(int id);
+
+    Task<Pocket> GetByUserId(int id);
+    
     Task<int> Count();
     Task<IEnumerable<Pocket>> GetOrderByPagination(int page, int pageSize, CancellationToken cancellationToken);
 }

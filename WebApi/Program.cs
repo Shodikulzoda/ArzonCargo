@@ -5,9 +5,7 @@ using WebApi.Application.UserData.Commands.CreateUser;
 using WebApi.Extensions;
 using WebApi.Infrastructure.Data;
 
-var MyOption = "_myOptions";
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
@@ -19,15 +17,6 @@ var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ApplicationContext>(options =>
     options.UseNpgsql(connection));
-
-builder.Services.AddCors(x =>
-{
-    x.AddPolicy("_myOptions",
-        policyBuilder => policyBuilder
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
-});
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -57,8 +46,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseCors(MyOption);
 
 app.UseAuthorization();
 
