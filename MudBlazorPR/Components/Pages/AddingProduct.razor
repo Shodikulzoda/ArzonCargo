@@ -17,7 +17,7 @@
                   AdornmentIcon="@Icons.Material.Filled.QrCode"
                   Immediate="true"
                   Class="barcode-text"
-                  OnKeyDown="HandleKeyPress" />
+                  OnKeyDown="HandleKeyPress"/>
 
     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitBarcode" Class="mt-2 me-2">
         Add
@@ -117,7 +117,7 @@
         try
         {
             var response = await Http.GetAsync(
-                $"http://localhost:5191/Product/GetBybarcode?BarCode={Uri.EscapeDataString(Barcode)}"
+                $"http://localhost:5191/Product/GetByBarCode?BarCode={Uri.EscapeDataString(Barcode)}"
             );
 
             if (response.IsSuccessStatusCode)
@@ -141,11 +141,14 @@
         await JS.InvokeVoidAsync("focusElement");
     }
 
-    private void RemoveProduct(string barcode)
+    private async Task RemoveProduct(string barcode)
     {
         var product = Products.FirstOrDefault(p => p.BarCode == barcode);
         if (product != null)
         {
+            var response = await Http.GetAsync(
+                $"http://localhost:5191/Product/DeleteUser?Id=5");
+
             Products.Remove(product);
             Message = $"Removed barcode '{barcode}' from the list.";
         }
@@ -158,4 +161,5 @@
             await SubmitBarcode();
         }
     }
+
 }

@@ -17,8 +17,13 @@ namespace WebApi.Controllers;
 public class UserController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> CreateUser(CreateUserCommand user)
+    public async Task<IActionResult> CreateUser(CreateUserCommand? user)
     {
+        if (string.IsNullOrEmpty(user.Name))
+        {
+            return BadRequest("User cannot be null");
+        }
+
         return Ok(await mediator.Send(user));
     }
 
@@ -46,7 +51,7 @@ public class UserController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Search([FromQuery]SearchQuery query)
+    public async Task<IActionResult> Search([FromQuery] SearchQuery query)
     {
         return Ok(await mediator.Send(query));
     }

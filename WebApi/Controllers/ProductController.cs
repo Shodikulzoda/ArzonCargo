@@ -33,19 +33,19 @@ public class ProductController(IMediator mediator) : ControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> GetByBarcode([FromQuery] GetByBarCodeQuery query)
+    public async Task<IActionResult> GetByBarCode([FromQuery] GetByBarCodeQuery query)
     {
         return Ok(await mediator.Send(query));
     }
 
     [HttpPost]
-    public async Task<IActionResult> UserPagination(GetProductByPaginationQuery getProductByPaginationQuery)
+    public async Task<IActionResult> ProductPagination(GetProductByPaginationQuery getProductByPaginationQuery)
     {
         return Ok(await mediator.Send(getProductByPaginationQuery));
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateUser(UpdateProductCommand updateProductCommand)
+    public async Task<IActionResult> UpdateProduct(UpdateProductCommand updateProductCommand)
     {
         return Ok(await mediator.Send(updateProductCommand));
     }
