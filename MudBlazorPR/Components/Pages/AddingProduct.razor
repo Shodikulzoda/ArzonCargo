@@ -3,6 +3,7 @@
 @inject IJSRuntime JS
 
 @using MudBlazor
+@using ReferenceClass.Models
 
 <PageTitle>Barcode Scanner</PageTitle>
 
@@ -16,10 +17,14 @@
                   AdornmentIcon="@Icons.Material.Filled.QrCode"
                   Immediate="true"
                   Class="barcode-text"
-                  OnKeyDown="HandleKeyPress"/>
+                  OnKeyDown="HandleKeyPress" />
 
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitBarcode" Class="mt-2">
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitBarcode" Class="mt-2 me-2">
         Add
+    </MudButton>
+
+    <MudButton Variant="Variant.Outlined" Color="Color.Info" OnClick="CheckBarcode" Class="mt-2">
+        Check
     </MudButton>
 
     <MudText Color="Color.Success" Class="mt-2">@Message</MudText>
@@ -33,11 +38,16 @@
         <MudTable Items="Products" Elevation="2" Dense="true" Hover="true">
             <HeaderContent>
                 <MudTh>Barcode</MudTh>
-                <MudTh>Name</MudTh>
+                <MudTh></MudTh> <!-- For Delete button -->
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Barcode">@context.Barcode</MudTd>
-                <MudTd DataLabel="Name">@context.Name</MudTd>
+                <MudTd DataLabel="Barcode">@context.BarCode</MudTd>
+                <MudTd>
+                    <MudButton Variant="Variant.Text" Color="Color.Error" Size="Size.Small"
+                               OnClick="@(() => RemoveProduct(context.BarCode))">
+                        Delete
+                    </MudButton>
+                </MudTd>
             </RowTemplate>
         </MudTable>
     </MudPaper>
@@ -47,12 +57,11 @@
     window.focusElement = () => {
         const el = document.querySelector('.barcode-text input');
         if (el) {
+            el.value = '';
             el.focus();
-            el.value = ''; 
         }
     };
 </script>
-
 
 @code {
     private string Barcode = "";
@@ -62,10 +71,9 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-        {
             await JS.InvokeVoidAsync("focusElement");
-        }
     }
+
     private async Task SubmitBarcode()
     {
         if (string.IsNullOrWhiteSpace(Barcode))
@@ -82,37 +90,72 @@
 
         if (response.IsSuccessStatusCode)
         {
-            var product = new Product
-            {
-                Barcode = Barcode,
-                Name = $"Product {Products.Count + 1}"
-            };
+            // Only add barcode if not already added
+            if (!Products.Any(p => p.BarCode == Barcode))
+                Products.Add(new Product { BarCode = Barcode });
 
-            Products.Add(product);
             Message = "Barcode added successfully!";
-            Barcode = ""; 
         }
         else
         {
             Message = "Failed to add barcode.";
         }
 
+        Barcode = "";
         await JS.InvokeVoidAsync("focusElement");
     }
 
+    private async Task CheckBarcode()
+    {
+        if (string.IsNullOrWhiteSpace(Barcode))
+        {
+            Message = "Please enter a barcode to check.";
+            await JS.InvokeVoidAsync("focusElement");
+            return;
+        }
+
+        try
+        {
+            var response = await Http.GetAsync(
+                $"http://localhost:5191/Product/GetBybarcode?BarCode={Uri.EscapeDataString(Barcode)}"
+            );
+
+            if (response.IsSuccessStatusCode)
+            {
+                Message = $"Product with barcode '{Barcode}' is registered.";
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                Message = $"Product with barcode '{Barcode}' is NOT registered.";
+            }
+            else
+            {
+                Message = "Error checking barcode.";
+            }
+        }
+        catch
+        {
+            Message = "Failed to check barcode due to network or server error.";
+        }
+
+        await JS.InvokeVoidAsync("focusElement");
+    }
+
+    private void RemoveProduct(string barcode)
+    {
+        var product = Products.FirstOrDefault(p => p.BarCode == barcode);
+        if (product != null)
+        {
+            Products.Remove(product);
+            Message = $"Removed barcode '{barcode}' from the list.";
+        }
+    }
 
     private async Task HandleKeyPress(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {
             await SubmitBarcode();
-            Barcode = "";
         }
-    }
-
-    public class Product
-    {
-        public string Barcode { get; set; } = "";
-        public string Name { get; set; } = "";
     }
 }

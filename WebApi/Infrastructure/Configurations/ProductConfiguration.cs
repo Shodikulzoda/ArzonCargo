@@ -15,8 +15,5 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         
         builder.HasIndex(p => p.BarCode)
             .IsUnique();
-
-        builder.Property(p => p.CreatedAt)
-            .IsRequired();
     }
 }

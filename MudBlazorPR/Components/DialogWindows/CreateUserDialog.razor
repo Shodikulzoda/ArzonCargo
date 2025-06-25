@@ -1,0 +1,35 @@
+@using ReferenceClass.Models
+@inject HttpClient Http
+@using MudBlazor
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">Create New User</MudText>
+        <MudTextField Label="Name" @bind-Value="UserModel.Name" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        <MudTextField Label="Phone" @bind-Value="UserModel.Phone" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        <MudTextField Label="Address" @bind-Value="UserModel.Address" Variant="Variant.Outlined" Margin="Margin.Dense" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit" Variant="Variant.Filled">Create</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public User UserModel { get; set; } = new();
+
+    private async Task Submit()
+    {
+        var response = await Http.PostAsJsonAsync("http://localhost:5191/User/CreateUser", UserModel);
+        if (response.IsSuccessStatusCode)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Console.WriteLine("Create failed: " + response.ReasonPhrase);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

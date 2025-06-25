@@ -4,6 +4,8 @@ using WebApi.Application.ProductData.Commands.CreateProduct;
 using WebApi.Application.ProductData.Commands.DeleteProduct;
 using WebApi.Application.ProductData.Commands.UpdateProduct;
 using WebApi.Application.ProductData.Queries.GetAllProduct;
+using WebApi.Application.ProductData.Queries.GetByBarCode;
+using WebApi.Application.ProductData.Queries.GetProductById;
 using WebApi.Application.ProductData.Queries.GetProductByPagination;
 
 namespace WebApi.Controllers;
@@ -22,6 +24,18 @@ public class ProductController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetAll()
     {
         return Ok(await mediator.Send(new GetAllProductQuery()));
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetProductById([FromQuery] GetProductByIdQuery getProductByIdQuery)
+    {
+        return Ok(await mediator.Send(getProductByIdQuery));
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetByBarcode([FromQuery] GetByBarCodeQuery query)
+    {
+        return Ok(await mediator.Send(query));
     }
 
     [HttpPost]

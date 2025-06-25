@@ -1,9 +1,10 @@
 @using MudBlazor
-@using MudBlazor.Components.Pages
+@using ReferenceClass.Models
 @inject HttpClient Http
+
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
-    [Parameter] public Users.User UserModel { get; set; } = new();
+    [Parameter] public User UserModel { get; set; } = new();
 
     private async Task Submit()
     {

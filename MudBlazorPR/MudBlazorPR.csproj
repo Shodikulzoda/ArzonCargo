@@ -18,4 +18,8 @@
         <_ContentIncludedByDefault Remove="DialogWindows\ConfirmDialog.razor" />
         <_ContentIncludedByDefault Remove="DialogWindows\EditUserDialog.razor" />
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ReferenceClass\ReferenceClass.csproj" />
+    </ItemGroup>
 </Project>
