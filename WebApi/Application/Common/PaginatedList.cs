@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using ReferenceClass.Models;
 
 namespace WebApi.Application.Common;
 
-public class PaginatedList<T>
+public class PaginatedList<T> where T : BaseEntity
 {
     public IEnumerable<T> Items { get; }
     public int PageNumber { get; }
@@ -21,11 +22,19 @@ public class PaginatedList<T>
 
     public bool HasNextPage => PageNumber < TotalPages;
 
-    public static async Task<PaginatedList<T>> CreateAsync(IQueryable<T> source, int pageNumber, int pageSize,
+    public static async Task<PaginatedList<T>> CreateAsync(
+        IQueryable<T> source,
+        int pageNumber,
+        int pageSize,
         CancellationToken cancellationToken = default)
     {
         var count = await source.CountAsync(cancellationToken);
-        var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
+        var items = await source
+            .OrderBy(x => x.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
         return new PaginatedList<T>(items, count, pageNumber, pageSize);
     }
 }
