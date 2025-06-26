@@ -13,11 +13,12 @@ public class GetProductByPaginationHandler(IProductRepository productRepository)
     public async Task<PaginatedList<Product>> Handle(GetProductByPaginationQuery request,
         CancellationToken cancellationToken)
     {
-        var productByPagination =
-            await productRepository.GetProductByPagination(request.Page, request.PageSize, cancellationToken);
+        var userPagination = await PaginatedList<Product>.CreateAsync(
+            productRepository.Queryable,
+            request.Page,
+            request.PageSize, cancellationToken);
 
-        var count = await productRepository.Count();
-
-        return new PaginatedList<Product>(productByPagination, count, request.Page, request.PageSize);
+        return new PaginatedList<Product>(userPagination.Items, userPagination.TotalCount, userPagination.PageNumber,
+            userPagination.TotalPages);
     }
 }

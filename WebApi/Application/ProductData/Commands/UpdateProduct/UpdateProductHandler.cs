@@ -7,7 +7,7 @@ namespace WebApi.Application.ProductData.Commands.UpdateProduct;
 
 public record UpdateProductCommand : IRequest<Product>
 {
-    public string? BarCode { get; set; }
+    public int Id { get; set; }
     public Status Status { get; set; }
 }
 
@@ -16,16 +16,18 @@ public class UpdateProductHandler(IProductRepository productRepository)
 {
     public async Task<Product> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.BarCode))
+        if (string.IsNullOrEmpty(request.Status.ToString()))
         {
             throw new Exception();
         }
 
-        var product = new Product
+        var product = await productRepository.GetById(request.Id);
+        if (product is null)
         {
-            BarCode = request.BarCode,
-            Status = request.Status,
-        };
+            return null;
+        }
+
+        product.Status = request.Status;
 
         await productRepository.Update(product);
 

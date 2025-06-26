@@ -5,4 +5,4 @@ public enum Status
     Created,
     Completed,
     Lost
-} 
+}

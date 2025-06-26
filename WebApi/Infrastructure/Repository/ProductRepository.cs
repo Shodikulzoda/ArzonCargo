@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ReferenceClass.Models;
+using ReferenceClass.Models.Enums;
 using WebApi.Application.Interfaces;
 using WebApi.Infrastructure.Data;
 
@@ -52,6 +53,7 @@ public class ProductRepository(ApplicationContext context) : BaseRepository<Prod
         return await context.Products
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
+            .OrderBy(x => x.Status == Status.Created)
             .ToListAsync(cancellationToken);
     }
 }

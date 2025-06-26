@@ -1,12 +1,12 @@
-﻿@page "/users"
+@page "/products"
 @inject HttpClient Http
 @inject IDialogService DialogService
 @using MudBlazor.Components.DialogWindows
 @using ReferenceClass.Models
 
-<PageTitle>Users</PageTitle>
+<PageTitle>Products</PageTitle>
 
-<MudText Typo="Typo.h4" GutterBottom="true">Users Table</MudText>
+<MudText Typo="Typo.h4" GutterBottom="true">Products Table</MudText>
 
 <div class="mb-4 d-flex gap-2">
     <MudTextField @bind-Value="SearchQuery"
@@ -15,39 +15,40 @@
                   AdornmentIcon="@Icons.Material.Filled.Search"
                   Immediate="true"
                   OnKeyDown="HandleKeyDown"
-                  Margin="Margin.Dense" />
-    <MudButton OnClick="SearchUsers" Color="Color.Primary" Variant="Variant.Filled">Search</MudButton>
-    <MudButton OnClick="OpenCreateDialog" Color="Color.Success" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add">
-        Add User
-    </MudButton>
+                  Margin="Margin.Dense"/>
+    <MudButton OnClick="SearchProduct" Color="Color.Primary" Variant="Variant.Filled">Search</MudButton>
 </div>
 
 @if (IsLoading)
 {
-    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+    <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
 }
 else
 {
-    <MudTable Items="UsersList" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
+    <MudTable Items="ProductList" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
         <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x => x.Id)">Id</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x => x.Name)">Name</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x => x.Address)">Address</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x => x.Phone)">Phone</MudTableSortLabel></MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<Product, object>(x => x.Id)">Id</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<Product, object>(x => x.BarCode)">BarCode</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<Product, object>(x => x.Status)">Status</MudTableSortLabel>
+            </MudTh>
             <MudTh>Actions</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="Name">@context.Name</MudTd>
-            <MudTd DataLabel="Address">@context.Address</MudTd>
-            <MudTd DataLabel="Phone">@context.Phone</MudTd>
+            <MudTd DataLabel="Name">@context.BarCode</MudTd>
+            <MudTd DataLabel="Address">@context.Status</MudTd>
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                Color="Color.Primary"
-                               OnClick="@(() => OpenEditDialog(context))" />
+                               OnClick="@(() => OpenEditDialog(context))"/>
                 <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                Color="Color.Error"
-                               OnClick="@(() => ConfirmDelete(context.Id))" />
+                               OnClick="@(() => ConfirmDelete(context.Id))"/>
             </MudTd>
         </RowTemplate>
     </MudTable>
@@ -60,8 +61,8 @@ else
 }
 
 @code {
-    private IEnumerable<User> UsersList { get; set; } = Enumerable.Empty<User>();
-    private UserDto? UserDtos { get; set; }
+    private IEnumerable<Product> ProductList { get; set; } = Enumerable.Empty<Product>();
+    private ProductDto? ProductDtos { get; set; }
 
     private int CurrentPage = 1;
     private int TotalPages = 1;
@@ -71,36 +72,37 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadUsers();
+        await LoadProduct();
     }
 
-    private async Task LoadUsers()
+    private async Task LoadProduct()
     {
         IsLoading = true;
         try
         {
-            string url = $"http://localhost:5191/User/UserPagination?Page={CurrentPage}&PageSize={PageSize}";
-            UserDtos = await Http.GetFromJsonAsync<UserDto>(url);
+            string url = $"http://localhost:5191/Product/ProductPagination?Page={CurrentPage}&PageSize={PageSize}";
+            ProductDtos = await Http.GetFromJsonAsync<ProductDto>(url);
 
-            if (UserDtos?.Users != null)
+            if (ProductDtos?.Products != null)
             {
-                UsersList = UserDtos.Users;
-                TotalPages = (int)Math.Ceiling((double)UserDtos.TotalCount / PageSize);
+                ProductList = ProductDtos.Products;
+                TotalPages = (int)Math.Ceiling((double)ProductDtos.TotalCount / PageSize);
             }
             else
             {
-                UsersList = Enumerable.Empty<User>();
+                ProductList = Enumerable.Empty<Product>();
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine("Error loading users: " + ex.Message);
-            UsersList = Enumerable.Empty<User>();
+            ProductList = Enumerable.Empty<Product>();
         }
+
         IsLoading = false;
     }
 
-    private async Task ConfirmDelete(int userId)
+    private async Task ConfirmDelete(int productId)
     {
         var parameters = new DialogParameters
         {
@@ -111,26 +113,26 @@ else
 
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
 
-        var dialog = DialogService.Show<UserConfirmDeleteDialog>("Confirm Delete", parameters, options);
+        var dialog = DialogService.Show<ProductConfirmDeleteDialog>("Confirm Delete", parameters, options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
-            await DeleteUser(userId);
+            await DeleteProduct(productId);
         }
     }
 
-    private async Task DeleteUser(int userId)
+    private async Task DeleteProduct(int productId)
     {
         IsLoading = true;
         try
         {
-            string url = $"http://localhost:5191/User/DeleteUser?Id={userId}";
+            string url = $"http://localhost:5191/Product/DeleteUser?Id={productId}";
             var response = await Http.DeleteAsync(url);
 
             if (response.IsSuccessStatusCode)
             {
-                await LoadUsers();
+                await LoadProduct();
             }
             else
             {
@@ -141,64 +143,47 @@ else
         {
             Console.WriteLine("Error deleting user: " + ex.Message);
         }
+
         IsLoading = false;
     }
 
-    private async Task OpenEditDialog(User user)
+    private async Task OpenEditDialog(Product product)
     {
         var parameters = new DialogParameters
         {
-            { "UserModel", new User {
-                Id = user.Id,
-                Name = user.Name,
-                Phone = user.Phone,
-                Address = user.Address,
-                Role = user.Role
-            }},
+            {
+                "Product", new Product
+                {
+                    Id = product.Id,
+                    Status = product.Status,
+                }
+            },
         };
 
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
 
-        var dialog = DialogService.Show<EditUserDialog>("Edit User", parameters, options);
+        var dialog = DialogService.Show<EditProductDialog>("Edit Product", parameters, options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
-            await LoadUsers();
+            await LoadProduct();
         }
     }
 
-    private async Task OpenCreateDialog()
-    {
-        var parameters = new DialogParameters
-        {
-            { "UserModel", new User() }
-        };
-
-        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
-
-        var dialog = DialogService.Show<CreateUserDialog>("Create User", parameters, options);
-        var result = await dialog.Result;
-
-        if (!result.Canceled)
-        {
-            await LoadUsers();
-        }
-    }
-
-    private async Task SearchUsers()
+    private async Task SearchProduct()
     {
         if (string.IsNullOrWhiteSpace(SearchQuery))
         {
-            await LoadUsers();
+            await LoadProduct();
             return;
         }
 
         IsLoading = true;
         try
         {
-            string url = $"http://localhost:5191/User/Search?Text={Uri.EscapeDataString(SearchQuery)}";
-            UsersList = await Http.GetFromJsonAsync<IEnumerable<User>>(url) ?? Enumerable.Empty<User>();
+            string url = $"http://localhost:5191/Product/Search?Text={Uri.EscapeDataString(SearchQuery)}";
+            ProductList = await Http.GetFromJsonAsync<IEnumerable<Product>>(url) ?? Enumerable.Empty<Product>();
 
             TotalPages = 1;
             CurrentPage = 1;
@@ -206,8 +191,9 @@ else
         catch (Exception ex)
         {
             Console.WriteLine("Search error: " + ex.Message);
-            UsersList = Enumerable.Empty<User>();
+            ProductList = Enumerable.Empty<Product>();
         }
+
         IsLoading = false;
         StateHasChanged();
     }
@@ -217,7 +203,7 @@ else
         if (CurrentPage < TotalPages)
         {
             CurrentPage++;
-            await LoadUsers();
+            await LoadProduct();
         }
     }
 
@@ -226,7 +212,7 @@ else
         if (CurrentPage > 1)
         {
             CurrentPage--;
-            await LoadUsers();
+            await LoadProduct();
         }
     }
 
@@ -234,7 +220,8 @@ else
     {
         if (args.Key == "Enter")
         {
-            await SearchUsers();
+            await SearchProduct();
         }
     }
+
 }

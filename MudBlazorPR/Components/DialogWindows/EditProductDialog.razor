@@ -1,0 +1,51 @@
+@using ReferenceClass.Models
+@inject HttpClient Http
+    @using ReferenceClass.Models.Enums
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public Product Product { get; set; } 
+
+    private async Task Submit()
+    {
+        var response = await Http.PutAsJsonAsync("http://localhost:5191/Product/UpdateProduct", Product);
+        if (response.IsSuccessStatusCode)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            Console.WriteLine("Update failed: " + response.ReasonPhrase);
+        }
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">Edit Product</MudText>
+
+        <MudTextField Label="Product Id"
+                      Variant="Variant.Outlined"
+                      @bind-Value="Product.Id"
+                      Margin="Margin.Dense"
+                      ReadOnly="false" />
+
+        <MudSelect T="Status"
+                   Label="Status"
+                   @bind-Value="Product.Status"
+                   Variant="Variant.Outlined"
+                   Margin="Margin.Dense">
+            @foreach (var status in Enum.GetValues<Status>())
+            {
+                <MudSelectItem Value="status">@status</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit" Variant="Variant.Filled">Save</MudButton>
+    </DialogActions>
+</MudDialog>

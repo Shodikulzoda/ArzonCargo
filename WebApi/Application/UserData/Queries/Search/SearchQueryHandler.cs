@@ -7,7 +7,7 @@ namespace WebApi.Application.UserData.Queries.Search;
 
 public class SearchQuery : IRequest<List<User>>
 {
-    public string Text { get; set; }
+    public string? Text { get; set; }
 }
 
 public class SearchQueryHandler(IUserRepository userRepository)
