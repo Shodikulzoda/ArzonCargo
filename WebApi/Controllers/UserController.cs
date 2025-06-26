@@ -42,12 +42,7 @@ public class UserController(IMediator mediator) : ControllerBase
     [HttpGet]
     public async Task<ActionResult<UserDto>> UserPagination([FromQuery] UsersByPaginationQuery user)
     {
-        var person = new UserDto();
-        var paginatedList = await mediator.Send(user);
-        person.Users = paginatedList.Items;
-        person.TotalCount = paginatedList.TotalCount;
-
-        return Ok(person);
+        return Ok(await mediator.Send(user));
     }
 
     [HttpGet]

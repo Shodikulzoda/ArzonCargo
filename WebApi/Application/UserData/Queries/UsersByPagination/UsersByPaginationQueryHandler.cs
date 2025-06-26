@@ -16,9 +16,8 @@ public class UsersByPaginationQueryHandler(IUserRepository userRepository)
         var userPagination = await PaginatedList<User>.CreateAsync(
             userRepository.Queryable,
             request.Page,
-            request.PageSize, cancellationToken);
-
-        return new PaginatedList<User>(userPagination.Items, userPagination.TotalCount, userPagination.PageNumber,
-            userPagination.TotalPages);
+            request.PageSize);
+        
+        return new  PaginatedList<User>(userPagination.Items, userPagination.TotalCount, userPagination.PageNumber, userPagination.TotalPages);
     }
 }
