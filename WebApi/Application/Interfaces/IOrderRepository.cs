@@ -10,6 +10,7 @@ public interface IOrderRepository : IBaseRepository<Order>
     Task<bool> Delete(int id);
     
     Task<Order?> GetById(int id);
+    Task<IEnumerable<Order>> GetOrdersByUserId(int id);
     Task<int> Count();
     Task<IEnumerable<Order>> GetOrderByPagination(int page, int pageSize, CancellationToken cancellationToken);
 

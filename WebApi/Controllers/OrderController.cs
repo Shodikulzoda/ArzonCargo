@@ -1,10 +1,12 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ReferenceClass.Models;
 using WebApi.Application.OrderData.Commands.CreateOrder;
 using WebApi.Application.OrderData.Commands.DeleteOrder;
 using WebApi.Application.OrderData.Commands.UpdateOrder;
 using WebApi.Application.OrderData.Queries.GetAllOrder;
 using WebApi.Application.OrderData.Queries.GetOrderById;
+using WebApi.Application.OrderData.Queries.GetOrdersByUserId;
 using WebApi.Application.OrderData.Queries.OrderByPagination;
 
 namespace WebApi.Controllers;
@@ -29,6 +31,13 @@ public class OrderController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> GetOrderById([FromQuery] GetOrderByIdQuery query)
     {
         return Ok(await mediator.Send(query));
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<PageData<Order>>> GetOrdersByUserId(
+        [FromQuery] GetOrdersByUserIdQuery getOrdersByUserIdQuery)
+    {
+        return Ok(await mediator.Send(getOrdersByUserIdQuery));
     }
 
     [HttpPost]

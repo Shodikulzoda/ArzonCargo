@@ -17,7 +17,8 @@ public class UsersByPaginationQueryHandler(IUserRepository userRepository)
             userRepository.Queryable,
             request.Page,
             request.PageSize, cancellationToken);
-        
-        return new  PaginatedList<User>(userPagination.Items, userPagination.TotalCount, userPagination.PageNumber, userPagination.TotalPages);
+
+        return new PaginatedList<User>(userPagination.Items, userPagination.TotalCount, userPagination.PageNumber,
+            userPagination.TotalPages);
     }
 }

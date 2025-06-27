@@ -29,7 +29,7 @@
 }
 else
 {
-    <MudTable Items="_pageDate.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
+    <MudTable Items="_userPage.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
         <HeaderContent>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<User, object>(x => x.Id)">Id</MudTableSortLabel>
@@ -51,6 +51,9 @@ else
             <MudTd DataLabel="Address">@context.Address</MudTd>
             <MudTd DataLabel="Phone">@context.Phone</MudTd>
             <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.ViewList"
+                               Color="Color.Success"
+                               OnClick="@(() => UserOrders(context.Id))"/>
                 <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                Color="Color.Primary"
                                OnClick="@(() => OpenEditDialog(context))"/>
@@ -70,7 +73,7 @@ else
 
 @code {
 
-    private PageData<User>? _pageDate = new();
+    private PageData<User>? _userPage = new();
 
     private int _currentPage = 1;
     private int _totalPages = 1;
@@ -89,21 +92,21 @@ else
         try
         {
             string url = $"http://localhost:5191/User/UserPagination?Page={_currentPage}&PageSize={PageSize}";
-            _pageDate = await Http.GetFromJsonAsync<PageData<User>>(url);
+            _userPage = await Http.GetFromJsonAsync<PageData<User>>(url);
 
-            if (_pageDate != null)
+            if (_userPage != null)
             {
-                _totalPages = (int)Math.Ceiling((double)_pageDate.TotalCount / PageSize);
+                _totalPages = (int)Math.Ceiling((double)_userPage.TotalCount / PageSize);
             }
             else
             {
-                _pageDate.Items = [];
+                _userPage.Items = [];
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine("Error loading users: " + ex.Message);
-            _pageDate.Items = [];
+            _userPage.Items = [];
         }
 
         _isLoading = false;
@@ -127,6 +130,23 @@ else
         {
             await DeleteUser(userId);
         }
+    }
+
+    private async Task UserOrders(int userId)
+    {
+        var parameters = new DialogParameters
+        {
+            { "UserId", userId }
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        };
+
+        DialogService.Show<UserDetailsDialog>("Orders for User", parameters, options);
     }
 
     private async Task DeleteUser(int userId)
@@ -211,7 +231,7 @@ else
         try
         {
             string url = $"http://localhost:5191/User/Search?Text={Uri.EscapeDataString(_searchQuery)}";
-            _pageDate.Items = await Http.GetFromJsonAsync<IEnumerable<User>>(url) ?? Enumerable.Empty<User>();
+            _userPage.Items = await Http.GetFromJsonAsync<IEnumerable<User>>(url) ?? Enumerable.Empty<User>();
 
             _totalPages = 1;
             _currentPage = 1;
@@ -219,7 +239,7 @@ else
         catch (Exception ex)
         {
             Console.WriteLine("Search error: " + ex.Message);
-            _pageDate.Items = [];
+            _userPage.Items = [];
         }
 
         _isLoading = false;

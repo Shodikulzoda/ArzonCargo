@@ -28,12 +28,12 @@ public class OrderRepository(ApplicationContext context) : BaseRepository<Order>
 
     public async Task<bool> Delete(int id)
     {
-        var order = await context.Orders.FirstOrDefaultAsync(x=>x.Id==id);
+        var order = await context.Orders.FirstOrDefaultAsync(x => x.Id == id);
         if (order is null)
         {
             return false;
         }
-        
+
         context.Orders.Remove(order);
         await context.SaveChangesAsync();
         return true;
@@ -42,6 +42,17 @@ public class OrderRepository(ApplicationContext context) : BaseRepository<Order>
     public async Task<Order?> GetById(int id)
     {
         return await context.Orders.FirstOrDefaultAsync(o => o.Id == id);
+    }
+
+    public async Task<IEnumerable<Order>> GetOrdersByUserId(int id)
+    {
+        var orders = context.Orders.Where(x => x.UserId == id).AsEnumerable();
+        if (orders is null)
+        {
+            return null;
+        }
+
+        return orders;
     }
 
     public async Task<int> Count()
