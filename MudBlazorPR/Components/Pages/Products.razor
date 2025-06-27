@@ -1,7 +1,7 @@
 @page "/products"
 @inject HttpClient Http
 @inject IDialogService DialogService
-@using MudBlazor.Components.DialogWindows
+@using MudBlazor.Components.DialogWindows.ProductDialogs
 @using ReferenceClass.Models
 
 <PageTitle>Products</PageTitle>
@@ -9,7 +9,7 @@
 <MudText Typo="Typo.h4" GutterBottom="true">Products Table</MudText>
 
 <div class="mb-4 d-flex gap-2">
-    <MudTextField @bind-Value="SearchQuery"
+    <MudTextField @bind-Value="_searchQuery"
                   Placeholder="Search by name, phone, etc..."
                   Adornment="Adornment.Start"
                   AdornmentIcon="@Icons.Material.Filled.Search"
@@ -19,13 +19,13 @@
     <MudButton OnClick="SearchProduct" Color="Color.Primary" Variant="Variant.Filled">Search</MudButton>
 </div>
 
-@if (IsLoading)
+@if (_isLoading)
 {
     <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
 }
 else
 {
-    <MudTable Items="ProductList" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
+    <MudTable Items="_productPage?.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
         <HeaderContent>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<Product, object>(x => x.Id)">Id</MudTableSortLabel>
@@ -45,109 +45,89 @@ else
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                Color="Color.Primary"
-                               OnClick="@(() => OpenEditDialog(context))"/>
+                               OnClick="@(() => Update(context))"/>
                 <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                Color="Color.Error"
-                               OnClick="@(() => ConfirmDelete(context.Id))"/>
+                               OnClick="@(() => Delete(context.Id))"/>
             </MudTd>
         </RowTemplate>
     </MudTable>
 
     <div class="mt-4 d-flex justify-between">
-        <MudButton OnClick="Decrement" Disabled="@(CurrentPage <= 1)" Color="Color.Secondary">Back</MudButton>
-        <MudText Class="mx-2">@CurrentPage / @TotalPages</MudText>
-        <MudButton OnClick="Increment" Disabled="@(CurrentPage >= TotalPages)" Color="Color.Primary">Next</MudButton>
+        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Back</MudButton>
+        <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
+        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Next</MudButton>
     </div>
 }
 
 @code {
-    private IEnumerable<Product> ProductList { get; set; } = Enumerable.Empty<Product>();
-    private ProductDto? ProductDtos { get; set; }
+    private PageData<Product>? _productPage = new();
 
-    private int CurrentPage = 1;
-    private int TotalPages = 1;
-    private int PageSize = 10;
-    private bool IsLoading = false;
-    private string SearchQuery = "";
+    private int _currentPage = 1;
+    private int _totalPages = 1;
+    private readonly int _pageSize = 15;
+    private bool _isLoading;
+    private string _searchQuery = "";
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadProduct();
+        await LoadProducts();
     }
 
-    private async Task LoadProduct()
+    private async Task LoadProducts()
     {
-        IsLoading = true;
+        _isLoading = true;
         try
         {
-            string url = $"http://localhost:5191/Product/ProductPagination?Page={CurrentPage}&PageSize={PageSize}";
-            ProductDtos = await Http.GetFromJsonAsync<ProductDto>(url);
+            string url = $"http://localhost:5191/Product/ProductPagination?Page={_currentPage}&PageSize={_pageSize}";
+            _productPage = await Http.GetFromJsonAsync<PageData<Product>>(url);
 
-            if (ProductDtos?.Products != null)
+            if (_productPage?.Items != null)
             {
-                ProductList = ProductDtos.Products;
-                TotalPages = (int)Math.Ceiling((double)ProductDtos.TotalCount / PageSize);
+                _totalPages = (int)Math.Ceiling((double)_productPage.TotalCount / _pageSize);
             }
             else
             {
-                ProductList = Enumerable.Empty<Product>();
+                _productPage.Items = [];
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine("Error loading users: " + ex.Message);
-            ProductList = Enumerable.Empty<Product>();
+            _productPage.Items = [];
         }
 
-        IsLoading = false;
+        _isLoading = false;
     }
 
-    private async Task ConfirmDelete(int productId)
+    private async Task Delete(int productId)
     {
         var parameters = new DialogParameters
         {
-            { "ContentText", "Are you sure you want to delete this user?" },
-            { "ButtonText", "Delete" },
-            { "Color", Color.Error }
+            { "ProductId", productId }
         };
 
-        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
-
-        var dialog = DialogService.Show<ProductConfirmDeleteDialog>("Confirm Delete", parameters, options);
-        var result = await dialog.Result;
-
-        if (!result.Canceled)
+        var options = new DialogOptions
         {
-            await DeleteProduct(productId);
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        };
+
+        var dialogReference = await DialogService.ShowAsync<DeleteProductDialog>("Delete Product", parameters, options);
+
+        var dialogReferenceResult = await dialogReference.Result;
+
+        if (dialogReferenceResult is not null)
+        {
+            if (!dialogReferenceResult.Canceled)
+            {
+                await LoadProducts();
+            }
         }
     }
 
-    private async Task DeleteProduct(int productId)
-    {
-        IsLoading = true;
-        try
-        {
-            string url = $"http://localhost:5191/Product/DeleteUser?Id={productId}";
-            var response = await Http.DeleteAsync(url);
-
-            if (response.IsSuccessStatusCode)
-            {
-                await LoadProduct();
-            }
-            else
-            {
-                Console.WriteLine("Error deleting user: " + response.ReasonPhrase);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error deleting user: " + ex.Message);
-        }
-
-        IsLoading = false;
-    }
-
-    private async Task OpenEditDialog(Product product)
+    private async Task Update(Product product)
     {
         var parameters = new DialogParameters
         {
@@ -160,59 +140,67 @@ else
             },
         };
 
-        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        };
 
-        var dialog = DialogService.Show<EditProductDialog>("Edit Product", parameters, options);
+        var dialog = await DialogService.ShowAsync<EditProductDialog>("Edit Product", parameters, options);
         var result = await dialog.Result;
 
-        if (!result.Canceled)
+        if (result is not null)
         {
-            await LoadProduct();
+            if (!result.Canceled)
+            {
+                await LoadProducts();
+            }
         }
     }
 
     private async Task SearchProduct()
     {
-        if (string.IsNullOrWhiteSpace(SearchQuery))
+        if (string.IsNullOrWhiteSpace(_searchQuery))
         {
-            await LoadProduct();
+            await LoadProducts();
             return;
         }
 
-        IsLoading = true;
+        _isLoading = true;
         try
         {
-            string url = $"http://localhost:5191/Product/Search?Text={Uri.EscapeDataString(SearchQuery)}";
-            ProductList = await Http.GetFromJsonAsync<IEnumerable<Product>>(url) ?? Enumerable.Empty<Product>();
+            var url = $"http://localhost:5191/Product/Search?Text={Uri.EscapeDataString(_searchQuery)}";
+            _productPage = await Http.GetFromJsonAsync<PageData<Product>>(url) ?? new PageData<Product>();
 
-            TotalPages = 1;
-            CurrentPage = 1;
+            _totalPages = 1;
+            _currentPage = 1;
         }
         catch (Exception ex)
         {
             Console.WriteLine("Search error: " + ex.Message);
-            ProductList = Enumerable.Empty<Product>();
+            _productPage.Items = [];
         }
 
-        IsLoading = false;
+        _isLoading = false;
         StateHasChanged();
     }
 
     private async Task Increment()
     {
-        if (CurrentPage < TotalPages)
+        if (_currentPage < _totalPages)
         {
-            CurrentPage++;
-            await LoadProduct();
+            _currentPage++;
+            await LoadProducts();
         }
     }
 
     private async Task Decrement()
     {
-        if (CurrentPage > 1)
+        if (_currentPage > 1)
         {
-            CurrentPage--;
-            await LoadProduct();
+            _currentPage--;
+            await LoadProducts();
         }
     }
 

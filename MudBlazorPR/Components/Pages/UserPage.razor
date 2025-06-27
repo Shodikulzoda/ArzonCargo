@@ -1,7 +1,7 @@
 ﻿@page "/users"
 @inject HttpClient Http
 @inject IDialogService DialogService
-@using MudBlazor.Components.DialogWindows
+@using MudBlazor.Components.DialogWindows.UserDialogs
 @using ReferenceClass.Models
 
 <PageTitle>UserPage</PageTitle>
@@ -29,7 +29,7 @@
 }
 else
 {
-    <MudTable Items="_userPage.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
+    <MudTable Items="_userPage?.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
         <HeaderContent>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<User, object>(x => x.Id)">Id</MudTableSortLabel>
@@ -56,10 +56,10 @@ else
                                OnClick="@(() => UserOrders(context.Id))"/>
                 <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                Color="Color.Primary"
-                               OnClick="@(() => OpenEditDialog(context))"/>
+                               OnClick="@(() => Update(context))"/>
                 <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                Color="Color.Error"
-                               OnClick="@(() => ConfirmDelete(context.Id))"/>
+                               OnClick="@(() => Delete(context.Id))"/>
             </MudTd>
         </RowTemplate>
     </MudTable>
@@ -91,10 +91,10 @@ else
         _isLoading = true;
         try
         {
-            string url = $"http://localhost:5191/User/UserPagination?Page={_currentPage}&PageSize={PageSize}";
+            var url = $"http://localhost:5191/User/UserPagination?Page={_currentPage}&PageSize={PageSize}";
             _userPage = await Http.GetFromJsonAsync<PageData<User>>(url);
 
-            if (_userPage != null)
+            if (_userPage?.Items != null)
             {
                 _totalPages = (int)Math.Ceiling((double)_userPage.TotalCount / PageSize);
             }
@@ -112,23 +112,29 @@ else
         _isLoading = false;
     }
 
-    private async Task ConfirmDelete(int userId)
+    private async Task Delete(int userId)
     {
         var parameters = new DialogParameters
         {
-            { "ContentText", "Are you sure you want to delete this user?" },
-            { "ButtonText", "Delete" },
-            { "Color", Color.Error }
+            { "UserId", userId }
         };
 
-        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        };
 
-        var dialog = DialogService.Show<UserConfirmDeleteDialog>("Confirm Delete", parameters, options);
+        var dialog = await DialogService.ShowAsync<DeleteUserDialog>("Confirm Delete", parameters, options);
         var result = await dialog.Result;
 
-        if (!result.Canceled)
+        if (result is not null)
         {
-            await DeleteUser(userId);
+            if (!result.Canceled)
+            {
+                await LoadUsers();
+            }
         }
     }
 
@@ -146,35 +152,19 @@ else
             FullWidth = true
         };
 
-        DialogService.Show<UserDetailsDialog>("Orders for User", parameters, options);
-    }
+        var dialogReference = await DialogService.ShowAsync<OrdersPaginationUserDialog>("Orders for User", parameters, options);
+        var dialogReferenceResult = await dialogReference.Result;
 
-    private async Task DeleteUser(int userId)
-    {
-        _isLoading = true;
-        try
+        if (dialogReferenceResult is not null)
         {
-            string url = $"http://localhost:5191/User/DeleteUser?Id={userId}";
-            var response = await Http.DeleteAsync(url);
-
-            if (response.IsSuccessStatusCode)
+            if (!dialogReferenceResult.Canceled)
             {
                 await LoadUsers();
             }
-            else
-            {
-                Console.WriteLine("Error deleting user: " + response.ReasonPhrase);
-            }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error deleting user: " + ex.Message);
-        }
-
-        _isLoading = false;
     }
 
-    private async Task OpenEditDialog(User user)
+    private async Task Update(User user)
     {
         var parameters = new DialogParameters
         {
@@ -195,9 +185,12 @@ else
         var dialog = await DialogService.ShowAsync<EditUserDialog>("Edit User", parameters, options);
         var result = await dialog.Result;
 
-        if (!result.Canceled)
+        if (result is not null)
         {
-            await LoadUsers();
+            if (!result.Canceled)
+            {
+                await LoadUsers();
+            }
         }
     }
 
@@ -213,9 +206,12 @@ else
         var dialog = await DialogService.ShowAsync<CreateUserDialog>("Create User", parameters, options);
         var result = await dialog.Result;
 
-        if (!result.Canceled)
+        if (result is not null)
         {
-            await LoadUsers();
+            if (!result.Canceled)
+            {
+                await LoadUsers();
+            }
         }
     }
 
@@ -231,7 +227,7 @@ else
         try
         {
             string url = $"http://localhost:5191/User/Search?Text={Uri.EscapeDataString(_searchQuery)}";
-            _userPage.Items = await Http.GetFromJsonAsync<IEnumerable<User>>(url) ?? Enumerable.Empty<User>();
+            _userPage.Items = await Http.GetFromJsonAsync<IEnumerable<User>>(url) ?? [];
 
             _totalPages = 1;
             _currentPage = 1;

@@ -47,16 +47,12 @@ public class ProductController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ProductDto>> ProductPagination(
+    public async Task<ActionResult<PageData<Product>>> ProductPagination(
         [FromQuery] GetProductByPaginationQuery getProductByPaginationQuery)
-
     {
-        var productDto = new ProductDto();
         var paginatedList = await mediator.Send(getProductByPaginationQuery);
-        productDto.Products = paginatedList.Items;
-        productDto.TotalCount = paginatedList.TotalCount;
 
-        return Ok(productDto);
+        return Ok(paginatedList);
     }
 
     [HttpPut]
