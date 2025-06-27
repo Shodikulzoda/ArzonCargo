@@ -29,12 +29,18 @@ public class ProductRepository(ApplicationContext context) : BaseRepository<Prod
         return product;
     }
 
-    public async Task<Product> Delete(Product product)
+    public async Task<bool> Delete(int id)
     {
+        var product = await context.Products.FirstOrDefaultAsync(x=>x.Id==id);
+        if (product is null)
+        {
+            return false;
+        }
+        
         context.Products.Remove(product);
         await context.SaveChangesAsync();
 
-        return product;
+        return true;
     }
 
     public async Task<Product?> GetById(int id)

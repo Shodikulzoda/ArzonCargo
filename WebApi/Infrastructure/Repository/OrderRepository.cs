@@ -26,11 +26,17 @@ public class OrderRepository(ApplicationContext context) : BaseRepository<Order>
         return order;
     }
 
-    public async Task<Order> Delete(Order order)
+    public async Task<bool> Delete(int id)
     {
+        var order = await context.Orders.FirstOrDefaultAsync(x=>x.Id==id);
+        if (order is null)
+        {
+            return false;
+        }
+        
         context.Orders.Remove(order);
         await context.SaveChangesAsync();
-        return order;
+        return true;
     }
 
     public async Task<Order?> GetById(int id)

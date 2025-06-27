@@ -7,7 +7,8 @@ public interface IPocketRepository : IBaseRepository<Pocket>
     Task<Pocket> Add(Pocket pocket);
     Task<IEnumerable<Pocket>> GetAll();
     Task<Pocket> Update(Pocket pocket);
-    Task<Pocket> Delete(Pocket pocket);
+    Task<bool> Delete(int id);
+    
     Task<Pocket?> GetById(int id);
 
     Task<Pocket> GetByUserId(int id);

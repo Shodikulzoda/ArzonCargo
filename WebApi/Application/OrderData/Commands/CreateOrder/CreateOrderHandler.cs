@@ -30,13 +30,13 @@ public class CreateOrderHandler(
             return null;
         }
 
-        var byUserId = await pocketRepository.GetByUserId(request.UserId);
-        if (byUserId is null)
+        var pocketById = await pocketRepository.GetByUserId(request.UserId);
+        if (pocketById is null)
         {
             return null;
         }
 
-        var orderItems = byUserId.PocketItems.Select(x => new OrderItem
+        var orderItems = pocketById.PocketItems.Select(x => new OrderItem
         {
             ProductId = x.ProductId,
             Product = x.Product,
@@ -56,11 +56,11 @@ public class CreateOrderHandler(
 
         orderItems.Select(orderItemRepository.Add);
 
-        var byPocketId = await pocketItemRepository.GetByPocketId(byUserId.Id);
+        var byPocketId = await pocketItemRepository.GetByPocketId(pocketById.Id);
 
         byPocketId.Select(x => pocketItemRepository.Delete(x.Id));
 
-        pocketRepository.Delete(byUserId.Id);
+        pocketRepository.Delete(pocketById.Id);
 
         return add;
     }

@@ -30,12 +30,18 @@ public class UserRepository(ApplicationContext context) : BaseRepository<User>(c
         return user;
     }
 
-    public async Task<User> Delete(User user)
+    public async Task<bool> Delete(int id)
     {
+        var user = await context.Users.FirstOrDefaultAsync(x=>x.Id==id);
+        if (user is null)
+        {
+            return false;
+        }
+        
         context.Users.Remove(user);
         await context.SaveChangesAsync();
 
-        return user;
+        return true;
     }
 
     public async Task<User?> GetById(int id)

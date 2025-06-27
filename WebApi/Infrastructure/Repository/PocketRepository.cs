@@ -26,11 +26,17 @@ public class PocketRepository(ApplicationContext context) : BaseRepository<Pocke
         return pocket;
     }
 
-    public async Task<Pocket> Delete(Pocket pocket)
+    public async Task<bool> Delete(int id)
     {
+        var pocket = await context.Pockets.FirstOrDefaultAsync(x=>x.Id==id);
+        if (pocket is null)
+        {
+            return false;
+        }
+        
         context.Pockets.Remove(pocket);
         await context.SaveChangesAsync();
-        return pocket;
+        return true;
     }
 
     public async Task<Pocket?> GetById(int id)

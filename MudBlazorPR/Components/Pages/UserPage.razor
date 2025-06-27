@@ -9,31 +9,40 @@
 <MudText Typo="Typo.h4" GutterBottom="true">UserPage Table</MudText>
 
 <div class="mb-4 d-flex gap-2">
-    <MudTextField @bind-Value="SearchQuery"
+    <MudTextField @bind-Value="_searchQuery"
                   Placeholder="Search by name, phone, etc..."
                   Adornment="Adornment.Start"
                   AdornmentIcon="@Icons.Material.Filled.Search"
                   Immediate="true"
                   OnKeyDown="HandleKeyDown"
-                  Margin="Margin.Dense" />
+                  Margin="Margin.Dense"/>
     <MudButton OnClick="SearchUsers" Color="Color.Primary" Variant="Variant.Filled">Search</MudButton>
-    <MudButton OnClick="OpenCreateDialog" Color="Color.Success" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add">
+    <MudButton OnClick="OpenCreateDialog" Color="Color.Success" Variant="Variant.Filled"
+               StartIcon="@Icons.Material.Filled.Add">
         Add User
     </MudButton>
 </div>
 
-@if (IsLoading)
+@if (_isLoading)
 {
-    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+    <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
 }
 else
 {
-    <MudTable Items="pageDate.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
+    <MudTable Items="_pageDate.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
         <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x => x.Id)">Id</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x => x.Name)">Name</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x => x.Phone)">Phone</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<User, object>(x => x.Address)">Address</MudTableSortLabel></MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<User, object>(x => x.Id)">Id</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<User, object?>(x => x.Name)">Name</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<User, object?>(x => x.Phone)">Phone</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<User, object?>(x => x.Address)">Address</MudTableSortLabel>
+            </MudTh>
             <MudTh>Actions</MudTh>
         </HeaderContent>
         <RowTemplate>
@@ -44,30 +53,30 @@ else
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                Color="Color.Primary"
-                               OnClick="@(() => OpenEditDialog(context))" />
+                               OnClick="@(() => OpenEditDialog(context))"/>
                 <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                Color="Color.Error"
-                               OnClick="@(() => ConfirmDelete(context.Id))" />
+                               OnClick="@(() => ConfirmDelete(context.Id))"/>
             </MudTd>
         </RowTemplate>
     </MudTable>
 
     <div class="mt-4 d-flex justify-between">
-        <MudButton OnClick="Decrement" Disabled="@(CurrentPage <= 1)" Color="Color.Secondary">Back</MudButton>
-        <MudText Class="mx-2">@CurrentPage / @TotalPages</MudText>
-        <MudButton OnClick="Increment" Disabled="@(CurrentPage >= TotalPages)" Color="Color.Primary">Next</MudButton>
+        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Back</MudButton>
+        <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
+        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Next</MudButton>
     </div>
 }
 
 @code {
 
-    private PageData<User> pageDate = new();
-    
-    private int CurrentPage = 1;
-    private int TotalPages = 1;
-    private int PageSize = 10;
-    private bool IsLoading = false;
-    private string SearchQuery = "";
+    private PageData<User>? _pageDate = new();
+
+    private int _currentPage = 1;
+    private int _totalPages = 1;
+    private const int PageSize = 15;
+    private bool _isLoading;
+    private string _searchQuery = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -76,28 +85,28 @@ else
 
     private async Task LoadUsers()
     {
-        IsLoading = true;
+        _isLoading = true;
         try
         {
-            string url = $"http://localhost:5191/User/UserPagination?Page={CurrentPage}&PageSize={PageSize}";
-            pageDate = await Http.GetFromJsonAsync<PageData<User>>(url);
+            string url = $"http://localhost:5191/User/UserPagination?Page={_currentPage}&PageSize={PageSize}";
+            _pageDate = await Http.GetFromJsonAsync<PageData<User>>(url);
 
-            if (pageDate != null)
+            if (_pageDate != null)
             {
-                TotalPages = (int)Math.Ceiling((double)pageDate.TotalCount / PageSize);
-                
+                _totalPages = (int)Math.Ceiling((double)_pageDate.TotalCount / PageSize);
             }
             else
             {
-                pageDate.Items = [];
+                _pageDate.Items = [];
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine("Error loading users: " + ex.Message);
-            pageDate.Items = [];
+            _pageDate.Items = [];
         }
-        IsLoading = false;
+
+        _isLoading = false;
     }
 
     private async Task ConfirmDelete(int userId)
@@ -122,7 +131,7 @@ else
 
     private async Task DeleteUser(int userId)
     {
-        IsLoading = true;
+        _isLoading = true;
         try
         {
             string url = $"http://localhost:5191/User/DeleteUser?Id={userId}";
@@ -141,25 +150,29 @@ else
         {
             Console.WriteLine("Error deleting user: " + ex.Message);
         }
-        IsLoading = false;
+
+        _isLoading = false;
     }
 
     private async Task OpenEditDialog(User user)
     {
         var parameters = new DialogParameters
         {
-            { "UserModel", new User {
-                Id = user.Id,
-                Name = user.Name,
-                Phone = user.Phone,
-                Address = user.Address,
-                Role = user.Role
-            }},
+            {
+                "UserModel", new User
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Phone = user.Phone,
+                    Address = user.Address,
+                    Role = user.Role
+                }
+            },
         };
 
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
 
-        var dialog = DialogService.Show<EditUserDialog>("Edit User", parameters, options);
+        var dialog = await DialogService.ShowAsync<EditUserDialog>("Edit User", parameters, options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
@@ -177,7 +190,7 @@ else
 
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
 
-        var dialog = DialogService.Show<CreateUserDialog>("Create User", parameters, options);
+        var dialog = await DialogService.ShowAsync<CreateUserDialog>("Create User", parameters, options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
@@ -188,44 +201,45 @@ else
 
     private async Task SearchUsers()
     {
-        if (string.IsNullOrWhiteSpace(SearchQuery))
+        if (string.IsNullOrWhiteSpace(_searchQuery))
         {
             await LoadUsers();
             return;
         }
 
-        IsLoading = true;
+        _isLoading = true;
         try
         {
-            string url = $"http://localhost:5191/User/Search?Text={Uri.EscapeDataString(SearchQuery)}";
-            pageDate.Items = await Http.GetFromJsonAsync<IEnumerable<User>>(url) ?? Enumerable.Empty<User>();
+            string url = $"http://localhost:5191/User/Search?Text={Uri.EscapeDataString(_searchQuery)}";
+            _pageDate.Items = await Http.GetFromJsonAsync<IEnumerable<User>>(url) ?? Enumerable.Empty<User>();
 
-            TotalPages = 1;
-            CurrentPage = 1;
+            _totalPages = 1;
+            _currentPage = 1;
         }
         catch (Exception ex)
         {
             Console.WriteLine("Search error: " + ex.Message);
-            pageDate.Items = [];
+            _pageDate.Items = [];
         }
-        IsLoading = false;
+
+        _isLoading = false;
         StateHasChanged();
     }
 
     private async Task Increment()
     {
-        if (CurrentPage < TotalPages)
+        if (_currentPage < _totalPages)
         {
-            CurrentPage++;
+            _currentPage++;
             await LoadUsers();
         }
     }
 
     private async Task Decrement()
     {
-        if (CurrentPage > 1)
+        if (_currentPage > 1)
         {
-            CurrentPage--;
+            _currentPage--;
             await LoadUsers();
         }
     }
@@ -237,4 +251,5 @@ else
             await SearchUsers();
         }
     }
+
 }

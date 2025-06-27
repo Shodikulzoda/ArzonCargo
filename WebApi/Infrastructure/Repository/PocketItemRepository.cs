@@ -40,12 +40,18 @@ public class PocketItemRepository(ApplicationContext context)
         return pocketItem;
     }
 
-    public async Task<PocketItem> Delete(PocketItem pocketItem)
+    public async Task<bool> Delete(int id)
     {
+        var pocketItem = await context.PocketItem.FirstOrDefaultAsync(x => x.Id == id);
+        if (pocketItem is null)
+        {
+            return false;
+        }
+
         context.PocketItem.Remove(pocketItem);
         await context.SaveChangesAsync();
 
-        return pocketItem;
+        return true;
     }
 
     public async Task<IEnumerable<PocketItem?>> GetByPocketId(int id)

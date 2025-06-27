@@ -33,8 +33,14 @@ public class OrderItemRepository(ApplicationContext context) : BaseRepository<Or
         return order;
     }
 
-    public async Task<bool> Delete(OrderItem orderItem)
+    public async Task<bool> Delete(int id)
     {
+        var orderItem = await context.OrderItems.FirstOrDefaultAsync(x=>x.Id==id);
+        if (orderItem is null)
+        {
+            return false;
+        }
+        
         context.OrderItems.Remove(orderItem);
         await context.SaveChangesAsync();
 
