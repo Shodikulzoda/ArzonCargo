@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ReferenceClass.Models;
+using WebApi.Application.OrderItemData.Queries.GetByOrderId;
 using WebApi.Application.UserData.Commands.CreateUser;
 using WebApi.Application.UserData.Commands.DeleteUser;
 using WebApi.Application.UserData.Commands.UpdateUser;
@@ -41,9 +42,9 @@ public class UserController(IMediator mediator) : ControllerBase
 
     [HttpGet]
     public async Task<ActionResult<PageData<User>>> UserPagination(
-        [FromQuery] UsersByPaginationQuery getProductByPaginationQuery)
+        [FromQuery] UsersByPaginationQuery usersByPaginationQuery)
     {
-        var paginatedList = await mediator.Send(getProductByPaginationQuery);
+        var paginatedList = await mediator.Send(usersByPaginationQuery);
         
         return Ok(paginatedList);
     }

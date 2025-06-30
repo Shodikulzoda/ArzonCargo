@@ -1,0 +1,106 @@
+@using ReferenceClass.Models
+@inject HttpClient Http
+@if (_isLoading)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
+}
+else
+{
+    <MudTable Items="_orderItems.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
+        <HeaderContent>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<OrderItem, object>(x => x.Id)">Id</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.OrderId)">BarCode</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.ProductId)">TotalWeight
+                </MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.CreatedAt)">TotalAmount
+                </MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.IsDeleted)">Status</MudTableSortLabel>
+            </MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="OrderId">@context.OrderId</MudTd>
+            <MudTd DataLabel="ProductId">@context.ProductId</MudTd>
+            <MudTd DataLabel="CreateAt">@context.CreatedAt</MudTd>
+            <MudTd DataLabel="IsDelete">@context.IsDeleted</MudTd>
+        </RowTemplate>
+    </MudTable>
+
+    <div class="mt-4 d-flex justify-between">
+        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Back</MudButton>
+        <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
+        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Next</MudButton>
+    </div>
+}
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public int OrderId { get; set; }
+
+    private PageData<OrderItem>? _orderItems = new();
+
+    private int _currentPage = 1;
+    private int _totalPages = 1;
+    private const int PageSize = 15;
+    private bool _isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOrders();
+    }
+
+    private async Task LoadOrders()
+    {
+        _isLoading = true;
+
+        try
+        {
+            var url = $"http://localhost:5191/OrderItem/GetOrdersByUserId?OrderId={OrderId}&Page={_currentPage}&PageSize={PageSize}";
+            _orderItems = await Http.GetFromJsonAsync<PageData<OrderItem>>(url);
+
+            if (_orderItems != null)
+            {
+                _orderItems.TotalPages = (int)Math.Ceiling((double)_orderItems.TotalCount / PageSize);
+            }
+            else
+            {
+                _orderItems.Items = [];
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Failed to load orders: " + ex.Message);
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task Increment()
+    {
+        if (_currentPage < _totalPages)
+        {
+            _currentPage++;
+            await LoadOrders();
+        }
+    }
+
+    private async Task Decrement()
+    {
+        if (_currentPage > 1)
+        {
+            _currentPage--;
+            await LoadOrders();
+        }
+    }
+
+    private void Close() => MudDialog.Cancel();
+}

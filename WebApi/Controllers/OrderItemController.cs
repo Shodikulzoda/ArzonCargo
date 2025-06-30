@@ -1,9 +1,11 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using ReferenceClass.Models;
 using WebApi.Application.OrderItemData.Commands.CreateOrderItem;
 using WebApi.Application.OrderItemData.Commands.DeleteOrderItem;
 using WebApi.Application.OrderItemData.Commands.UpdateOrderItem;
 using WebApi.Application.OrderItemData.Queries.GetAllOrderItem;
+using WebApi.Application.OrderItemData.Queries.GetByOrderId;
 using WebApi.Application.OrderItemData.Queries.GetOrderItemById;
 using WebApi.Application.OrderItemData.Queries.OrderItemByPagination;
 
@@ -30,6 +32,14 @@ public class OrderItemController(IMediator mediator) : ControllerBase
     {
         return Ok(await mediator.Send(query));
     }
+
+    [HttpGet]
+    public async Task<ActionResult<PageData<OrderItem>>> GetOrdersByUserId(
+        [FromQuery] GetByOrderIdQuery getByOrderIdQuery)
+    {
+        return Ok(await mediator.Send(getByOrderIdQuery));
+    }
+
 
     [HttpPost]
     public async Task<IActionResult> OrderPagination([FromBody] OrderItemByPaginationQuery query)

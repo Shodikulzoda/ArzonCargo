@@ -1,5 +1,7 @@
 @using ReferenceClass.Models
 @inject HttpClient Http
+@inject IDialogService DialogService
+
 @if (_isLoading)
 {
     <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
@@ -30,6 +32,11 @@ else
             <MudTd DataLabel="TotalWeight">@context.TotalWeight</MudTd>
             <MudTd DataLabel="TotalAmount">@context.TotalAmount</MudTd>
             <MudTd DataLabel="Status">@context.Status</MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.ViewList"
+                               Color="Color.Success"
+                               OnClick="@(() => UserOrderItems(context.Id))"/>
+            </MudTd>
         </RowTemplate>
     </MudTable>
 
@@ -80,6 +87,32 @@ else
         }
 
         _isLoading = false;
+    }
+
+    private async Task UserOrderItems(int orderId)
+    {
+        var parameters = new DialogParameters
+        {
+            { "OrderId", orderId }
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        };
+
+        var dialogReference = await DialogService.ShowAsync<OrderItems>("OrderItem Of Order", parameters, options);
+        var dialogReferenceResult = await dialogReference.Result;
+
+        if (dialogReferenceResult is not null)
+        {
+            if (!dialogReferenceResult.Canceled)
+            {
+                await LoadOrders();
+            }
+        }
     }
 
     private async Task Increment()
