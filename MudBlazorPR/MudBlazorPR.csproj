@@ -8,18 +8,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0"/>
         <PackageReference Include="MudBlazor" Version="7.*"/>
     </ItemGroup>
 
     <ItemGroup>
         <_ContentIncludedByDefault Remove="Pages1\Counter1.razor"/>
         <_ContentIncludedByDefault Remove="Pages1\Home1.razor"/>
-        <_ContentIncludedByDefault Remove="DialogWindows\ConfirmDialog.razor" />
-        <_ContentIncludedByDefault Remove="DialogWindows\EditUserDialog.razor" />
+        <_ContentIncludedByDefault Remove="DialogWindows\ConfirmDialog.razor"/>
+        <_ContentIncludedByDefault Remove="DialogWindows\EditUserDialog.razor"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ReferenceClass\ReferenceClass.csproj" />
+        <ProjectReference Include="..\ReferenceClass\ReferenceClass.csproj"/>
     </ItemGroup>
+    
 </Project>

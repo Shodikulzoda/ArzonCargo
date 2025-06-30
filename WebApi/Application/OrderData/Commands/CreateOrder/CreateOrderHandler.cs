@@ -57,10 +57,15 @@ public class CreateOrderHandler(
         orderItems.Select(orderItemRepository.Add);
 
         var byPocketId = await pocketItemRepository.GetByPocketId(pocketById.Id);
+        foreach (var pocketItem in byPocketId)
+        {
+            if (pocketItem is not null)
+            {
+                await pocketItemRepository.Delete(pocketItem.Id);
+            }
+        }
 
-        byPocketId.Select(x => pocketItemRepository.Delete(x.Id));
-
-        pocketRepository.Delete(pocketById.Id);
+        await pocketRepository.Delete(pocketById.Id);
 
         return add;
     }

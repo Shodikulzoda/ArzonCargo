@@ -7,46 +7,49 @@ namespace WebApi.Infrastructure.Repository;
 
 public class PocketRepository(ApplicationContext context) : BaseRepository<Pocket>(context), IPocketRepository
 {
+    private readonly ApplicationContext _context1 = context;
+
     public async Task<Pocket> Add(Pocket pocket)
     {
-        var entity = context.Pockets.Add(pocket).Entity;
-        await context.SaveChangesAsync();
+        var entity = _context1.Pockets.Add(pocket).Entity;
+        await _context1.SaveChangesAsync();
         return entity;
     }
 
     public async Task<IEnumerable<Pocket>> GetAll()
     {
-        return await context.Pockets.ToListAsync();
+        return await _context1.Pockets.ToListAsync();
     }
 
     public async Task<Pocket> Update(Pocket pocket)
     {
-        context.Pockets.Update(pocket);
-        await context.SaveChangesAsync();
+        _context1.Pockets.Update(pocket);
+        await _context1.SaveChangesAsync();
         return pocket;
     }
 
     public async Task<bool> Delete(int id)
     {
-        var pocket = await context.Pockets.FirstOrDefaultAsync(x=>x.Id==id);
+        var pocket = await _context1.Pockets.FirstOrDefaultAsync(x => x.Id == id);
         if (pocket is null)
         {
             return false;
         }
-        
-        context.Pockets.Remove(pocket);
-        await context.SaveChangesAsync();
+
+        _context1.Pockets.Remove(pocket);
+        await _context1.SaveChangesAsync();
         return true;
     }
 
     public async Task<Pocket?> GetById(int id)
     {
-        return await context.Pockets.FirstOrDefaultAsync(o => o.Id == id);
+        return await _context1.Pockets.FirstOrDefaultAsync(o => o.Id == id);
     }
 
     public async Task<Pocket> GetByUserId(int id)
     {
-        var firstOrDefaultAsync = await context.Pockets.Include(x => x.PocketItems)
+        var firstOrDefaultAsync = await _context1.Pockets.Include(x => x.PocketItems)
+            .ThenInclude(x => x.Product)
             .FirstOrDefaultAsync(x => x.UserId == id);
         if (firstOrDefaultAsync is null)
         {
@@ -58,13 +61,13 @@ public class PocketRepository(ApplicationContext context) : BaseRepository<Pocke
 
     public async Task<int> Count()
     {
-        return await context.Pockets.CountAsync();
+        return await _context1.Pockets.CountAsync();
     }
 
     public async Task<IEnumerable<Pocket>> GetOrderByPagination(int page, int pageSize,
         CancellationToken cancellationToken)
     {
-        return await context.Pockets
+        return await _context1.Pockets
             .Skip((page) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
