@@ -1,0 +1,71 @@
+@page "/"
+@using MudBlazor.Components.Layout
+@using ReferenceClass.Models
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@layout NoNavbar
+
+<div class="d-flex justify-center align-center" style="height: 70vh;">
+    <MudGrid Class="ma-0 pa-6" Style="max-width: 600px;">
+        <MudItem xs="12">
+            <MudPaper Class="pa-6" Elevation="3">
+                <MudForm>
+                    <MudTextField T="string"
+                                  @bind-Value="Data.UserName"
+                                  Label="Username"
+                                  Class="mb-4"
+                                  Error="@IsLoged"
+                                  ErrorText="Invalid username or password"/>
+
+                    <MudTextField T="string"
+                                  @bind-Value="Data.PasswordHash"
+                                  Label="Password"
+                                  InputType="InputType.Password"
+                                  Class="mb-4"
+                                  Error="@IsLoged"
+                                  ErrorText="Invalid username or password"/>
+
+                    <MudButton Variant="Variant.Filled"
+                               OnClick="Submit"
+                               Color="Color.Primary"
+                               FullWidth="true">
+                        Login
+                    </MudButton>
+                </MudForm>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</div>
+
+@code {
+    [Parameter] public AuthenticationData Data { get; set; } = new();
+    private bool IsLoged = false;
+
+    private async Task Submit()
+    {
+        var response = await Http.PostAsJsonAsync("http://localhost:5191/api/Auth/Verify", Data);
+
+        if (response.IsSuccessStatusCode)
+        {
+            bool isAuthenticated = await response.Content.ReadFromJsonAsync<bool>();
+
+            if (isAuthenticated)
+            {
+                IsLoged = false;
+                Data.PasswordHash = "";
+                Data.UserName = "";
+                //redirection to page after successful login change this to your to redirect
+                Navigation.NavigateTo("/home");
+            }
+            else
+            {
+                IsLoged = true;
+            }
+        }
+        else
+        {
+            IsLoged = true;
+        }
+    }
+
+}
