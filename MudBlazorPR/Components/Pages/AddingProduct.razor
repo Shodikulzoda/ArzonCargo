@@ -1,8 +1,7 @@
 @page "/adding-product"
 @inject HttpClient Http
-@inject IJSRuntime JS
+@inject IJSRuntime Js
 
-@using MudBlazor
 @using ReferenceClass.Models
 
 <PageTitle>Barcode Scanner</PageTitle>
@@ -11,13 +10,13 @@
     <MudText Typo="Typo.h5" GutterBottom>Barcode Scanner</MudText>
 
     <MudTextField Label="Enter Barcode"
-                  @bind-Value="Barcode"
+                  @bind-Value="_barcode"
                   Variant="Variant.Filled"
                   Adornment="Adornment.Start"
                   AdornmentIcon="@Icons.Material.Filled.QrCode"
                   Immediate="true"
                   Class="barcode-text"
-                  OnKeyDown="HandleKeyPress" />
+                  OnKeyDown="HandleKeyPress"/>
 
     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitBarcode" Class="mt-2 me-2">
         Add
@@ -27,15 +26,15 @@
         Check
     </MudButton>
 
-    <MudText Color="Color.Success" Class="mt-2">@Message</MudText>
+    <MudText Color="Color.Success" Class="mt-2">@_message</MudText>
 </MudPaper>
 
-@if (Products.Any())
+@if (_products.Any())
 {
     <MudPaper Class="p-4 mx-auto mt-4" Style="max-width: 600px;">
         <MudText Typo="Typo.h6">Added Products</MudText>
 
-        <MudTable Items="Products" Elevation="2" Dense="true" Hover="true">
+        <MudTable Items="_products" Elevation="2" Dense="true" Hover="true">
             <HeaderContent>
                 <MudTh>Barcode</MudTh>
                 <MudTh></MudTh> <!-- For Delete button -->
@@ -64,90 +63,90 @@
 </script>
 
 @code {
-    private string Barcode = "";
-    private string Message = "";
-    private List<Product> Products = new();
+    private string _barcode = "";
+    private string _message = "";
+    private readonly List<Product> _products = [];
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-            await JS.InvokeVoidAsync("focusElement");
+            await Js.InvokeVoidAsync("focusElement");
     }
 
     private async Task SubmitBarcode()
     {
-        if (string.IsNullOrWhiteSpace(Barcode))
+        if (string.IsNullOrWhiteSpace(_barcode))
         {
-            Message = "Please enter a barcode.";
-            await JS.InvokeVoidAsync("focusElement");
+            _message = "Please enter a barcode.";
+            await Js.InvokeVoidAsync("focusElement");
             return;
         }
 
         var response = await Http.PostAsync(
-            $"http://localhost:5191/Product/Add?BarCode={Uri.EscapeDataString(Barcode)}",
+            $"http://localhost:5191/Product/Add?BarCode={Uri.EscapeDataString(_barcode)}",
             null
         );
 
         if (response.IsSuccessStatusCode)
         {
             // Only add barcode if not already added
-            if (!Products.Any(p => p.BarCode == Barcode))
-                Products.Add(new Product { BarCode = Barcode });
+            if (_products.Any(p => p.BarCode == _barcode))
+                _products.Add(new Product { BarCode = _barcode });
 
-            Message = "Barcode added successfully!";
+            _message = "Barcode added successfully!";
         }
         else
         {
-            Message = "Failed to add barcode.";
+            _message = "Failed to add barcode.";
         }
 
-        Barcode = "";
-        await JS.InvokeVoidAsync("focusElement");
+        _barcode = "";
+        await Js.InvokeVoidAsync("focusElement");
     }
 
     private async Task CheckBarcode()
     {
-        if (string.IsNullOrWhiteSpace(Barcode))
+        if (string.IsNullOrWhiteSpace(_barcode))
         {
-            Message = "Please enter a barcode to check.";
-            await JS.InvokeVoidAsync("focusElement");
+            _message = "Please enter a barcode to check.";
+            await Js.InvokeVoidAsync("focusElement");
             return;
         }
 
         try
         {
             var response = await Http.GetAsync(
-                $"http://localhost:5191/Product/GetBybarcode?BarCode={Uri.EscapeDataString(Barcode)}"
+                $"http://localhost:5191/Product/GetBybarcode?BarCode={Uri.EscapeDataString(_barcode)}"
             );
 
             if (response.IsSuccessStatusCode)
             {
-                Message = $"Product with barcode '{Barcode}' is registered.";
+                _message = $"Product with barcode '{_barcode}' is registered.";
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                Message = $"Product with barcode '{Barcode}' is NOT registered.";
+                _message = $"Product with barcode '{_barcode}' is NOT registered.";
             }
             else
             {
-                Message = "Error checking barcode.";
+                _message = "Error checking barcode.";
             }
         }
         catch
         {
-            Message = "Failed to check barcode due to network or server error.";
+            _message = "Failed to check barcode due to network or server error.";
         }
 
-        await JS.InvokeVoidAsync("focusElement");
+        await Js.InvokeVoidAsync("focusElement");
     }
 
-    private void RemoveProduct(string barcode)
+    private void RemoveProduct(string? barcode)
     {
-        var product = Products.FirstOrDefault(p => p.BarCode == barcode);
+        var product = _products.FirstOrDefault(p => p.BarCode == barcode);
         if (product != null)
         {
-            Products.Remove(product);
-            Message = $"Removed barcode '{barcode}' from the list.";
+            _products.Remove(product);
+            _message = $"Removed barcode '{barcode}' from the list.";
         }
     }
 
@@ -158,4 +157,5 @@
             await SubmitBarcode();
         }
     }
+
 }

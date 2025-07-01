@@ -41,7 +41,7 @@ public class ProductController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Search([FromQuery] GetProductBySearchQuery getProductBySearchQuery)
+    public async Task<ActionResult<PageData<Product>>> Search([FromQuery] GetProductBySearchQuery getProductBySearchQuery)
     {
         return Ok(await mediator.Send(getProductBySearchQuery));
     }

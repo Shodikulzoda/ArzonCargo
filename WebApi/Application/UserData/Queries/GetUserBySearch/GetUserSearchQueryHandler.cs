@@ -10,7 +10,7 @@ public class SearchQuery : IRequest<List<User>>
     public string? Text { get; set; }
 }
 
-public class SearchQueryHandler(IUserRepository userRepository)
+public class GetUserSearchQueryHandler(IUserRepository userRepository)
     : IRequestHandler<SearchQuery, List<User>>
 {
     public async Task<List<User>> Handle(SearchQuery query, CancellationToken cancellationToken)

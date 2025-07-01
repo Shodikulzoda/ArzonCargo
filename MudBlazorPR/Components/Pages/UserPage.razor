@@ -10,13 +10,13 @@
 
 <div class="mb-4 d-flex gap-2">
     <MudTextField @bind-Value="_searchQuery"
-                  Placeholder="Search by name, phone, etc..."
+                  Placeholder="GetUserBySearch by name, phone, etc..."
                   Adornment="Adornment.Start"
                   AdornmentIcon="@Icons.Material.Filled.Search"
                   Immediate="true"
                   OnKeyDown="HandleKeyDown"
                   Margin="Margin.Dense"/>
-    <MudButton OnClick="SearchUsers" Color="Color.Primary" Variant="Variant.Filled">Search</MudButton>
+    <MudButton OnClick="SearchUsers" Color="Color.Primary" Variant="Variant.Filled">GetUserBySearch</MudButton>
     <MudButton OnClick="OpenCreateDialog" Color="Color.Success" Variant="Variant.Filled"
                StartIcon="@Icons.Material.Filled.Add">
         Add User
@@ -226,7 +226,7 @@ else
         _isLoading = true;
         try
         {
-            string url = $"http://localhost:5191/User/Search?Text={Uri.EscapeDataString(_searchQuery)}";
+            string url = $"http://localhost:5191/User/GetUserBySearch?Text={Uri.EscapeDataString(_searchQuery)}";
             _userPage.Items = await Http.GetFromJsonAsync<IEnumerable<User>>(url) ?? [];
 
             _totalPages = 1;
@@ -234,7 +234,7 @@ else
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Search error: " + ex.Message);
+            Console.WriteLine("GetUserBySearch error: " + ex.Message);
             _userPage.Items = [];
         }
 
