@@ -21,14 +21,14 @@ public class VerifyUserHandler(IAuthRepository authRepository, IJwtService jwtSe
 
         if (user == null)
         {
-            throw new NullReferenceException($"email: {request.UserName} not found!");
+            throw new NullReferenceException("Incorrect username or password.");
         }
 
         var hashPassword = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
 
         if (!hashPassword)
         {
-            throw new KeyNotFoundException($"password is incorrect!");
+            throw new KeyNotFoundException("Incorrect username or password.");
         }
 
         return jwtService.GenerateToken(user);
