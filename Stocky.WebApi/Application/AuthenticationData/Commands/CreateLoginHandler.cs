@@ -26,7 +26,7 @@ public class CreateLoginHandler(IAuthRepository authRepository)
 
         if (lookForUser != null)
         {
-            throw new NullReferenceException($"the email: {request.UserName} has already exist!");
+            throw new NullReferenceException($"the Username: {request.UserName}  already exist!");
         }
 
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
