@@ -2,7 +2,7 @@
 using ReferenceClass.Models;
 using Stocky.WebApi.Infrastructure.Configurations;
 
-namespace Stocky.WebApi.Infrastructure.Data;
+namespace Stocky.WebApi.Infrastructure.Databases;
 
 public class ApplicationContext(DbContextOptions<ApplicationContext> options) : DbContext(options)
 {
@@ -10,7 +10,6 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
     public DbSet<Product> Products { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
-
     public DbSet<AuthenticationData> AuthenticationData { get; set; }
     public DbSet<Pocket> Pockets { get; set; }
     public DbSet<PocketItem> PocketItem { get; set; }

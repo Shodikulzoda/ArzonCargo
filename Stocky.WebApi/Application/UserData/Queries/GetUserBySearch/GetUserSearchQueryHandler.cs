@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ReferenceClass.Models;
 using Stocky.WebApi.Application.Interfaces;
 
-namespace Stocky.WebApi.Application.UserData.Queries.Search;
+namespace Stocky.WebApi.Application.UserData.Queries.GetUserBySearch;
 
 public class SearchQuery : IRequest<List<User>>
 {

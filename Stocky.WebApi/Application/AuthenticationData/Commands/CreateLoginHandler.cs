@@ -1,28 +1,43 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Stocky.WebApi.Application.Interfaces;
 
 namespace Stocky.WebApi.Application.AuthenticationData.Commands;
 
 public record CreateLoginCommand : IRequest<ReferenceClass.Models.AuthenticationData>
 {
-    public string UserName { get; set; }
-    public string Password { get; set; }
+    public string? UserName { get; set; }
+    public string? Password { get; set; }
 }
 
 public class CreateLoginHandler(IAuthRepository authRepository)
     : IRequestHandler<CreateLoginCommand, ReferenceClass.Models.AuthenticationData>
 {
-    public async Task<ReferenceClass.Models.AuthenticationData> Handle(CreateLoginCommand request, CancellationToken cancellationToken)
+    public async Task<ReferenceClass.Models.AuthenticationData> Handle(CreateLoginCommand request,
+        CancellationToken cancellationToken)
     {
+        if (request.UserName is null)
+        {
+            throw new NullReferenceException();
+        }
+
+        var lookForUser = await authRepository.Queryable.FirstOrDefaultAsync(x =>
+            x.UserName == request.UserName, cancellationToken);
+
+        if (lookForUser != null)
+        {
+            throw new NullReferenceException($"the email: {request.UserName} has already exist!");
+        }
+
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
-        
+
         var auth = new ReferenceClass.Models.AuthenticationData
         {
             UserName = request.UserName,
             PasswordHash = hashedPassword
         };
-        await authRepository.Add(auth);
 
+        await authRepository.Add(auth);
         return auth;
     }
 }

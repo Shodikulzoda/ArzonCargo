@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ReferenceClass.Models;
 using Stocky.WebApi.Application.Interfaces;
-using Stocky.WebApi.Infrastructure.Data;
+using Stocky.WebApi.Infrastructure.Databases;
 
 namespace Stocky.WebApi.Infrastructure.Repository;
 

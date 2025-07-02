@@ -1,5 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReferenceClass.Models;
 using Stocky.WebApi.Application.UserData.Commands.CreateUser;
@@ -7,14 +7,14 @@ using Stocky.WebApi.Application.UserData.Commands.DeleteUser;
 using Stocky.WebApi.Application.UserData.Commands.UpdateUser;
 using Stocky.WebApi.Application.UserData.Queries.GetUser;
 using Stocky.WebApi.Application.UserData.Queries.GetUserById;
-using Stocky.WebApi.Application.UserData.Queries.Search;
 using Stocky.WebApi.Application.UserData.Queries.UsersByPagination;
-using Stocky.WebApi.Application.OrderItemData.Queries.GetByOrderId;
+using Stocky.WebApi.Application.UserData.Queries.GetUserBySearch;
 
 namespace Stocky.WebApi.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
+[Authorize]
 public class UserController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
@@ -45,7 +45,7 @@ public class UserController(IMediator mediator) : ControllerBase
         [FromQuery] UsersByPaginationQuery usersByPaginationQuery)
     {
         var paginatedList = await mediator.Send(usersByPaginationQuery);
-        
+
         return Ok(paginatedList);
     }
 

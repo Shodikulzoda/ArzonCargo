@@ -5,7 +5,7 @@ using Serilog;
 using Stocky.WebApi.Application.Interfaces;
 using Stocky.WebApi.Application.UserData.Commands.CreateUser;
 using Stocky.WebApi.Extensions;
-using Stocky.WebApi.Infrastructure.Data;
+using Stocky.WebApi.Infrastructure.Databases;
 using Stocky.WebApi.Infrastructure.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +27,8 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Bank application APIs", Version = "v1" });
 });
+
+builder.Services.UseJwtToken();
 
 builder.Services.AddMediatR(cfg => { cfg.RegisterServicesFromAssembly(typeof(CreateUserHandler).Assembly); });
 

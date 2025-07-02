@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Stocky.WebApi.Application.Interfaces;
+using Stocky.WebApi.Application.Services;
+using Stocky.WebApi.Application.Services.Interfaces;
 using Stocky.WebApi.Infrastructure.Repository;
 
 namespace Stocky.WebApi.Extensions;
@@ -15,5 +17,7 @@ public static class DependencyInjection
         collection.AddScoped<IProductRepository, ProductRepository>();
         collection.AddScoped<IPocketItemRepository, PocketItemRepository>();
         collection.AddScoped<IPocketRepository, PocketRepository>();
+
+        collection.AddScoped<IJwtService, JwtService>();
     }
 }

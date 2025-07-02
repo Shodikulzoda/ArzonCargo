@@ -1,34 +1,36 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Stocky.WebApi.Application.Interfaces;
+using Stocky.WebApi.Application.Services.Interfaces;
 
 namespace Stocky.WebApi.Application.AuthenticationData.Commands;
 
-public record VerifyLoginCommand : IRequest<bool>
+public record VerifyLoginCommand : IRequest<string>
 {
-    public string UserName { get; set; }
-    public string Password { get; set; }
+    public string? UserName { get; set; }
+    public string? Password { get; set; }
 }
 
-public class VerifyUserHandler(IAuthRepository authRepository)
-    : IRequestHandler<VerifyLoginCommand, bool>
+public class VerifyUserHandler(IAuthRepository authRepository, IJwtService jwtService)
+    : IRequestHandler<VerifyLoginCommand, string>
 {
-    public async Task<bool> Handle(VerifyLoginCommand request, CancellationToken cancellationToken)
+    public async Task<string> Handle(VerifyLoginCommand request, CancellationToken cancellationToken)
     {
-        var auth = await authRepository.Queryable
-            .FirstOrDefaultAsync(x => x.UserName == request.UserName,
-                cancellationToken: cancellationToken);
+        var user = await authRepository.Queryable.FirstOrDefaultAsync(x =>
+            x.UserName == request.UserName, cancellationToken);
 
-        if (auth is null)
+        if (user == null)
         {
-            throw new Exception("User not found");
+            throw new NullReferenceException($"email: {request.UserName} not found!");
         }
 
-        if (!BCrypt.Net.BCrypt.Verify(request.Password, auth.PasswordHash))
+        var hashPassword = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
+
+        if (!hashPassword)
         {
-            return false;
+            throw new KeyNotFoundException($"password is incorrect!");
         }
 
-        return true;
+        return jwtService.GenerateToken(user);
     }
 }

@@ -23,7 +23,6 @@ public class CreateUserHandler(IUserRepository userRepository)
             Name = request.Name,
             Phone = request.Phone,
             Address = request.Address,
-            Role = request.Role,
         };
         await userRepository.Add(user);
 
