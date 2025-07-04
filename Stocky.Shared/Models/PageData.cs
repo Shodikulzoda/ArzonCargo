@@ -3,7 +3,7 @@ namespace ReferenceClass.Models;
 public class PageData<T> 
     where T : class
 {
-    public IEnumerable<T> Items { get; set; }
+    public IEnumerable<T>? Items { get; set; }
     public int PageNumber { get; set; }
     public int TotalPages { get; set; }
     public int TotalCount { get; set; }

@@ -1,7 +1,9 @@
 @page "/"
 @using MudBlazor.Components.Layout
+@using MudBlazor.Components.Service
 @using ReferenceClass.Models
 @inject HttpClient Http
+@inject AuthService AuthService
 @inject NavigationManager Navigation
 @layout NoNavbar
 
@@ -14,7 +16,7 @@
                                   @bind-Value="Data.UserName"
                                   Label="Username"
                                   Class="mb-4"
-                                  Error="@IsLoged"
+                                  Error="@_isLoged"
                                   ErrorText="Invalid username or password"/>
 
                     <MudTextField T="string"
@@ -22,7 +24,7 @@
                                   Label="Password"
                                   InputType="InputType.Password"
                                   Class="mb-4"
-                                  Error="@IsLoged"
+                                  Error="@_isLoged"
                                   ErrorText="Invalid username or password"/>
 
                     <MudButton Variant="Variant.Filled"
@@ -39,7 +41,7 @@
 
 @code {
     [Parameter] public AuthenticationData Data { get; set; } = new();
-    private bool IsLoged = false;
+    private bool _isLoged;
 
     private async Task Submit()
     {
@@ -47,25 +49,30 @@
 
         if (response.IsSuccessStatusCode)
         {
-            bool isAuthenticated = await response.Content.ReadFromJsonAsync<bool>();
+            var resultText = await response.Content.ReadAsStringAsync();
 
-            if (isAuthenticated)
+            var loginResponse = new LoginResponse
             {
-                IsLoged = false;
-                Data.PasswordHash = "";
-                Data.UserName = "";
-                //redirection to page after successful login change this to your to redirect
+                Token = resultText
+            };
+
+            if (!string.IsNullOrWhiteSpace(loginResponse?.Token))
+            {
+                AuthService.SetToken(loginResponse.Token);
+
+                // store token securely (e.g., in local storage, session, or singleton service)
                 Navigation.NavigateTo("/home");
-            }
-            else
-            {
-                IsLoged = true;
             }
         }
         else
         {
-            IsLoged = true;
+            _isLoged = true;
         }
+    }
+
+    public class LoginResponse
+    {
+        public string? Token { get; set; }
     }
 
 }

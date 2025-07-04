@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using ReferenceClass.Models;
 using Stocky.WebApi.Application.UserData.Commands.CreateUser;
 using Stocky.WebApi.Application.UserData.Commands.DeleteUser;

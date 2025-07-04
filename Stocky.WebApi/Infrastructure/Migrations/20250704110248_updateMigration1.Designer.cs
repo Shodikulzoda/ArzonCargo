@@ -12,8 +12,8 @@ using Stocky.WebApi.Infrastructure.Databases;
 namespace Stocky.WebApi.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250701153738_authirithation")]
-    partial class authirithation
+    [Migration("20250704110248_updateMigration1")]
+    partial class updateMigration1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,13 +40,23 @@ namespace Stocky.WebApi.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("PasswordHash")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "password");
 
+                    b.Property<int>("Role")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(2);
+
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserName")
+                        .IsUnique();
 
                     b.ToTable("AuthenticationData");
                 });
@@ -235,10 +245,6 @@ namespace Stocky.WebApi.Migrations
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
-
-                    b.Property<int>("Role")
-                        .HasMaxLength(50)
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
