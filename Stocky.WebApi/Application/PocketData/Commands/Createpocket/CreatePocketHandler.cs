@@ -7,6 +7,7 @@ namespace Stocky.WebApi.Application.PocketData.Commands.Createpocket;
 public record CreatePocketCommand : IRequest<Pocket>
 {
     public string? BarCode { get; set; }
+    public double TotalAmount { get; set; }
     public double TotalWeight { get; set; }
     public int UserId { get; set; }
 }

@@ -7,6 +7,7 @@ namespace Stocky.WebApi.Application.OrderData.Commands.CreateOrder;
 public record CreateOrderCommand : IRequest<Order>
 {
     public string? BarCode { get; set; }
+    public double TotalAmount { get; set; }
     public double TotalWeight { get; set; }
     public int UserId { get; set; }
 }

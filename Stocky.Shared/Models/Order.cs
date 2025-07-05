@@ -1,6 +1,4 @@
-﻿using ReferenceClass.Models.Enums;
-
-namespace ReferenceClass.Models;
+﻿namespace ReferenceClass.Models;
 
 public class Order : BaseEntity
 {
@@ -9,5 +7,5 @@ public class Order : BaseEntity
     public double TotalWeight { get; set; }
     public int UserId { get; set; }
     public User? User { get; set; }
-    public IEnumerable<OrderItem> OrderItems { get; set; }
+    public IEnumerable<OrderItem>? OrderItems { get; set; }
 }
