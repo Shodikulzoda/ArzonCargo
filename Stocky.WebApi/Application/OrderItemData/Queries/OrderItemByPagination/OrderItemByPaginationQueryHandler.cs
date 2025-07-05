@@ -1,5 +1,5 @@
 using MediatR;
-using ReferenceClass.Models;
+using Stocky.Shared.Models;
 using Stocky.WebApi.Application.Common;
 using Stocky.WebApi.Application.Interfaces;
 

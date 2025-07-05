@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ReferenceClass.Models;
+using Stocky.Shared.Models;
 using Stocky.WebApi.Application.PocketData.Commands.Createpocket;
 using Stocky.WebApi.Application.PocketData.Commands.DeletePocket;
 using Stocky.WebApi.Application.PocketData.Commands.Updatepocket;

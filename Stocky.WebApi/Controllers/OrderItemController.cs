@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ReferenceClass.Models;
+using Stocky.Shared.Models;
 using Stocky.WebApi.Application.OrderItemData.Commands.CreateOrderItem;
 using Stocky.WebApi.Application.OrderItemData.Commands.DeleteOrderItem;
 using Stocky.WebApi.Application.OrderItemData.Commands.UpdateOrderItem;

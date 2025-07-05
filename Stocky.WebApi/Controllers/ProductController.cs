@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ReferenceClass.Models;
+using Stocky.Shared.Models;
 using Stocky.WebApi.Application.ProductData.Commands.CreateProduct;
 using Stocky.WebApi.Application.ProductData.Commands.DeleteProduct;
 using Stocky.WebApi.Application.ProductData.Commands.UpdateProduct;

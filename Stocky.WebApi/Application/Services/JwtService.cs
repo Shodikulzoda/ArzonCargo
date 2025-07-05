@@ -9,7 +9,7 @@ namespace Stocky.WebApi.Application.Services;
 
 public class JwtService(IConfiguration configuration) : IJwtService
 {
-    public string GenerateToken(ReferenceClass.Models.AuthenticationData authenticationData)
+    public string GenerateToken(Shared.Models.AuthenticationData authenticationData)
     {
         if (authenticationData.UserName == null)
         {

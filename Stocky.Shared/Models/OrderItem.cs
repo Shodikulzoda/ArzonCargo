@@ -1,4 +1,4 @@
-﻿namespace ReferenceClass.Models;
+﻿namespace Stocky.Shared.Models;
 
 public class OrderItem : BaseEntity
 {

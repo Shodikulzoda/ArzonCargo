@@ -1,6 +1,6 @@
-﻿using ReferenceClass.Models.Enums;
+﻿using Stocky.Shared.Models.Enums;
 
-namespace ReferenceClass.Models;
+namespace Stocky.Shared.Models;
 
 public class Product : BaseEntity
 {

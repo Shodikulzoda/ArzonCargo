@@ -1,6 +1,6 @@
-@using ReferenceClass.Models
+@using Stocky.Shared.Models
+@using Stocky.Shared.Models.Enums
 @inject HttpClient Http
-    @using ReferenceClass.Models.Enums
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;

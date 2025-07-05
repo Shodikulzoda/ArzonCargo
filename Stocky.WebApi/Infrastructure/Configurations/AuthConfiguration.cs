@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ReferenceClass.Models;
-using ReferenceClass.Models.Enums;
+using Stocky.Shared.Models;
 
 namespace Stocky.WebApi.Infrastructure.Configurations;
 

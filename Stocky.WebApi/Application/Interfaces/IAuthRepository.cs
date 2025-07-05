@@ -1,7 +1,7 @@
 namespace Stocky.WebApi.Application.Interfaces;
 
-public interface IAuthRepository : IBaseRepository<ReferenceClass.Models.AuthenticationData>
+public interface IAuthRepository : IBaseRepository<Shared.Models.AuthenticationData>
 {
-    Task<ReferenceClass.Models.AuthenticationData> Add(ReferenceClass.Models.AuthenticationData auth);
-    Task<IEnumerable<ReferenceClass.Models.AuthenticationData>> GetAll();
+    Task<Shared.Models.AuthenticationData> Add(Shared.Models.AuthenticationData auth);
+    Task<IEnumerable<Shared.Models.AuthenticationData>> GetAll();
 }

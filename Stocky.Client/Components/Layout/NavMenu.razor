@@ -1,6 +1,38 @@
-﻿<MudNavMenu>
-    <MudNavLink Href="home" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-    <MudNavLink Href="users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Users Page</MudNavLink>
-    <MudNavLink Href="adding-product" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Adding Product</MudNavLink>
-    <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Products Page</MudNavLink>
+﻿@using MudBlazor.Components.Service
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<MudNavMenu>
+
+    <MudNavLink Href="home" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">
+        Home
+    </MudNavLink>
+
+    <MudNavLink Href="users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">
+        Users Page
+    </MudNavLink>
+
+    <MudNavLink Href="adding-product" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">
+        Adding Product
+    </MudNavLink>
+
+    <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">
+        Products Page
+    </MudNavLink>
+
+    <MudSpacer />
+
+    <MudNavLink OnClick="Logout" Icon="@Icons.Material.Filled.ExitToApp" Color="Color.Error">
+            Logout
+        </MudNavLink>
+    
+
 </MudNavMenu>
+
+@code {
+    private void Logout()
+    {
+        AuthService.ClearToken();
+        Navigation.NavigateTo("/", true);
+    }
+}

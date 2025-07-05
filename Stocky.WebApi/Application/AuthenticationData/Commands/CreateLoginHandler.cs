@@ -4,16 +4,16 @@ using Stocky.WebApi.Application.Interfaces;
 
 namespace Stocky.WebApi.Application.AuthenticationData.Commands;
 
-public record CreateLoginCommand : IRequest<ReferenceClass.Models.AuthenticationData>
+public record CreateLoginCommand : IRequest<Shared.Models.AuthenticationData>
 {
     public string? UserName { get; set; }
     public string? Password { get; set; }
 }
 
 public class CreateLoginHandler(IAuthRepository authRepository)
-    : IRequestHandler<CreateLoginCommand, ReferenceClass.Models.AuthenticationData>
+    : IRequestHandler<CreateLoginCommand, Shared.Models.AuthenticationData>
 {
-    public async Task<ReferenceClass.Models.AuthenticationData> Handle(CreateLoginCommand request,
+    public async Task<Shared.Models.AuthenticationData> Handle(CreateLoginCommand request,
         CancellationToken cancellationToken)
     {
         if (request.UserName is null)
@@ -31,7 +31,7 @@ public class CreateLoginHandler(IAuthRepository authRepository)
 
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
-        var auth = new ReferenceClass.Models.AuthenticationData
+        var auth = new Shared.Models.AuthenticationData
         {
             UserName = request.UserName,
             PasswordHash = hashedPassword

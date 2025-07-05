@@ -2,5 +2,5 @@
 
 public interface IJwtService
 {
-    public string GenerateToken(ReferenceClass.Models.AuthenticationData authenticationData);
+    public string GenerateToken(Shared.Models.AuthenticationData authenticationData);
 }

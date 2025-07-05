@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ReferenceClass.Models;
+using Stocky.Shared.Models;
 
 namespace Stocky.WebApi.Application.Common;
 

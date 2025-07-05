@@ -1,6 +1,5 @@
 using MediatR;
-using ReferenceClass.Models;
-using ReferenceClass.Models.Enums;
+using Stocky.Shared.Models;
 using Stocky.WebApi.Application.Interfaces;
 
 namespace Stocky.WebApi.Application.OrderData.Commands.UpdateOrder;

@@ -1,4 +1,4 @@
-﻿using ReferenceClass.Models;
+﻿using Stocky.Shared.Models;
 
 namespace Stocky.WebApi.Application.Interfaces;
 

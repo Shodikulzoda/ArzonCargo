@@ -1,6 +1,6 @@
 ﻿using MediatR;
-using ReferenceClass.Models;
-using ReferenceClass.Models.Enums;
+using Stocky.Shared.Models;
+using Stocky.Shared.Models.Enums;
 using Stocky.WebApi.Application.Interfaces;
 
 namespace Stocky.WebApi.Application.UserData.Commands.CreateUser;

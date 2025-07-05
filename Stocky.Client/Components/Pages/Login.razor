@@ -1,7 +1,7 @@
 @page "/"
 @using MudBlazor.Components.Layout
 @using MudBlazor.Components.Service
-@using ReferenceClass.Models
+@using Stocky.Shared.Models
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject AuthService AuthService
@@ -48,6 +48,16 @@
     [Parameter] public AuthenticationData Data { get; set; } = new();
     private bool _isLoged;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthService.LoadTokenAsync();
+
+        if (!string.IsNullOrWhiteSpace(AuthService.Token))
+        {
+            Navigation.NavigateTo("/home", true);
+        }
+    }
+
     private async Task Submit()
     {
         var response = await Http.PostAsJsonAsync("http://localhost:5191/api/Auth/Verify", Data);
@@ -64,8 +74,7 @@
             if (!string.IsNullOrWhiteSpace(loginResponse.Token))
             {
                 AuthService.SetToken(loginResponse.Token);
-
-                Navigation.NavigateTo("/home");
+                Navigation.NavigateTo("/home", true);
             }
         }
         else
@@ -94,5 +103,4 @@
     {
         public string? Token { get; set; }
     }
-
 }

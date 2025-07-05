@@ -1,28 +1,34 @@
 ﻿@page "/users"
 @inject HttpClient Http
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
 @inject AuthService AuthService
+@inject NavigationManager Navigation
 @using System.Net.Http.Headers
 @using System.Text.Json
-@using Microsoft.AspNetCore.Authorization
+@using System.Net
 @using MudBlazor.Components.DialogWindows.UserDialogs
 @using MudBlazor.Components.Service
-@using ReferenceClass.Models
-@attribute [Authorize]
+@using Stocky.Shared.Models
 
-<PageTitle>UserPage</PageTitle>
+<PageTitle>User Management</PageTitle>
 
-<MudText Typo="Typo.h4" GutterBottom="true">UserPage Table</MudText>
+@if (_isAuthenticated)
+{
+    Navigation.NavigateTo("/UnAuthorized", true);
+}
+
+<MudText Typo="Typo.h4" GutterBottom="true">User Management</MudText>
 
 <div class="mb-4 d-flex gap-2">
     <MudTextField @bind-Value="_searchQuery"
-                  Placeholder="GetUserBySearch by name, phone, etc..."
+                  Placeholder="Search users by name, phone, etc..."
                   Adornment="Adornment.Start"
                   AdornmentIcon="@Icons.Material.Filled.Search"
                   Immediate="true"
                   OnKeyDown="HandleKeyDown"
                   Margin="Margin.Dense"/>
-    <MudButton OnClick="SearchUsers" Color="Color.Primary" Variant="Variant.Filled">GetUserBySearch</MudButton>
+    <MudButton OnClick="SearchUsers" Color="Color.Primary" Variant="Variant.Filled">Search</MudButton>
     <MudButton OnClick="OpenCreateDialog" Color="Color.Success" Variant="Variant.Filled"
                StartIcon="@Icons.Material.Filled.Add">
         Add User
@@ -35,242 +41,102 @@
 }
 else
 {
-    <MudTable Items="_userPage?.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
+    <MudTable Items="_userPage?.Items" Hover="true" Elevation="1" Dense="true">
         <HeaderContent>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<User, object>(x => x.Id)">Id</MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<User, object?>(x => x.Name)">Name</MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<User, object?>(x => x.Phone)">Phone</MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<User, object?>(x => x.Address)">Address</MudTableSortLabel>
-            </MudTh>
+            <MudTh>Id</MudTh>
+            <MudTh>Name</MudTh>
+            <MudTh>Phone</MudTh>
+            <MudTh>Address</MudTh>
+            <MudTh>Orders</MudTh>
+            <MudTh>Pockets</MudTh>
             <MudTh>Actions</MudTh>
-            <MudTh></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="Name">@context.Name</MudTd>
-            <MudTd DataLabel="Address">@context.Address</MudTd>
-            <MudTd DataLabel="Phone">@context.Phone</MudTd>
+            <MudTd>@context.Id</MudTd>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.Phone</MudTd>
+            <MudTd>@context.Address</MudTd>
             <MudTd>
-                <MudIconButton Icon="@Icons.Material.Filled.ViewList"
-                               Color="Color.Success"
+                <MudIconButton Icon="@Icons.Material.Filled.ViewList" Color="Color.Info"
                                OnClick="@(() => UserOrders(context.Id))"/>
             </MudTd>
             <MudTd>
-                <MudIconButton Icon="@Icons.Material.Filled.ShoppingBag"
-                               Color="Color.Success"
+                <MudIconButton Icon="@Icons.Material.Filled.ShoppingBag" Color="Color.Primary"
                                OnClick="@(() => UserPockets(context.Id))"/>
             </MudTd>
-            <MudTd DataLabel="Others">
-                <MudMenu Icon="@Icons.Material.Filled.MoreVert"
-                         Color="Color.Info"
-                         AnchorOrigin="Origin.TopRight"
-                         TransformOrigin="Origin.TopRight">
+            <MudTd>
+                <MudMenu Icon="@Icons.Material.Filled.MoreVert">
                     <MudMenuItem OnClick="@(() => Update(context))">Edit</MudMenuItem>
                     <MudMenuItem OnClick="@(() => Delete(context.Id))">Delete</MudMenuItem>
                 </MudMenu>
             </MudTd>
-
         </RowTemplate>
     </MudTable>
 
     <div class="mt-4 d-flex justify-between">
-        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Back</MudButton>
+        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)">Back</MudButton>
         <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
-        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Next</MudButton>
+        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)">Next</MudButton>
     </div>
 }
 
 @code {
-
-    private PageData<User>? _userPage = new();
-
+    private PageData<User>? _userPage = new() { Items = new List<User>() };
     private int _currentPage = 1;
     private int _totalPages = 1;
     private const int PageSize = 15;
-    private bool _isLoading;
+    private bool _isLoading = false;
     private string _searchQuery = "";
+    private bool _isAuthenticated = false;
 
     protected override async Task OnInitializedAsync()
     {
+        await AuthService.LoadTokenAsync();
+
+        if (string.IsNullOrEmpty(AuthService.Token))
+        {
+            _isAuthenticated = true;
+            return;
+        }
+
         await LoadUsers();
     }
 
     private async Task LoadUsers()
     {
         _isLoading = true;
+
         try
         {
             var url = $"http://localhost:5191/User/UserPagination?Page={_currentPage}&PageSize={PageSize}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
-
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
             var response = await Http.SendAsync(request);
+
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
-
-                _userPage = JsonSerializer.Deserialize<PageData<User>>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-
+                _userPage = JsonSerializer.Deserialize<PageData<User>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 _totalPages = (int)Math.Ceiling((double)(_userPage?.TotalCount ?? 0) / PageSize);
+            }
+            else if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                _isAuthenticated = true;
             }
             else
             {
-                if (_userPage != null)
-                {
-                    _userPage.Items = [];
-                }
+                Snackbar.Add("Error loading users.", Severity.Error);
+                _userPage.Items = new List<User>();
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error loading users: " + ex.Message);
-
-            if (_userPage != null)
-            {
-                _userPage.Items = [];
-            }
+            Console.WriteLine("Load error: " + ex.Message);
+            Snackbar.Add("Unexpected error while loading users.", Severity.Error);
         }
 
         _isLoading = false;
-    }
-
-    private async Task Delete(int userId)
-    {
-        var parameters = new DialogParameters
-        {
-            { "UserId", userId }
-        };
-
-        var options = new DialogOptions
-        {
-            CloseButton = true,
-            MaxWidth = MaxWidth.Small,
-            FullWidth = true
-        };
-
-        var dialog = await DialogService.ShowAsync<DeleteUserDialog>("Confirm Delete", parameters, options);
-        var result = await dialog.Result;
-
-        if (result is not null)
-        {
-            if (!result.Canceled)
-            {
-                await LoadUsers();
-            }
-        }
-    }
-
-    private async Task UserOrders(int userId)
-    {
-        var parameters = new DialogParameters
-        {
-            { "UserId", userId }
-        };
-
-        var options = new DialogOptions
-        {
-            CloseButton = true,
-            MaxWidth = MaxWidth.Medium,
-            FullWidth = true
-        };
-
-        var dialogReference = await DialogService.ShowAsync<OrdersPaginationUserDialog>("Orders for User", parameters, options);
-        var dialogReferenceResult = await dialogReference.Result;
-
-        if (dialogReferenceResult is not null)
-        {
-            if (!dialogReferenceResult.Canceled)
-            {
-                await LoadUsers();
-            }
-        }
-    }
-    
-    private async Task UserPockets(int userId)
-    {
-        var parameters = new DialogParameters
-        {
-            { "UserId", userId }
-        };
-
-        var options = new DialogOptions
-        {
-            CloseButton = true,
-            MaxWidth = MaxWidth.Medium,
-            FullWidth = true
-        };
-
-        var dialogReference = await DialogService.ShowAsync<PocketsPaginationUserDialog>("Pockets Of User", parameters, options);
-        var dialogReferenceResult = await dialogReference.Result;
-
-        if (dialogReferenceResult is not null)
-        {
-            if (!dialogReferenceResult.Canceled)
-            {
-                await LoadUsers();
-            }
-        }
-    }
-
-    private async Task Update(User user)
-    {
-        var parameters = new DialogParameters
-        {
-            {
-                "UserModel", new User
-                {
-                    Id = user.Id,
-                    Name = user.Name,
-                    Phone = user.Phone,
-                    Address = user.Address,
-                }
-            },
-        };
-
-        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
-
-        var dialog = await DialogService.ShowAsync<EditUserDialog>("Edit User", parameters, options);
-        var result = await dialog.Result;
-
-        if (result is not null)
-        {
-            if (!result.Canceled)
-            {
-                await LoadUsers();
-            }
-        }
-    }
-
-    private async Task OpenCreateDialog()
-    {
-        var parameters = new DialogParameters
-        {
-            { "UserModel", new User() }
-        };
-
-        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
-
-        var dialog = await DialogService.ShowAsync<CreateUserDialog>("Create User", parameters, options);
-        var result = await dialog.Result;
-
-        if (result is not null)
-        {
-            if (!result.Canceled)
-            {
-                await LoadUsers();
-            }
-        }
     }
 
     private async Task SearchUsers()
@@ -282,39 +148,42 @@ else
         }
 
         _isLoading = true;
+
         try
         {
             var url = $"http://localhost:5191/User/Search?Text={Uri.EscapeDataString(_searchQuery)}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
-
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
             var response = await Http.SendAsync(request);
+
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                _isAuthenticated = true;
+                return;
+            }
+
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
-
-                _userPage.Items = JsonSerializer.Deserialize<List<User>>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
+                var results = JsonSerializer.Deserialize<List<User>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                _userPage.Items = results ?? new List<User>();
+                _totalPages = 1;
+                _currentPage = 1;
             }
-
-            _totalPages = 1;
-            _currentPage = 1;
+            else
+            {
+                Snackbar.Add("Search failed.", Severity.Error);
+                _userPage.Items = new List<User>();
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine("GetUserBySearch error: " + ex.Message);
-
-            if (_userPage != null)
-            {
-                _userPage.Items = [];
-            }
+            Console.WriteLine("Search error: " + ex.Message);
+            Snackbar.Add("Unexpected error during search.", Severity.Error);
         }
 
         _isLoading = false;
-        StateHasChanged();
     }
 
     private async Task Increment()
@@ -343,4 +212,67 @@ else
         }
     }
 
+    private async Task Delete(int userId)
+    {
+        var parameters = new DialogParameters { { "UserId", userId } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+
+        var dialog = await DialogService.ShowAsync<DeleteUserDialog>("Confirm Delete", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadUsers();
+        }
+    }
+
+    private async Task Update(User user)
+    {
+        var parameters = new DialogParameters
+        {
+            { "UserModel", new User { Id = user.Id, Name = user.Name, Phone = user.Phone, Address = user.Address } }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+
+        var dialog = await DialogService.ShowAsync<EditUserDialog>("Edit User", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadUsers();
+        }
+    }
+
+    private async Task OpenCreateDialog()
+    {
+        var parameters = new DialogParameters { { "UserModel", new User() } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+
+        var dialog = await DialogService.ShowAsync<CreateUserDialog>("Create User", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            await LoadUsers();
+        }
+    }
+
+    private async Task UserOrders(int userId)
+    {
+        var parameters = new DialogParameters { { "UserId", userId } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+        var dialog = await DialogService.ShowAsync<OrdersPaginationUserDialog>("User Orders", parameters, options);
+        await dialog.Result;
+    }
+
+    private async Task UserPockets(int userId)
+    {
+        var parameters = new DialogParameters { { "UserId", userId } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+        var dialog = await DialogService.ShowAsync<PocketsPaginationUserDialog>("User Pockets", parameters, options);
+        await dialog.Result;
+    }
 }
