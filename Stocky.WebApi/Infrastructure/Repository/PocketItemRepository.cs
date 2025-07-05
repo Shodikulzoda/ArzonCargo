@@ -28,6 +28,12 @@ public class PocketItemRepository(ApplicationContext context)
 
     public async Task<PocketItem> Add(PocketItem pocketItem)
     {
+        var findPocketItem = await _context1.PocketItem.SingleOrDefaultAsync(x => x.ProductId == pocketItem.ProductId);
+        if (findPocketItem is not null)
+        {
+            return pocketItem;
+        }
+
         await _context1.PocketItem.AddAsync(pocketItem);
         await _context1.SaveChangesAsync();
 
@@ -85,7 +91,7 @@ public class PocketItemRepository(ApplicationContext context)
     {
         var firstOrDefaultAsync =
             await _context1.PocketItem.FirstOrDefaultAsync(x => x.ProductId == productId &&
-                                                              x.PocketId == pocketId);
+                                                                x.PocketId == pocketId);
 
         if (firstOrDefaultAsync is null)
         {
