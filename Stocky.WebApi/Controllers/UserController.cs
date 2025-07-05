@@ -15,7 +15,6 @@ namespace Stocky.WebApi.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
-[Authorize]
 public class UserController(IMediator mediator) : ControllerBase
 {
     [HttpPost]

@@ -3,7 +3,6 @@
 @using MudBlazor.Components.Service
 @using ReferenceClass.Models
 @inject HttpClient Http
-@inject AuthService AuthService
 @inject NavigationManager Navigation
 @layout NoNavbar
 
@@ -17,6 +16,7 @@
                                   Label="Username"
                                   Class="mb-4"
                                   Error="@_isLoged"
+                                  OnKeyDown="HandleKeyDown"
                                   ErrorText="Invalid username or password"/>
 
                     <MudTextField T="string"
@@ -25,6 +25,8 @@
                                   InputType="InputType.Password"
                                   Class="mb-4"
                                   Error="@_isLoged"
+                                  @ref="_secondInput"
+                                  OnKeyDown="Enter"
                                   ErrorText="Invalid username or password"/>
 
                     <MudButton Variant="Variant.Filled"
@@ -40,6 +42,8 @@
 </div>
 
 @code {
+    private MudTextField<string> _secondInput = null!;
+
     [Parameter] public AuthenticationData Data { get; set; } = new();
     private bool _isLoged;
 
@@ -60,13 +64,28 @@
             {
                 AuthService.SetToken(loginResponse.Token);
 
-                // store token securely (e.g., in local storage, session, or singleton service)
                 Navigation.NavigateTo("/home");
             }
         }
         else
         {
             _isLoged = true;
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await _secondInput.FocusAsync();
+        }
+    }
+
+    private async Task Enter(KeyboardEventArgs e)
+    {
+        if (e.Code is "Enter" or "NumpadEnter")
+        {
+            await Submit();
         }
     }
 
