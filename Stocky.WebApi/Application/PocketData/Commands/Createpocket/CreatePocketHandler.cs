@@ -6,7 +6,6 @@ namespace Stocky.WebApi.Application.PocketData.Commands.Createpocket;
 
 public record CreatePocketCommand : IRequest<Pocket>
 {
-    public string? BarCode { get; set; }
     public double TotalAmount { get; set; }
     public double TotalWeight { get; set; }
     public int UserId { get; set; }
@@ -21,14 +20,11 @@ public class CreatePocketHandler(IPocketRepository pocketRepository, IUserReposi
         if (user is null)
             throw new Exception("User not found");
 
-        if (string.IsNullOrEmpty(request.BarCode))
-        {
-            return null;
-        }
+        var barcodeGuid = Guid.CreateVersion7().ToString();
 
         var pocket = new Pocket()
         {
-            BarCode = request.BarCode,
+            BarCode = barcodeGuid,
             TotalWeight = request.TotalWeight,
             UserId = request.UserId,
             CreatedAt = DateTime.UtcNow
