@@ -2,7 +2,7 @@
 
 public class Pocket : BaseEntity
 {
-    public string? BarCode { get; set; }
+    public Guid BarCode { get; set; } = Guid.CreateVersion7();
     public double TotalAmount { get; set; }
     public double TotalWeight { get; set; }
     public int UserId { get; set; }

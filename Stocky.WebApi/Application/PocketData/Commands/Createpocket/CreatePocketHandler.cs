@@ -20,11 +20,12 @@ public class CreatePocketHandler(IPocketRepository pocketRepository, IUserReposi
         if (user is null)
             throw new Exception("User not found");
 
-        var barcodeGuid = Guid.CreateVersion7().ToString();
+        var barcodeGuid = Guid.CreateVersion7();
 
         var pocket = new Pocket()
         {
             BarCode = barcodeGuid,
+            TotalAmount = request.TotalAmount,
             TotalWeight = request.TotalWeight,
             UserId = request.UserId,
             CreatedAt = DateTime.UtcNow

@@ -6,7 +6,6 @@ namespace Stocky.WebApi.Application.OrderData.Commands.CreateOrder;
 
 public record CreateOrderCommand : IRequest<Order>
 {
-    public string? BarCode { get; set; }
     public double TotalAmount { get; set; }
     public double TotalWeight { get; set; }
     public int UserId { get; set; }
@@ -26,11 +25,6 @@ public class CreateOrderHandler(
         if (user.Result is null)
             throw new Exception("User not found");
 
-        if (string.IsNullOrEmpty(request.BarCode))
-        {
-            return null;
-        }
-
         var pocketById = await pocketRepository.GetByUserId(request.UserId);
         if (pocketById is null)
         {
@@ -47,8 +41,9 @@ public class CreateOrderHandler(
 
         var order = new Order()
         {
-            BarCode = request.BarCode,
+            BarCode = pocketById.BarCode,
             TotalWeight = request.TotalWeight,
+            TotalAmount = request.TotalAmount,
             UserId = request.UserId,
             OrderItems = orderItems,
             CreatedAt = DateTime.UtcNow
@@ -57,8 +52,8 @@ public class CreateOrderHandler(
 
         orderItems.Select(orderItemRepository.Add);
 
-        var byPocketId = await pocketItemRepository.GetByPocketId(pocketById.Id);
-        foreach (var pocketItem in byPocketId)
+        var pocketItemsByPocketId = await pocketItemRepository.GetByPocketId(pocketById.Id);
+        foreach (var pocketItem in pocketItemsByPocketId)
         {
             if (pocketItem is not null)
             {
