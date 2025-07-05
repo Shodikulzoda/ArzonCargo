@@ -50,6 +50,7 @@ else
                 <MudTableSortLabel SortBy="new Func<User, object?>(x => x.Address)">Address</MudTableSortLabel>
             </MudTh>
             <MudTh>Actions</MudTh>
+            <MudTh></MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Id">@context.Id</MudTd>
@@ -60,13 +61,17 @@ else
                 <MudIconButton Icon="@Icons.Material.Filled.ViewList"
                                Color="Color.Success"
                                OnClick="@(() => UserOrders(context.Id))"/>
-                <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                               Color="Color.Primary"
-                               OnClick="@(() => Update(context))"/>
-                <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                               Color="Color.Error"
-                               OnClick="@(() => Delete(context.Id))"/>
             </MudTd>
+            <MudTd DataLabel="Others">
+                <MudMenu Icon="@Icons.Material.Filled.MoreVert"
+                         Color="Color.Info"
+                         AnchorOrigin="Origin.TopRight"
+                         TransformOrigin="Origin.TopRight">
+                    <MudMenuItem OnClick="@(() => Update(context))">Edit</MudMenuItem>
+                    <MudMenuItem OnClick="@(() => Delete(context.Id))">Delete</MudMenuItem>
+                </MudMenu>
+            </MudTd>
+
         </RowTemplate>
     </MudTable>
 
@@ -250,9 +255,9 @@ else
         {
             var url = $"http://localhost:5191/User/Search?Text={Uri.EscapeDataString(_searchQuery)}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
-            
+
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
-            
+
             var response = await Http.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {

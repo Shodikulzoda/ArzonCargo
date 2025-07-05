@@ -14,9 +14,6 @@ public class AuthConfiguration : IEntityTypeConfiguration<AuthenticationData>
         builder.Property(x => x.Id)
             .ValueGeneratedOnAdd();
         
-        builder.Property(x => x.Role)
-            .HasDefaultValue(Role.User);
-        
         builder.HasIndex(x=> x.UserName)
             .IsUnique();
     }

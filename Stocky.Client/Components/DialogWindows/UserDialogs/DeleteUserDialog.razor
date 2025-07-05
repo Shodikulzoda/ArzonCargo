@@ -1,4 +1,7 @@
+@using System.Net.Http.Headers
+@using MudBlazor.Components.Service
 @inject HttpClient Http
+@inject AuthService AuthService
 
 <MudDialog>
     <DialogContent>
@@ -12,7 +15,7 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
-    
+
     [Parameter] public int UserId { get; set; }
     [Parameter] public string ContentText { get; set; } = "Are you sure?";
     [Parameter] public string ButtonText { get; set; } = "OK";
@@ -20,14 +23,18 @@
 
     private bool _isLoading;
     private void Cancel() => MudDialog.Cancel();
-    
+
     private async Task DeleteUser()
     {
         _isLoading = true;
         try
         {
-            string url = $"http://localhost:5191/User/DeleteUser?Id={UserId}";
-            var response = await Http.DeleteAsync(url);
+            var url = $"http://localhost:5191/User/DeleteUser?Id={UserId}";
+            var request = new HttpRequestMessage(HttpMethod.Delete, url);
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+            var response = await Http.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {
@@ -45,4 +52,5 @@
 
         _isLoading = false;
     }
+
 }

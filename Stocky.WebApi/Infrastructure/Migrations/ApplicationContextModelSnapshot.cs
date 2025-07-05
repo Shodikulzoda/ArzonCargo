@@ -42,9 +42,7 @@ namespace Stocky.WebApi.Migrations
                         .HasAnnotation("Relational:JsonPropertyName", "password");
 
                     b.Property<int>("Role")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(2);
+                        .HasColumnType("integer");
 
                     b.Property<string>("UserName")
                         .IsRequired()

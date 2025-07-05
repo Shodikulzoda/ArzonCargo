@@ -1,13 +1,21 @@
+@using System.Net.Http.Headers
+@using MudBlazor.Components.Service
 @using ReferenceClass.Models
 @inject HttpClient Http
+@inject AuthService AuthService
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
     [Parameter] public User UserModel { get; set; } = new();
 
     private async Task Submit()
     {
-        var response = await Http.PutAsJsonAsync("http://localhost:5191/User/UpdateUser", UserModel);
+        var request = new HttpRequestMessage(HttpMethod.Put, "http://localhost:5191/User/UpdateUser");
+        request.Content = JsonContent.Create(UserModel);
+
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+        var response = await Http.SendAsync(request);
+
         if (response.IsSuccessStatusCode)
         {
             MudDialog.Close(DialogResult.Ok(true));
@@ -24,9 +32,9 @@
 <MudDialog>
     <DialogContent>
         <MudText Typo="Typo.h6">Edit User</MudText>
-        <MudTextField Label="Name" @bind-Value="UserModel.Name" Variant="Variant.Outlined" Margin="Margin.Dense" />
-        <MudTextField Label="Phone" @bind-Value="UserModel.Phone" Variant="Variant.Outlined" Margin="Margin.Dense" />
-        <MudTextField Label="Address" @bind-Value="UserModel.Address" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        <MudTextField Label="Name" @bind-Value="UserModel.Name" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+        <MudTextField Label="Phone" @bind-Value="UserModel.Phone" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+        <MudTextField Label="Address" @bind-Value="UserModel.Address" Variant="Variant.Outlined" Margin="Margin.Dense"/>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
