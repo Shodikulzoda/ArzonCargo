@@ -22,7 +22,6 @@ public class OrdersByPaginationQueryHandler(IOrderRepository orderRepository)
             .Select(x => new Order
             {
                 BarCode = x.BarCode,
-                Status = x.Status,
                 TotalAmount = x.TotalAmount,
                 TotalWeight = x.TotalWeight,
                 UserId = x.UserId,

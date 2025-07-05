@@ -73,9 +73,6 @@ namespace Stocky.WebApi.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
                     b.Property<double>("TotalAmount")
                         .HasColumnType("double precision");
 
@@ -137,9 +134,6 @@ namespace Stocky.WebApi.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
 
                     b.Property<double>("TotalAmount")
                         .HasColumnType("double precision");

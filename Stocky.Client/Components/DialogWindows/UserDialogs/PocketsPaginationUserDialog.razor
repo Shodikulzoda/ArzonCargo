@@ -12,19 +12,21 @@
 }
 else
 {
-    <MudTable Items="_orders.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
+    <MudTable Items="_pockets.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
         <HeaderContent>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Order, object>(x => x.Id)">Id</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.Id)">Id</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.BarCode)">BarCode</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Pocket, object?>(x => x.BarCode)">BarCode</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.TotalWeight)">TotalWeight</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Pocket, object?>(x => x.TotalWeight)">TotalWeight
+                </MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.TotalAmount)">TotalAmount</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Pocket, object?>(x => x.TotalAmount)">TotalAmount
+                </MudTableSortLabel>
             </MudTh>
         </HeaderContent>
         <RowTemplate>
@@ -33,9 +35,9 @@ else
             <MudTd DataLabel="TotalWeight">@context.TotalWeight</MudTd>
             <MudTd DataLabel="TotalAmount">@context.TotalAmount</MudTd>
             <MudTd>
-                <MudIconButton Icon="@Icons.Material.Filled.ViewList"
+                <MudIconButton Icon="@Icons.Material.Filled.ShoppingBag"
                                Color="Color.Success"
-                               OnClick="@(() => UserOrderItems(context.Id))"/>
+                               OnClick="@(() => UserPocketItems(context.Id))"/>
             </MudTd>
         </RowTemplate>
     </MudTable>
@@ -51,7 +53,7 @@ else
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
     [Parameter] public int UserId { get; set; }
 
-    private PageData<Order>? _orders = new();
+    private PageData<Pocket>? _pockets = new();
 
     private int _currentPage = 1;
     private int _totalPages = 1;
@@ -60,36 +62,34 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadOrders();
+        await LoadPockets();
     }
 
-    private async Task LoadOrders()
+    private async Task LoadPockets()
     {
         _isLoading = true;
 
         try
         {
-            var url = $"http://localhost:5191/Order/GetOrdersByUserId?UserId={UserId}&Page={_currentPage}&PageSize={PageSize}";
+            var url = $"http://localhost:5191/Pocket/GetPocketsByUserId?UserId={UserId}&Page={_currentPage}&PageSize={PageSize}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
             var response = await Http.SendAsync(request);
-
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
 
-                _orders = JsonSerializer.Deserialize<PageData<Order>>(json, new JsonSerializerOptions
+                _pockets = JsonSerializer.Deserialize<PageData<Pocket>>(json, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
-
-                _orders.TotalPages = (int)Math.Ceiling((double)_orders.TotalCount / PageSize);
+                _pockets.TotalPages = (int)Math.Ceiling((double)_pockets.TotalCount / PageSize);
             }
             else
             {
-                _orders.Items = [];
+                _pockets.Items = [];
             }
         }
         catch (Exception ex)
@@ -100,11 +100,11 @@ else
         _isLoading = false;
     }
 
-    private async Task UserOrderItems(int orderId)
+    private async Task UserPocketItems(int pocketId)
     {
         var parameters = new DialogParameters
         {
-            { "OrderId", orderId }
+            { "PocketId", pocketId }
         };
 
         var options = new DialogOptions
@@ -114,14 +114,14 @@ else
             FullWidth = true
         };
 
-        var dialogReference = await DialogService.ShowAsync<OrderItems>("OrderItem Of Order", parameters, options);
+        var dialogReference = await DialogService.ShowAsync<PocketItems>("PocketItem Of Order", parameters, options);
         var dialogReferenceResult = await dialogReference.Result;
 
         if (dialogReferenceResult is not null)
         {
             if (!dialogReferenceResult.Canceled)
             {
-                await LoadOrders();
+                await LoadPockets();
             }
         }
     }
@@ -131,7 +131,7 @@ else
         if (_currentPage < _totalPages)
         {
             _currentPage++;
-            await LoadOrders();
+            await LoadPockets();
         }
     }
 
@@ -140,7 +140,7 @@ else
         if (_currentPage > 1)
         {
             _currentPage--;
-            await LoadOrders();
+            await LoadPockets();
         }
     }
 

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Stocky.WebApi.Migrations
 {
     /// <inheritdoc />
-    public partial class updateMigration1 : Migration
+    public partial class FirstMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,7 +19,7 @@ namespace Stocky.WebApi.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserName = table.Column<string>(type: "text", nullable: false),
-                    Role = table.Column<int>(type: "integer", nullable: false, defaultValue: 2),
+                    Role = table.Column<int>(type: "integer", nullable: false),
                     PasswordHash = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
@@ -71,7 +71,6 @@ namespace Stocky.WebApi.Migrations
                     BarCode = table.Column<string>(type: "text", nullable: true),
                     TotalAmount = table.Column<double>(type: "double precision", nullable: false),
                     TotalWeight = table.Column<double>(type: "double precision", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
@@ -96,7 +95,6 @@ namespace Stocky.WebApi.Migrations
                     BarCode = table.Column<string>(type: "text", nullable: true),
                     TotalAmount = table.Column<double>(type: "double precision", nullable: false),
                     TotalWeight = table.Column<double>(type: "double precision", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)

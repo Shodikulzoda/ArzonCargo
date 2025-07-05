@@ -1,4 +1,5 @@
 @using System.Net.Http.Headers
+@using System.Text.Json
 @using MudBlazor.Components.Service
 @using ReferenceClass.Models
 @inject HttpClient Http
@@ -10,29 +11,29 @@
 }
 else
 {
-    <MudTable Items="_orderItems.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
+    <MudTable Items="_pocketItems.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
         <HeaderContent>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<OrderItem, object>(x => x.Id)">Id</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<PocketItem, object>(x => x.Id)">Id</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.OrderId)">BarCode</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.PocketId)">BarCode</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.ProductId)">TotalWeight
+                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.ProductId)">TotalWeight
                 </MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.CreatedAt)">TotalAmount
+                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.CreatedAt)">TotalAmount
                 </MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.IsDeleted)">Status</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.IsDeleted)">Status</MudTableSortLabel>
             </MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="OrderId">@context.OrderId</MudTd>
+            <MudTd DataLabel="OrderId">@context.PocketId</MudTd>
             <MudTd DataLabel="ProductId">@context.ProductId</MudTd>
             <MudTd DataLabel="CreateAt">@context.CreatedAt</MudTd>
             <MudTd DataLabel="IsDelete">@context.IsDeleted</MudTd>
@@ -47,10 +48,10 @@ else
 }
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
-    [Parameter] public int OrderId { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    [Parameter] public int PocketId { get; set; }
 
-    private PageData<OrderItem>? _orderItems = new();
+    private PageData<PocketItem>? _pocketItems = new();
 
     private int _currentPage = 1;
     private int _totalPages = 1;
@@ -59,16 +60,16 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadOrders();
+        await LoadPocketItmes();
     }
 
-    private async Task LoadOrders()
+    private async Task LoadPocketItmes()
     {
         _isLoading = true;
 
         try
         {
-            var url = $"http://localhost:5191/OrderItem/GetOrdersByUserId?OrderId={OrderId}&Page={_currentPage}&PageSize={PageSize}";
+            var url = $"http://localhost:5191/PocketItem/GetPocketItemsByPocketId?PocketId={PocketId}&Page={_currentPage}&PageSize={PageSize}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
@@ -76,11 +77,18 @@ else
             var response = await Http.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
-                _orderItems.TotalPages = (int)Math.Ceiling((double)_orderItems.TotalCount / PageSize);
+                var json = await response.Content.ReadAsStringAsync();
+
+                _pocketItems = JsonSerializer.Deserialize<PageData<PocketItem>>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+                
+                _pocketItems.TotalPages = (int)Math.Ceiling((double)_pocketItems.TotalCount / PageSize);
             }
             else
             {
-                _orderItems.Items = [];
+                _pocketItems.Items = [];
             }
         }
         catch (Exception ex)
@@ -96,7 +104,7 @@ else
         if (_currentPage < _totalPages)
         {
             _currentPage++;
-            await LoadOrders();
+            await LoadPocketItmes();
         }
     }
 
@@ -105,7 +113,7 @@ else
         if (_currentPage > 1)
         {
             _currentPage--;
-            await LoadOrders();
+            await LoadPocketItmes();
         }
     }
 

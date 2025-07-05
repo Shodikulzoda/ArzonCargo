@@ -34,7 +34,7 @@ public class OrderItemController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<PageData<OrderItem>>> GetOrdersByUserId(
+    public async Task<ActionResult<PageData<OrderItem>>> GetOrderItemsByOrderId(
         [FromQuery] GetByOrderIdQuery getByOrderIdQuery)
     {
         return Ok(await mediator.Send(getByOrderIdQuery));

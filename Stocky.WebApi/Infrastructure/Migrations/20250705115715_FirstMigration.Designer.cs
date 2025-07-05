@@ -12,8 +12,8 @@ using Stocky.WebApi.Infrastructure.Databases;
 namespace Stocky.WebApi.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250704110248_updateMigration1")]
-    partial class updateMigration1
+    [Migration("20250705115715_FirstMigration")]
+    partial class FirstMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,9 +45,7 @@ namespace Stocky.WebApi.Migrations
                         .HasAnnotation("Relational:JsonPropertyName", "password");
 
                     b.Property<int>("Role")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(2);
+                        .HasColumnType("integer");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -77,9 +75,6 @@ namespace Stocky.WebApi.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
 
                     b.Property<double>("TotalAmount")
                         .HasColumnType("double precision");
@@ -142,9 +137,6 @@ namespace Stocky.WebApi.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
 
                     b.Property<double>("TotalAmount")
                         .HasColumnType("double precision");

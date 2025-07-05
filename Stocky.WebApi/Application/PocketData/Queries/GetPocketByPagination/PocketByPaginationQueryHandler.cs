@@ -22,7 +22,6 @@ public class GetPocketByPaginationQueryHandler(IPocketRepository pocketRepositor
             .Select(x => new Pocket()
             {
                 BarCode = x.BarCode,
-                Status = x.Status,
                 TotalAmount = x.TotalAmount,
                 TotalWeight = x.TotalWeight,
                 UserId = x.UserId,

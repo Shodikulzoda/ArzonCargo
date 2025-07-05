@@ -62,6 +62,11 @@ else
                                Color="Color.Success"
                                OnClick="@(() => UserOrders(context.Id))"/>
             </MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.ShoppingBag"
+                               Color="Color.Success"
+                               OnClick="@(() => UserPockets(context.Id))"/>
+            </MudTd>
             <MudTd DataLabel="Others">
                 <MudMenu Icon="@Icons.Material.Filled.MoreVert"
                          Color="Color.Info"
@@ -181,6 +186,32 @@ else
         };
 
         var dialogReference = await DialogService.ShowAsync<OrdersPaginationUserDialog>("Orders for User", parameters, options);
+        var dialogReferenceResult = await dialogReference.Result;
+
+        if (dialogReferenceResult is not null)
+        {
+            if (!dialogReferenceResult.Canceled)
+            {
+                await LoadUsers();
+            }
+        }
+    }
+    
+    private async Task UserPockets(int userId)
+    {
+        var parameters = new DialogParameters
+        {
+            { "UserId", userId }
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        };
+
+        var dialogReference = await DialogService.ShowAsync<PocketsPaginationUserDialog>("Pockets Of User", parameters, options);
         var dialogReferenceResult = await dialogReference.Result;
 
         if (dialogReferenceResult is not null)
