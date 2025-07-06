@@ -20,8 +20,15 @@
                   AdornmentIcon="@Icons.Material.Filled.Search"
                   Immediate="true"
                   OnKeyDown="HandleKeyDown"
-                  Margin="Margin.Dense"/>
-    <MudButton OnClick="SearchPocket" Color="Color.Primary" Variant="Variant.Filled">Search</MudButton>
+                  Margin="Margin.Dense" />
+
+    <MudButton OnClick="SearchPocket" Color="Color.Primary" Variant="Variant.Filled">
+        Search
+    </MudButton>
+
+    <MudButton OnClick="OpenCreatePocketDialog" Color="Color.Success" Variant="Variant.Filled">
+        Create Pocket
+    </MudButton>
 </div>
 
 @if (_isLoading)
@@ -32,20 +39,10 @@ else
 {
     <MudTable Items="_pocketPage?.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
         <HeaderContent>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.Id)">Id</MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.BarCode)">BarCode</MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalAmount)">Total Amount
-                </MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalWeight)">Total Weight
-                </MudTableSortLabel>
-            </MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.Id)">Id</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.BarCode)">BarCode</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalAmount)">Total Amount</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalWeight)">Total Weight</MudTableSortLabel></MudTh>
             <MudTh>UserId</MudTh>
             <MudTh>Complete Order</MudTh>
         </HeaderContent>
@@ -77,7 +74,6 @@ else
     private readonly int _pageSize = 15;
     private bool _isLoading;
     private string _searchQuery = "";
-    private bool _isAuthenticated;
 
     protected override async Task OnInitializedAsync()
     {
@@ -85,7 +81,6 @@ else
 
         if (string.IsNullOrEmpty(AuthService.Token))
         {
-            _isAuthenticated = true;
             return;
         }
 
@@ -127,7 +122,6 @@ else
 
         _isLoading = false;
     }
-
 
     private async Task SearchPocket()
     {
@@ -179,6 +173,24 @@ else
         }
     }
 
+    private async Task OpenCreatePocketDialog()
+    {
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        };
+
+        var dialogReference = await DialogService.ShowAsync<CreatePocketDialog>("Create Pocket", new DialogParameters(), options);
+
+        var result = await dialogReference.Result;
+        if (result is { Canceled: false })
+        {
+            await LoadPockets();
+        }
+    }
+
     private async Task Increment()
     {
         if (_currentPage < _totalPages)
@@ -204,5 +216,4 @@ else
             await SearchPocket();
         }
     }
-
 }

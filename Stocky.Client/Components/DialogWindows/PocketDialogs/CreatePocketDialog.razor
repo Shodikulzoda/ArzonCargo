@@ -1,0 +1,193 @@
+@using System.Net.Http.Headers
+@using Append.Blazor.Printing
+@using MudBlazor.Components.Service
+@using QRCoder
+@using Stocky.Shared.Models
+@inject HttpClient Http
+@inject AuthService AuthService
+@inject IJSRuntime Js
+@inject IPrintingService PrintingService
+
+<MudDialog>
+    <DialogContent>
+        <MudPaper Class="pa-6 mx-auto" Style="max-width:600px;">
+            <MudStack Spacing="3">
+                <MudText Typo="Typo.h5">Create New Pocket</MudText>
+
+                <MudStack Spacing="2">
+                    <MudTextField @bind-Value="_pocketModel.TotalAmount" Label="Total Amount" Variant="Variant.Outlined" />
+                    <MudTextField @bind-Value="_pocketModel.TotalWeight" Label="Total Weight" Variant="Variant.Outlined" />
+                    <MudTextField @bind-Value="_pocketModel.UserId" Label="User ID" Variant="Variant.Outlined" />
+                </MudStack>
+
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreatePocket">
+                    Create Pocket
+                </MudButton>
+
+                @if (_pocketCreated)
+                {
+                    <MudDivider Class="my-4" />
+
+                    <MudText Typo="Typo.h6" Class="mt-2">Pocket Barcode: @_pocketModel.BarCode</MudText>
+
+                    <MudStack Spacing="2">
+                        <MudTextField @bind-Value="_productBarCode"
+                                      Label="Scan Product Barcode"
+                                      Immediate="true"
+                                      OnKeyDown="HandleKeyDown"
+                                      Class="barcode-text"
+                                      Variant="Variant.Outlined" />
+
+                        <MudStack Direction="Row" Spacing="2">
+                            <MudButton OnClick="AddProductToPocket" Color="Color.Warning" Variant="Variant.Filled">
+                                Add Product
+                            </MudButton>
+                            <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="FinishPocket">
+                                Finish Sale
+                            </MudButton>
+                        </MudStack>
+                    </MudStack>
+
+                    <MudTable Items="_pocketItems" Class="mt-4" Dense="true" Hover="true" Elevation="0">
+                        <HeaderContent>
+                            <MudTh>Barcode</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@context.ProductBarCode</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(_message))
+                {
+                    <MudText Color="Color.Success" Class="mt-3">@_message</MudText>
+                }
+            </MudStack>
+        </MudPaper>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Color="Color.Secondary" Variant="Variant.Outlined" OnClick="Cancel">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<script>
+    window.focusElement = () => {
+        const el = document.querySelector('.barcode-text input');
+        if (el) {
+            el.value = '';
+            el.focus();
+        }
+    };
+</script>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    private Pocket _pocketModel = new();
+    private bool _pocketCreated;
+    private string? _message = "";
+    private string? _productBarCode;
+    private List<PocketItem> _pocketItems = new();
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private byte[] GenerateQrCode(int size)
+    {
+        using var qrGenerator = new QRCodeGenerator();
+        using var qrCodeData = qrGenerator.CreateQrCode(_pocketModel.Id.ToString(), QRCodeGenerator.ECCLevel.Q);
+        using var qrCode = new PngByteQRCode(qrCodeData);
+        return qrCode.GetGraphic(size);
+    }
+
+    private async Task CreatePocket()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5191/Pocket/CreatePocket")
+        {
+            Content = JsonContent.Create(_pocketModel)
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+        var response = await Http.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            _pocketModel = await response.Content.ReadFromJsonAsync<Pocket>() ?? new();
+            _pocketCreated = true;
+        }
+    }
+
+    private async Task AddProductToPocket()
+    {
+        if (string.IsNullOrWhiteSpace(_productBarCode) || _pocketModel?.Id == 0) return;
+
+        // Prevent duplicate barcodes
+        if (_pocketItems.Any(item => item.ProductBarCode == _productBarCode))
+        {
+            _message = $"Product with barcode {_productBarCode} already added.";
+            await Js.InvokeVoidAsync("focusElement");
+            return;
+        }
+
+        var pocketItem = new PocketItem
+        {
+            PocketId = _pocketModel.Id,
+            ProductBarCode = _productBarCode
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5191/PocketItem/Add")
+        {
+            Content = JsonContent.Create(pocketItem)
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+        var response = await Http.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            _pocketItems.Add(pocketItem);
+            _productBarCode = "";
+            _message = null;
+            await Js.InvokeVoidAsync("focusElement");
+        }
+    }
+
+    private async Task FinishPocket()
+    {
+        if (_pocketModel?.BarCode is null) return;
+
+        var request = new HttpRequestMessage(HttpMethod.Put, "http://localhost:5191/Pocket/UpdatePocket")
+        {
+            Content = JsonContent.Create(_pocketModel)
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+        var response = await Http.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            _message = "Created successfully";
+            _pocketItems.Clear();
+            await Js.InvokeVoidAsync("focusElement");
+
+            var qrBytes = GenerateQrCode(10);
+            var base64Qr = Convert.ToBase64String(qrBytes);
+
+            string rawHtml = string.Join(
+                Environment.NewLine,
+                "<div style='width:57mm;height:57mm;padding:0;margin-left:1mm; margin-right:1mm; text-align:center;font-family:sans-serif;'>",
+                "<h2 style='margin:0;'>ArzonCargo</h2>",
+                "<div style='font-size:3mm;margin:0'><b>+992 92 788 0989</b></div>",
+                $"<img src='data:image/png;base64,{base64Qr}' style='width:40mm;height:40mm;margin:1mm 0;' />",
+                "<div style='font-size:3mm;'><b>Номер клиента: +992 92 677 4545</b></div>",
+                "</div>"
+            );
+
+            await PrintingService.Print(rawHtml, PrintType.RawHtml);
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key is "Enter" or "NumpadEnter")
+        {
+            await AddProductToPocket();
+        }
+    }
+}
