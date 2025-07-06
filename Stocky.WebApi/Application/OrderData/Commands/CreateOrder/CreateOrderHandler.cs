@@ -42,9 +42,9 @@ public class CreateOrderHandler(
         var order = new Order()
         {
             BarCode = pocketById.BarCode,
-            TotalWeight = request.TotalWeight,
-            TotalAmount = request.TotalAmount,
-            UserId = request.UserId,
+            TotalWeight = pocketById.TotalWeight,
+            TotalAmount = pocketById.TotalAmount,
+            UserId = pocketById.UserId,
             OrderItems = orderItems,
             CreatedAt = DateTime.UtcNow
         };

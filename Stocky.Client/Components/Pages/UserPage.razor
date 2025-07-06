@@ -7,6 +7,8 @@
 @using System.Net.Http.Headers
 @using System.Text.Json
 @using System.Net
+@using MudBlazor.Components.DialogWindows.OrderDialogs
+@using MudBlazor.Components.DialogWindows.PocketDialogs
 @using MudBlazor.Components.DialogWindows.UserDialogs
 @using MudBlazor.Components.Service
 @using Stocky.Shared.Models
@@ -269,10 +271,16 @@ else
 
     private async Task UserPockets(int userId)
     {
-        var parameters = new DialogParameters { { "UserId", userId } };
+        var parameters = new DialogParameters
+        {
+            {
+                "UserId", userId
+            }
+        };
+        
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
 
-        var dialog = await DialogService.ShowAsync<PocketsPaginationUserDialog>("User Pockets", parameters, options);
+        var dialog = await DialogService.ShowAsync<PocketsUserPaginationDialog>("User Pockets", parameters, options);
         await dialog.Result;
     }
 }

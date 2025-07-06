@@ -8,55 +8,62 @@ namespace Stocky.WebApi.Infrastructure.Repository;
 
 public class ProductRepository(ApplicationContext context) : BaseRepository<Product>(context), IProductRepository
 {
+    private readonly ApplicationContext _context1 = context;
+
     public async Task<Product> Add(Product product)
     {
-        await context.Products.AddAsync(product);
-        await context.SaveChangesAsync();
+        await _context1.Products.AddAsync(product);
+        await _context1.SaveChangesAsync();
 
         return product;
     }
 
     public async Task<IEnumerable<Product?>> GetAll()
     {
-        return await context.Products.ToListAsync();
+        return await _context1.Products.ToListAsync();
     }
 
     public async Task<Product> Update(Product product)
     {
-        context.Products.Update(product);
-        await context.SaveChangesAsync();
+        _context1.Products.Update(product);
+        await _context1.SaveChangesAsync();
 
         return product;
     }
 
     public async Task<bool> Delete(int id)
     {
-        var product = await context.Products.FirstOrDefaultAsync(x=>x.Id==id);
+        var product = await _context1.Products.FirstOrDefaultAsync(x=>x.Id==id);
         if (product is null)
         {
             return false;
         }
         
-        context.Products.Remove(product);
-        await context.SaveChangesAsync();
+        _context1.Products.Remove(product);
+        await _context1.SaveChangesAsync();
 
         return true;
     }
 
     public async Task<Product?> GetById(int id)
     {
-        return await context.Products.FirstOrDefaultAsync(o => o.Id == id);
+        return await _context1.Products.FirstOrDefaultAsync(o => o.Id == id);
+    }
+    
+    public async Task<Product?> GetByBarCode(string? barCode)
+    {
+        return await _context1.Products.FirstOrDefaultAsync(o => o.BarCode == barCode);
     }
 
     public async Task<int> Count()
     {
-        return await context.Products.CountAsync();
+        return await _context1.Products.CountAsync();
     }
 
     public async Task<IEnumerable<Product>> GetProductByPagination(int page, int pageSize,
         CancellationToken cancellationToken)
     {
-        return await context.Products
+        return await _context1.Products
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .OrderBy(x => x.Status == Status.Created)

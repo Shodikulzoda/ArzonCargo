@@ -151,7 +151,7 @@
 
     private async Task HandleKeyPress(KeyboardEventArgs e)
     {
-        if (e.Key == "Enter" || e.Key == "NumpadEnter")
+        if (e.Key is "Enter" or "NumpadEnter")
         {
             await SubmitBarcode();
         }

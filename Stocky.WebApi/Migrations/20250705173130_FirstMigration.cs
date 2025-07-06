@@ -68,7 +68,7 @@ namespace Stocky.WebApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    BarCode = table.Column<string>(type: "text", nullable: true),
+                    BarCode = table.Column<Guid>(type: "uuid", nullable: false),
                     TotalAmount = table.Column<double>(type: "double precision", nullable: false),
                     TotalWeight = table.Column<double>(type: "double precision", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: false),
@@ -92,7 +92,7 @@ namespace Stocky.WebApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    BarCode = table.Column<string>(type: "text", nullable: true),
+                    BarCode = table.Column<Guid>(type: "uuid", nullable: false),
                     TotalAmount = table.Column<double>(type: "double precision", nullable: false),
                     TotalWeight = table.Column<double>(type: "double precision", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: false),
@@ -144,6 +144,7 @@ namespace Stocky.WebApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ProductBarCode = table.Column<string>(type: "text", nullable: true),
                     ProductId = table.Column<int>(type: "integer", nullable: false),
                     PocketId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),

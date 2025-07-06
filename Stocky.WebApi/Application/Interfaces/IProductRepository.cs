@@ -10,6 +10,7 @@ public interface IProductRepository : IBaseRepository<Product>
     Task<bool> Delete(int id);
 
     Task<Product?> GetById(int id);
+    Task<Product?> GetByBarCode(string? barCode);
     Task<int> Count();
     Task<IEnumerable<Product>> GetProductByPagination(int page, int pageSize, CancellationToken cancellationToken);
 }
