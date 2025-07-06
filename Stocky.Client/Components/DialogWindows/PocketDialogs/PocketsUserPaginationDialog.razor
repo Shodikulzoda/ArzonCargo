@@ -72,7 +72,7 @@ else
 
         try
         {
-            var url = $"http://localhost:5191/CreatingPocket/GetPocketsByUserId?UserId={UserId}&Page={_currentPage}&PageSize={PageSize}";
+            var url = $"http://localhost:5191/Pocket/GetPocketsByUserId?UserId={UserId}&Page={_currentPage}&PageSize={PageSize}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);

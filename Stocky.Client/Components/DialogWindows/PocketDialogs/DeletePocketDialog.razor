@@ -30,7 +30,7 @@
         _isLoading = true;
         try
         {
-            var url = $"http://localhost:5191/CreatingPocket/DeletePocketDialog?Id={PocketId}";
+            var url = $"http://localhost:5191/Pocket/DeletePocketDialog?Id={PocketId}";
             var request = new HttpRequestMessage(HttpMethod.Delete, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 

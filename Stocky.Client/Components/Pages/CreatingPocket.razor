@@ -6,20 +6,20 @@
 @inject AuthService AuthService
 
 <MudPaper Class="pa-6" Style="max-width:600px">
-    <MudText Typo="Typo.h5">Create New CreatingPocket</MudText>
+    <MudText Typo="Typo.h5">Create New Pocket</MudText>
 
     <MudTextField @bind-Value="PocketModel.TotalAmount" Label="Total Amount"/>
     <MudTextField @bind-Value="PocketModel.TotalWeight" Label="Total Weight"/>
     <MudTextField @bind-Value="PocketModel.UserId" Label="UserId"/>
 
     <MudButton Color="Color.Primary" OnClick="CreatePocket">
-        Create CreatingPocket
+        Create Pocket
     </MudButton>
 
     @if (PocketCreated)
     {
         <MudDivider Class="my-4"/>
-        <MudText Typo="Typo.h6">CreatingPocket Barcode: @PocketModel.BarCode</MudText>
+        <MudText Typo="Typo.h6">Pocket Barcode: @PocketModel.BarCode</MudText>
 
         <MudTextField @bind-Value="ProductBarCode" Label="Scan Product Barcode" Immediate="true"/>
         <MudButton OnClick="AddProductToPocket">Add Product</MudButton>
@@ -42,7 +42,7 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
-    private Stocky.Shared.Models.Pocket PocketModel = new();
+    private Pocket? PocketModel = new();
     private bool PocketCreated;
     private string? _message = "";
 
@@ -51,7 +51,7 @@
 
     private async Task CreatePocket()
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5191/CreatingPocket/CreatePocket");
+        var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5191/Pocket/CreatePocket");
 
         request.Content = JsonContent.Create(PocketModel);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
@@ -60,7 +60,7 @@
 
         if (response.IsSuccessStatusCode)
         {
-            PocketModel = await response.Content.ReadFromJsonAsync<Stocky.Shared.Models.Pocket>();
+            PocketModel = await response.Content.ReadFromJsonAsync<Pocket>();
             PocketCreated = true;
         }
     }
@@ -90,7 +90,7 @@
 
     private async Task FinishPocket()
     {
-        var request = new HttpRequestMessage(HttpMethod.Put, "http://localhost:5191/CreatingPocket/UpdatePocket");
+        var request = new HttpRequestMessage(HttpMethod.Put, "http://localhost:5191/Pocket/UpdatePocket");
 
         request.Content = JsonContent.Create(PocketModel);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
