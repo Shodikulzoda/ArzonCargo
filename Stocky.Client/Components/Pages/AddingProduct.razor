@@ -21,10 +21,6 @@
         Add
     </MudButton>
 
-    <MudButton Variant="Variant.Outlined" Color="Color.Info" OnClick="CheckBarcode" Class="mt-2">
-        Check
-    </MudButton>
-
     <MudText Color="Color.Success" Class="mt-2">@_message</MudText>
 </MudPaper>
 
@@ -102,43 +98,7 @@
         _barcode = "";
         await Js.InvokeVoidAsync("focusElement");
     }
-
-    private async Task CheckBarcode()
-    {
-        if (string.IsNullOrWhiteSpace(_barcode))
-        {
-            _message = "Please enter a barcode to check.";
-            await Js.InvokeVoidAsync("focusElement");
-            return;
-        }
-
-        try
-        {
-            var response = await Http.GetAsync(
-                $"http://localhost:5191/Product/GetBybarcode?BarCode={Uri.EscapeDataString(_barcode)}"
-            );
-
-            if (response.IsSuccessStatusCode)
-            {
-                _message = $"Product with barcode '{_barcode}' is registered.";
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                _message = $"Product with barcode '{_barcode}' is NOT registered.";
-            }
-            else
-            {
-                _message = "Error checking barcode.";
-            }
-        }
-        catch
-        {
-            _message = "Failed to check barcode due to network or server error.";
-        }
-
-        await Js.InvokeVoidAsync("focusElement");
-    }
-
+    
     private void RemoveProduct(string? barcode)
     {
         var product = _products.FirstOrDefault(p => p.BarCode == barcode);
