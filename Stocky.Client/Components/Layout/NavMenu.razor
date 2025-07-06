@@ -12,6 +12,10 @@
         Users Page
     </MudNavLink>
 
+    <MudNavLink Href="pockets" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">
+        Pockets Page
+    </MudNavLink>
+
     <MudNavLink Href="adding-product" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">
         Adding Product
     </MudNavLink>
@@ -19,24 +23,26 @@
     <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">
         Products Page
     </MudNavLink>
-    
+
     <MudNavLink Href="create-pocket" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">
-        Adding Pocket
+        Adding CreatingPocket
     </MudNavLink>
 
-    <MudSpacer />
+    <MudSpacer/>
 
     <MudNavLink OnClick="Logout" Icon="@Icons.Material.Filled.ExitToApp" Color="Color.Error">
-            Logout
-        </MudNavLink>
-    
+        Logout
+    </MudNavLink>
+
 
 </MudNavMenu>
 
 @code {
+
     private void Logout()
     {
         AuthService.ClearToken();
         Navigation.NavigateTo("/", true);
     }
+
 }

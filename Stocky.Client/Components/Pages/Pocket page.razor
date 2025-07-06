@@ -1,0 +1,207 @@
+@page "/pockets"
+@using System.Net.Http.Headers
+@using System.Text.Json
+@using MudBlazor.Components.DialogWindows.PocketDialogs
+@using MudBlazor.Components.Service
+@using Stocky.Shared.Models
+@inject HttpClient Http
+@inject IDialogService DialogService
+@inject AuthService AuthService
+
+<PageTitle>CreatingPockets</PageTitle>
+
+<MudText Typo="Typo.h4" GutterBottom="true">CreatingPockets Table</MudText>
+
+<div class="mb-4 d-flex gap-2">
+    <MudTextField @bind-Value="_searchQuery"
+                  Placeholder="Search by barcode, user, etc..."
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Immediate="true"
+                  OnKeyDown="HandleKeyDown"
+                  Margin="Margin.Dense"/>
+    <MudButton OnClick="SearchPocket" Color="Color.Primary" Variant="Variant.Filled">Search</MudButton>
+</div>
+
+@if (_isLoading)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
+}
+else
+{
+    <MudTable Items="_pocketPage?.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
+        <HeaderContent>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.Id)">Id</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.BarCode)">BarCode</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalAmount)">Total Amount
+                </MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalWeight)">Total Weight
+                </MudTableSortLabel>
+            </MudTh>
+            <MudTh>User</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="BarCode">@context.BarCode</MudTd>
+            <MudTd DataLabel="TotalAmount">@context.TotalAmount</MudTd>
+            <MudTd DataLabel="TotalWeight">@context.TotalWeight</MudTd>
+            <MudTd DataLabel="UserId">@context.UserId</MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                               Color="Color.Error"
+                               OnClick="@(() => Delete(context.Id))"/>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+
+    <div class="mt-4 d-flex justify-between">
+        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Back</MudButton>
+        <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
+        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Next</MudButton>
+    </div>
+}
+
+@code {
+    private PageData<Pocket>? _pocketPage = new();
+    private int _currentPage = 1;
+    private int _totalPages = 1;
+    private readonly int _pageSize = 15;
+    private bool _isLoading;
+    private string _searchQuery = "";
+    private bool _isAuthenticated;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthService.LoadTokenAsync();
+
+        if (string.IsNullOrEmpty(AuthService.Token))
+        {
+            _isAuthenticated = true;
+            return;
+        }
+
+        await LoadPockets();
+    }
+
+    private async Task LoadPockets()
+    {
+        _isLoading = true;
+        try
+        {
+            var url = $"http://localhost:5191/Pocket/UserPagination?Page={_currentPage}&PageSize={_pageSize}";
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                _pocketPage = JsonSerializer.Deserialize<PageData<Pocket>>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                _pocketPage ??= new PageData<Pocket> { Items = new List<Pocket>(), TotalCount = 0 };
+                _totalPages = (int)Math.Ceiling((double)(_pocketPage.TotalCount) / _pageSize);
+            }
+            else
+            {
+                _pocketPage = new PageData<Pocket> { Items = new List<Pocket>(), TotalCount = 0 };
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error loading pockets: " + ex.Message);
+            _pocketPage = new PageData<Pocket> { Items = new List<Pocket>(), TotalCount = 0 };
+        }
+
+        _isLoading = false;
+    }
+
+
+    private async Task SearchPocket()
+    {
+        if (string.IsNullOrWhiteSpace(_searchQuery))
+        {
+            await LoadPockets();
+            return;
+        }
+
+        _isLoading = true;
+        try
+        {
+            var url = $"http://localhost:5191/CreatingPocket/Search?Text={Uri.EscapeDataString(_searchQuery)}";
+            var results = await Http.GetFromJsonAsync<IEnumerable<Pocket>>(url);
+            _pocketPage.Items = results?.ToList() ?? [];
+
+            _totalPages = 1;
+            _currentPage = 1;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Search error: " + ex.Message);
+            _pocketPage.Items = [];
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task Delete(int pocketId)
+    {
+        var parameters = new DialogParameters
+        {
+            { "PocketId", pocketId }
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        };
+
+        var dialogReference = await DialogService.ShowAsync<DeletePocketDialog>("Delete Pocket", parameters, options);
+
+        var result = await dialogReference.Result;
+        if (!result.Canceled)
+        {
+            await LoadPockets();
+        }
+    }
+
+    private async Task Increment()
+    {
+        if (_currentPage < _totalPages)
+        {
+            _currentPage++;
+            await LoadPockets();
+        }
+    }
+
+    private async Task Decrement()
+    {
+        if (_currentPage > 1)
+        {
+            _currentPage--;
+            await LoadPockets();
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            await SearchPocket();
+        }
+    }
+
+}

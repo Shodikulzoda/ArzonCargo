@@ -7,6 +7,7 @@ using Stocky.WebApi.Application.PocketData.Commands.Updatepocket;
 using Stocky.WebApi.Application.PocketData.Queries.GetAllPocket;
 using Stocky.WebApi.Application.PocketData.Queries.GetPocketById;
 using Stocky.WebApi.Application.PocketData.Queries.GetPocketByPagination;
+using Stocky.WebApi.Application.PocketData.Queries.GetPocketBySearch;
 using Stocky.WebApi.Application.PocketData.Queries.GetPocketByUserId;
 
 namespace Stocky.WebApi.Controllers;
@@ -40,10 +41,17 @@ public class PocketController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(getPocketsByUserIdQuery));
     }
 
-    [HttpPost]
-    public async Task<IActionResult> PocketByPagination(GetPocketByPaginationQuery pocketByPaginationQuery)
+    [HttpGet]
+    public async Task<IActionResult> GetPocketBySearch([FromQuery] SearchPocketQuery query)
     {
-        return Ok(await mediator.Send(pocketByPaginationQuery));
+        return Ok(await mediator.Send(query));
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<PageData<User>>> UserPagination(
+        [FromQuery] GetPocketByPaginationQuery getPocketByPaginationQuery)
+    {
+        return Ok(await mediator.Send(getPocketByPaginationQuery));
     }
 
     [HttpPut]

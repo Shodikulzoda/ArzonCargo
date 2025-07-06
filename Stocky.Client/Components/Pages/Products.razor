@@ -12,13 +12,13 @@
 
 <div class="mb-4 d-flex gap-2">
     <MudTextField @bind-Value="_searchQuery"
-                  Placeholder="GetUserBySearch by name, phone, etc..."
+                  Placeholder="GetCreatingPocketBySearch by name, phone, etc..."
                   Adornment="Adornment.Start"
                   AdornmentIcon="@Icons.Material.Filled.Search"
                   Immediate="true"
                   OnKeyDown="HandleKeyDown"
                   Margin="Margin.Dense"/>
-    <MudButton OnClick="SearchProduct" Color="Color.Primary" Variant="Variant.Filled">GetUserBySearch</MudButton>
+    <MudButton OnClick="SearchProduct" Color="Color.Primary" Variant="Variant.Filled">GetCreatingPocketBySearch</MudButton>
 </div>
 
 @if (_isLoading)
@@ -180,7 +180,7 @@ else
         }
         catch (Exception ex)
         {
-            Console.WriteLine("GetUserBySearch error: " + ex.Message);
+            Console.WriteLine("GetPocketBySearch error: " + ex.Message);
             _productPage.Items = [];
         }
 

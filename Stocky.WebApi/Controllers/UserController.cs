@@ -50,9 +50,9 @@ public class UserController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Search([FromQuery] SearchQuery query)
+    public async Task<IActionResult> Search([FromQuery] SearchUserQuery userQuery)
     {
-        return Ok(await mediator.Send(query));
+        return Ok(await mediator.Send(userQuery));
     }
 
     [HttpPut]
