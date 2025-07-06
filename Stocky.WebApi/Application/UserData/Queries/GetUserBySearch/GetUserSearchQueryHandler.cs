@@ -17,15 +17,15 @@ public class GetUserSearchQueryHandler(IUserRepository userRepository)
     {
         if (string.IsNullOrWhiteSpace(userQuery.Text))
         {
-            return new List<User>();
+            return [];
         }
 
-        var search = userQuery.Text.ToLower();
         var listUser = await userRepository.Queryable
-            .Where(x => x.Name.ToLower().Contains(search)
-                        || x.Phone.ToLower().Contains(search)
-                        || x.Address.ToLower().Contains(search)
-                        || x.Id.ToString().Contains(search))
+            .Where(x =>
+                EF.Functions.Like(x.Name, $"%{userQuery.Text}%") ||
+                EF.Functions.Like(x.Phone, $"%{userQuery.Text}%") ||
+                EF.Functions.Like(x.Address, $"%{userQuery.Text}%") ||
+                EF.Functions.Like(x.Id.ToString(), $"%{userQuery.Text}%"))
             .ToListAsync(cancellationToken);
 
         return listUser;

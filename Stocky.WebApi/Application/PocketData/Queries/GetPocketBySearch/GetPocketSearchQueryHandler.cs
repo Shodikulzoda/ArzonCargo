@@ -17,14 +17,16 @@ public class GetPocketSearchQueryHandler(IPocketRepository pocketRepository)
     {
         if (string.IsNullOrWhiteSpace(pocketQuery.Text))
         {
-            return new List<Pocket>();
+            return [];
         }
 
-        var search = pocketQuery.Text.ToLower();
         var pockets = await pocketRepository.Queryable
-            .Where(x => x.BarCode.ToString().Contains(search) ||
-                        x.Id.ToString().Contains(search) ||
-                        x.UserId.ToString().Contains(search))
+            .Where(x =>
+                EF.Functions.Like(x.BarCode.ToString(), $"%{pocketQuery.Text}%") ||
+                EF.Functions.Like(x.UserId.ToString(), $"%{pocketQuery.Text}%") ||
+                EF.Functions.Like(x.Id.ToString(), $"%{pocketQuery.Text}%") ||
+                EF.Functions.Like(x.TotalWeight.ToString(), $"%{pocketQuery.Text}%") ||
+                EF.Functions.Like(x.TotalAmount.ToString(), $"%{pocketQuery.Text}%"))
             .ToListAsync(cancellationToken);
 
         return pockets;

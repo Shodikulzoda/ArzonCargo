@@ -17,14 +17,15 @@ public class GetProductBySearchHandler(IProductRepository productRepository)
     {
         if (string.IsNullOrEmpty(request.Text))
         {
-            return new List<Product>();
+            return [];
         }
 
-        var lower = request.Text.ToLower();
         var products = await productRepository.Queryable
-            .Where(x => x.Id.ToString().Contains(lower)
-                        || x.BarCode.ToLower().Contains(lower) ||
-                        x.Status.ToString().Contains(lower)).ToListAsync();
+            .Where(x =>
+                EF.Functions.Like(x.BarCode, $"%{request.Text}%") ||
+                EF.Functions.Like(x.Status.ToString(), $"%{request.Text}%") ||
+                EF.Functions.Like(x.Id.ToString(), $"%{request.Text}%"))
+            .ToListAsync(cancellationToken);
 
         return products;
     }
