@@ -4,11 +4,10 @@
 
 <MudNavMenu>
 
-    <MudNavLink Href="home" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">
-        Home
-    </MudNavLink>
-
-    <MudNavLink Href="users" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">
+    @* <MudNavLink Href="home" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home"> *@
+    @*     Home *@
+    @* </MudNavLink> *@
+    <MudNavLink Href="home" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">
         Users Page
     </MudNavLink>
 
@@ -34,15 +33,12 @@
         Logout
     </MudNavLink>
 
-
 </MudNavMenu>
 
 @code {
-
     private void Logout()
     {
         AuthService.ClearToken();
         Navigation.NavigateTo("/", true);
     }
-
 }

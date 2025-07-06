@@ -1,3 +1,4 @@
+using Append.Blazor.Printing;
 using MudBlazor.Services;
 using MudBlazor.Components;
 using MudBlazor.Components.Service;
@@ -10,6 +11,9 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddHttpClient();
+
+builder.Services.AddScoped<IPrintingService, PrintingService>();
+
 
 builder.Services.AddScoped<AuthService>();
 

@@ -1,10 +1,13 @@
 @page "/create-pocket"
 @using System.Net.Http.Headers
+@using Append.Blazor.Printing
 @using MudBlazor.Components.Service
+@using QRCoder
 @using Stocky.Shared.Models
 @inject HttpClient Http
 @inject AuthService AuthService
 @inject IJSRuntime Js
+@inject IPrintingService PrintingService
 
 <MudPaper Class="pa-6" Style="max-width:600px">
     <MudText Typo="Typo.h5">Create New Pocket</MudText>
@@ -66,6 +69,18 @@
     private string? _productBarCode;
     private List<PocketItem> _pocketItems = [];
 
+    private MemoryStream GenerateQrCode(Guid id, int size)
+    {
+        using var qrGenerator = new QRCodeGenerator();
+        using QRCodeData qrCodeData = qrGenerator.CreateQrCode(id.ToString(), QRCodeGenerator.ECCLevel.Q);
+        using var qrCode = new PngByteQRCode(qrCodeData);
+        byte[] qrCodeAsPngByteArr = qrCode.GetGraphic(size);
+
+        using var ms = new MemoryStream(qrCodeAsPngByteArr);
+        return ms;
+    }
+
+
     private async Task CreatePocket()
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5191/Pocket/CreatePocket");
@@ -89,7 +104,7 @@
         var pocketItem = new PocketItem
         {
             PocketId = _pocketModel.Id,
-            ProductBarCode = _productBarCode,
+            ProductBarCode = _productBarCode
         };
 
         var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5191/PocketItem/Add");
@@ -109,7 +124,6 @@
     private async Task FinishPocket()
     {
         var request = new HttpRequestMessage(HttpMethod.Put, "http://localhost:5191/Pocket/UpdatePocket");
-
         request.Content = JsonContent.Create(_pocketModel);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
@@ -120,6 +134,20 @@
             _message = "created successfully";
             _pocketItems.Clear();
             await Js.InvokeVoidAsync("focusElement");
+
+            var qrStream = GenerateQrCode(@_pocketModel.BarCode, 10);
+            var base64Qr = Convert.ToBase64String(qrStream.ToArray());
+            string rawHtml = String.Join(
+                Environment.NewLine,
+                "<div style='width:57mm;height:57mm;padding:0;margin-left:1mm; margin-right:1mm; text-align:center;font-family:sans-serif;'>",
+                "<h2 style='margin:0;'>ArzonCargo</h4>",
+                "<div style='font-size:3mm;margin:0'><b>+992 92 788 0989</b></div>",
+                $"<img src='data:image/png;base64,{base64Qr}' style='width:40mm;height:40mm;margin:1mm 0;' />",
+                "<div style='font-size:3mm;'><b>Номер клиента: +992 92 677 4545</b></div>",
+                "</div>"
+            );
+            
+           await PrintingService.Print(rawHtml, PrintType.RawHtml);
         }
     }
 
