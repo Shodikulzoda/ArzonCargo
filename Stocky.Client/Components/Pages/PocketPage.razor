@@ -1,6 +1,7 @@
 @page "/pockets"
 @using System.Net.Http.Headers
 @using System.Text.Json
+@using MudBlazor.Components.DialogWindows.OrderDialogs
 @using MudBlazor.Components.DialogWindows.PocketDialogs
 @using MudBlazor.Components.Service
 @using Stocky.Shared.Models
@@ -8,9 +9,9 @@
 @inject IDialogService DialogService
 @inject AuthService AuthService
 
-<PageTitle>CreatingPockets</PageTitle>
+<PageTitle>AddingPockets</PageTitle>
 
-<MudText Typo="Typo.h4" GutterBottom="true">CreatingPockets Table</MudText>
+<MudText Typo="Typo.h4" GutterBottom="true">Pockets Table</MudText>
 
 <div class="mb-4 d-flex gap-2">
     <MudTextField @bind-Value="_searchQuery"
@@ -45,8 +46,8 @@ else
                 <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalWeight)">Total Weight
                 </MudTableSortLabel>
             </MudTh>
-            <MudTh>User</MudTh>
-            <MudTh>Actions</MudTh>
+            <MudTh>UserId</MudTh>
+            <MudTh>Complete Order</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Id">@context.Id</MudTd>
@@ -55,9 +56,9 @@ else
             <MudTd DataLabel="TotalWeight">@context.TotalWeight</MudTd>
             <MudTd DataLabel="UserId">@context.UserId</MudTd>
             <MudTd>
-                <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                               Color="Color.Error"
-                               OnClick="@(() => Delete(context.Id))"/>
+                <MudIconButton Icon="@Icons.Material.Filled.Add"
+                               Color="Color.Primary"
+                               OnClick="@(() => CreateOrder(context.UserId))"/>
             </MudTd>
         </RowTemplate>
     </MudTable>
@@ -139,7 +140,7 @@ else
         _isLoading = true;
         try
         {
-            var url = $"http://localhost:5191/CreatingPocket/Search?Text={Uri.EscapeDataString(_searchQuery)}";
+            var url = $"http://localhost:5191/AddingPocket/Search?Text={Uri.EscapeDataString(_searchQuery)}";
             var results = await Http.GetFromJsonAsync<IEnumerable<Pocket>>(url);
             _pocketPage.Items = results?.ToList() ?? [];
 
@@ -155,11 +156,11 @@ else
         _isLoading = false;
     }
 
-    private async Task Delete(int pocketId)
+    private async Task CreateOrder(int userId)
     {
         var parameters = new DialogParameters
         {
-            { "PocketId", pocketId }
+            { "UserId", userId }
         };
 
         var options = new DialogOptions
@@ -169,10 +170,10 @@ else
             FullWidth = true
         };
 
-        var dialogReference = await DialogService.ShowAsync<DeletePocketDialog>("Delete Pocket", parameters, options);
+        var dialogReference = await DialogService.ShowAsync<CreateOrderDialog>("Create Order", parameters, options);
 
         var result = await dialogReference.Result;
-        if (!result.Canceled)
+        if (result is { Canceled: false })
         {
             await LoadPockets();
         }

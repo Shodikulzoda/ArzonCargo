@@ -9,29 +9,29 @@
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="@Color" OnClick="DeletePocket" Variant="Variant.Filled">@ButtonText</MudButton>
+        <MudButton Color="@Color" OnClick="CreateOrder" Variant="Variant.Filled">@ButtonText</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
 
-    [Parameter] public int PocketId { get; set; }
-    [Parameter] public string ContentText { get; set; } = "Are you sure you want to delete this pocket?";
-    [Parameter] public string ButtonText { get; set; } = "Delete";
-    [Parameter] public Color Color { get; set; } = Color.Error;
+    [Parameter] public int UserId { get; set; }
+    [Parameter] public string ContentText { get; set; } = "Are you sure you want to create this order?";
+    [Parameter] public string ButtonText { get; set; } = "Create";
+    [Parameter] public Color Color { get; set; } = Color.Default;
 
     private bool _isLoading;
 
     private void Cancel() => MudDialog.Cancel();
 
-    private async Task DeletePocket()
+    private async Task CreateOrder()
     {
         _isLoading = true;
         try
         {
-            var url = $"http://localhost:5191/Pocket/DeletePocketDialog?Id={PocketId}";
-            var request = new HttpRequestMessage(HttpMethod.Delete, url);
+            var url = $"http://localhost:5191/Order/CreateOrder?UserId={UserId}";
+            var request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
             var response = await Http.SendAsync(request);
@@ -51,4 +51,5 @@
 
         _isLoading = false;
     }
+
 }

@@ -1,14 +1,10 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using Stocky.WebApi.Application.Interfaces;
 using Stocky.WebApi.Application.UserData.Commands.CreateUser;
 using Stocky.WebApi.Extensions;
 using Stocky.WebApi.Infrastructure.Databases;
-using Stocky.WebApi.Infrastructure.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 

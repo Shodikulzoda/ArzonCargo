@@ -16,7 +16,7 @@ namespace Stocky.WebApi.Controllers;
 public class OrderController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> CreateOrder(CreateOrderCommand order)
+    public async Task<IActionResult> CreateOrder([FromQuery] CreateOrderCommand order)
     {
         return Ok(await mediator.Send(order));
     }
