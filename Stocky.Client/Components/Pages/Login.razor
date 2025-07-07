@@ -1,4 +1,6 @@
 @page "/"
+@using System.ComponentModel.DataAnnotations
+@using MudBlazor
 @using MudBlazor.Components.Layout
 @using MudBlazor.Components.Service
 @using Stocky.Shared.Models
@@ -7,48 +9,53 @@
 @inject AuthService AuthService
 @layout NoNavbar
 
-<div class="d-flex justify-center align-center" style="height: 70vh;">
-    <MudGrid Class="ma-0 pa-6" Style="max-width: 600px;">
-        <MudItem xs="12">
-            <MudPaper Class="pa-6" Elevation="3">
-                <MudForm>
-                    <MudTextField T="string"
-                                  @ref="_firstInput"
-                                  @bind-Value="Data.UserName"
-                                  Label="Имя пользователя"
-                                  Class="mb-4"
-                                  Error="@_isLoged"
-                                  OnKeyDown="HandleKeyDown"
-                                  ErrorText="Неверное имя пользователя или пароль" />
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center align-center" Style="height: 70vh;">
+    <MudPaper Class="pa-6" Elevation="6" Style="width:100%; border-radius: 16px;">
+        <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-4">Авторизация</MudText>
+        <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+            <MudTextField T="string"
+                          Label="Имя пользователя"
+                          @bind-Value="loginModel.UserName"
+                          Required="true"
+                          Immediate="true"
+                          Margin="Margin.Dense"
+                          Error="@_isLoged"
+                          ErrorText="Неверное имя пользователя или пароль"
+                          Class="mb-3" />
 
-                    <MudTextField T="string"
-                                  @ref="_secondInput"
-                                  @bind-Value="Data.PasswordHash"
-                                  Label="Пароль"
-                                  InputType="InputType.Password"
-                                  Class="mb-4"
-                                  Error="@_isLoged"
-                                  OnKeyDown="Enter"
-                                  ErrorText="Неверное имя пользователя или пароль" />
+            <MudTextField T="string"
+                          Label="Пароль"
+                          @bind-Value="loginModel.PasswordHash"
+                          InputType="InputType.Password"
+                          Required="true"
+                          Immediate="true"
+                          Margin="Margin.Dense"
+                          Error="@_isLoged"
+                          ErrorText="Неверное имя пользователя или пароль"
+                          Class="mb-4" />
 
-                    <MudButton Variant="Variant.Filled"
-                               OnClick="Submit"
-                               Color="Color.Primary"
-                               FullWidth="true">
-                        Войти
-                    </MudButton>
-                </MudForm>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
-</div>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       ButtonType="ButtonType.Submit"
+                       Disabled="@_isSubmitting"
+                       FullWidth="true">
+                Войти
+            </MudButton>
+        </EditForm>
+
+        @if (_isLoged)
+        {
+            <MudText Color="Color.Error" Class="mt-3">Ошибка входа. Проверьте введенные данные.</MudText>
+        }
+    </MudPaper>
+</MudContainer>
 
 @code {
-    private MudTextField<string> _firstInput = null!;
-    private MudTextField<string> _secondInput = null!;
+    private bool _isSubmitting = false;
+    private bool _isLoged = false;
 
-    [Parameter] public AuthenticationData Data { get; set; } = new();
-    private bool _isLoged;
+    private AuthenticationData loginModel = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,45 +67,29 @@
         }
     }
 
-    private bool _isSubmitting = false;
-
-    private async Task Submit()
+    private async Task HandleLogin()
     {
-        if (_isSubmitting)
-            return; 
-
         _isSubmitting = true;
-        _isLoged = false; 
+        _isLoged = false;
         StateHasChanged();
 
         try
         {
-            var response = await Http.PostAsJsonAsync("http://localhost:5191/api/Auth/Verify", Data);
+            var response = await Http.PostAsJsonAsync("http://localhost:5191/api/Auth/Verify", loginModel);
 
             if (response.IsSuccessStatusCode)
             {
-                var resultText = await response.Content.ReadAsStringAsync();
+                var token = await response.Content.ReadAsStringAsync();
 
-                var loginResponse = new LoginResponse
+                if (!string.IsNullOrWhiteSpace(token))
                 {
-                    Token = resultText
-                };
-
-                if (!string.IsNullOrWhiteSpace(loginResponse.Token))
-                {
-                    AuthService.SetToken(loginResponse.Token);
-                    _isLoged = false;
+                    AuthService.SetToken(token);
                     Navigation.NavigateTo("/home");
-                }
-                else
-                {
-                    _isLoged = true;
+                    return;
                 }
             }
-            else
-            {
-                _isLoged = true;
-            }
+
+            _isLoged = true;
         }
         catch
         {
@@ -109,26 +100,5 @@
             _isSubmitting = false;
             StateHasChanged();
         }
-    }
-    
-    private async Task HandleKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Key == "Tab")
-        {
-            await _secondInput.FocusAsync();
-        }
-    }
-    
-    private async Task Enter(KeyboardEventArgs e)
-    {
-        if (e.Key is "Enter" or "NumpadEnter")
-        {
-            await Submit();
-        }
-    }
-    
-    public class LoginResponse
-    {
-        public string? Token { get; set; }
     }
 }
