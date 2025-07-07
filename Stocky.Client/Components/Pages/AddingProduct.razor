@@ -97,7 +97,6 @@
 
         if (response.IsSuccessStatusCode)
         {
-            // Only add barcode if not already added
             if (_products.Any(p => p.BarCode == _barcode))
                 _products.Add(new Product { BarCode = _barcode });
 

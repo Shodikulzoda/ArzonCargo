@@ -1,6 +1,7 @@
 @page "/"
 @using System.ComponentModel.DataAnnotations
 @using MudBlazor
+@using MudBlazor.Components.DialogWindows
 @using MudBlazor.Components.Layout
 @using MudBlazor.Components.Service
 @using Stocky.Shared.Models
@@ -8,12 +9,23 @@
 @inject NavigationManager Navigation
 @inject AuthService AuthService
 @layout NoNavbar
+@inject IJSRuntime Js
+@inject IDialogService DialogService
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center align-center" Style="height: 70vh;">
     <MudPaper Class="pa-6" Elevation="6" Style="width:100%; border-radius: 16px;">
         <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-4">Авторизация</MudText>
         <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
-            <DataAnnotationsValidator />
+            <DataAnnotationsValidator/>
+
+            <MudTextField @ref="hiddenField"
+                          T="string"
+                          Label="We should't see this field"
+                          Immediate="true"
+                          Margin="Margin.Dense"
+                          Class="hidden-field"
+                          OnKeyDown="HandleKeyDown"/>
+
             <MudTextField T="string"
                           Label="Имя пользователя"
                           @bind-Value="loginModel.UserName"
@@ -22,7 +34,7 @@
                           Margin="Margin.Dense"
                           Error="@_isLoged"
                           ErrorText="Неверное имя пользователя или пароль"
-                          Class="mb-3" />
+                          Class="mb-3"/>
 
             <MudTextField T="string"
                           Label="Пароль"
@@ -33,7 +45,7 @@
                           Margin="Margin.Dense"
                           Error="@_isLoged"
                           ErrorText="Неверное имя пользователя или пароль"
-                          Class="mb-4" />
+                          Class="mb-4"/>
 
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
@@ -51,11 +63,49 @@
     </MudPaper>
 </MudContainer>
 
+<script>
+    window.focusElement = () => {
+        const el = document.querySelector('.hidden-field input');
+        if (el) {
+            el.value = '';
+            el.focus();
+        }
+    };
+
+    window.enableGlobalFocus = () => {
+        document.addEventListener('click', (event) => {
+            const clickedElement = event.target;
+
+            if (clickedElement && clickedElement.tagName === 'INPUT') {
+                clickedElement.focus();
+            } else {
+                window.focusElement();
+            }
+        });
+    };
+
+    window.addEventListener('load', () => {
+        window.focusElement();
+        window.enableGlobalFocus();
+    });
+</script>
+
 @code {
     private bool _isSubmitting = false;
     private bool _isLoged = false;
+    private MudTextField<string> hiddenField;
+    private string _hiddenFieldValue = string.Empty;
 
     private AuthenticationData loginModel = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Js.InvokeVoidAsync("enableGlobalFocus");
+            await Js.InvokeVoidAsync("focusElement");
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,6 +114,10 @@
         if (!string.IsNullOrWhiteSpace(AuthService.Token))
         {
             Navigation.NavigateTo("/home", true);
+        }
+        else
+        {
+            await Js.InvokeVoidAsync("focusElement");
         }
     }
 
@@ -101,4 +155,43 @@
             StateHasChanged();
         }
     }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            try
+            {
+                if (hiddenField.Value is not null)
+                {
+                    var decodedBytes = Convert.FromBase64String(hiddenField.Value);
+                    var decodedString = System.Text.Encoding.UTF8.GetString(decodedBytes);
+
+                    var parameters = new DialogParameters
+                    {
+                        { "Message", decodedString }
+                    };
+                    _hiddenFieldValue = decodedString;
+                    if (decodedString.Contains("|"))
+                    {
+                        var splited = decodedString.Split("|");
+                        loginModel.UserName = splited[0];
+                        loginModel.PasswordHash = splited[1];
+
+                        await HandleLogin();
+                    }
+                }
+            }
+            catch
+            {
+                var parameters = new DialogParameters
+                {
+                    { "Message", "Invalid Base64 string." }
+                };
+
+                await DialogService.ShowAsync<DynamicDialog>("Invalid Base64 string", parameters);
+            }
+        }
+    }
+
 }

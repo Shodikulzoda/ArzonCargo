@@ -1,0 +1,19 @@
+@using MudBlazor
+@inject IDialogService DialogService
+
+<MudDialog>
+    <MudDialogTitle>Dialog Title</MudDialogTitle>
+    <MudDialogContent>
+        <MudText Typo="Typo.h6">@Message</MudText>
+    </MudDialogContent>
+    <MudDialogActions>
+        <MudButton OnClick="CloseDialog" Color="Color.Primary">Close</MudButton>
+    </MudDialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string Message { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private void CloseDialog() => MudDialog.Close();
+}
