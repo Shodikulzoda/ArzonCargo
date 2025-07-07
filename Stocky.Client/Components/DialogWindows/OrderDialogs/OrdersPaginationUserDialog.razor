@@ -6,6 +6,7 @@
 @inject HttpClient Http
 @inject IDialogService DialogService
 @inject AuthService AuthService
+@inject IConfiguration Configuration
 
 @if (_isLoading)
 {
@@ -51,6 +52,7 @@ else
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
     [Parameter] public int UserId { get; set; }
+    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     private PageData<Order>? _orders = new();
 
@@ -58,6 +60,7 @@ else
     private int _totalPages = 1;
     private const int PageSize = 15;
     private bool _isLoading;
+    
 
     protected override async Task OnInitializedAsync()
     {
@@ -70,7 +73,7 @@ else
 
         try
         {
-            var url = $"http://localhost:5191/Order/GetOrdersByUserId?UserId={UserId}&Page={_currentPage}&PageSize={PageSize}";
+            var url = $"{ApiBaseUrl}/Order/GetOrdersByUserId?UserId={UserId}&Page={_currentPage}&PageSize={PageSize}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);

@@ -4,6 +4,7 @@
 @using Stocky.Shared.Models
 @inject HttpClient Http
 @inject AuthService AuthService
+@inject IConfiguration Configuration
 
 @if (_isLoading)
 {
@@ -52,6 +53,7 @@ else
     [Parameter] public int OrderId { get; set; }
 
     private PageData<OrderItem>? _orderItems = new();
+    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     private int _currentPage = 1;
     private int _totalPages = 1;
@@ -69,7 +71,7 @@ else
 
         try
         {
-            var url = $"http://localhost:5191/OrderItem/GetOrderItemsByOrderId?OrderId={OrderId}&Page={_currentPage}&PageSize={PageSize}";
+            var url = $"{ApiBaseUrl}/OrderItem/GetOrderItemsByOrderId?OrderId={OrderId}&Page={_currentPage}&PageSize={PageSize}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);

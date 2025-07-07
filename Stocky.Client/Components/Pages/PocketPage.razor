@@ -8,6 +8,7 @@
 @inject HttpClient Http
 @inject IDialogService DialogService
 @inject AuthService AuthService
+@inject IConfiguration Configuration
 
 <PageTitle>Добавление Пакетов</PageTitle>
 
@@ -84,6 +85,7 @@ else
     private readonly int _pageSize = 15;
     private bool _isLoading;
     private string _searchQuery = "";
+    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     protected override async Task OnInitializedAsync()
     {
@@ -102,7 +104,7 @@ else
         _isLoading = true;
         try
         {
-            var url = $"http://localhost:5191/Pocket/PocketPagination?Page={_currentPage}&PageSize={_pageSize}";
+            var url = $"{ApiBaseUrl}/Pocket/PocketPagination?Page={_currentPage}&PageSize={_pageSize}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
@@ -144,7 +146,7 @@ else
         _isLoading = true;
         try
         {
-            var url = $"http://localhost:5191/Pocket/GetPocketBySearch?Text={Uri.EscapeDataString(_searchQuery)}";
+            var url = $"{ApiBaseUrl}/Pocket/GetPocketBySearch?Text={Uri.EscapeDataString(_searchQuery)}";
             var results = await Http.GetFromJsonAsync<IEnumerable<Pocket>>(url);
             _pocketPage.Items = results?.ToList() ?? [];
 

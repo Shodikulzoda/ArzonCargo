@@ -4,6 +4,7 @@
 @using Stocky.Shared.Models
 @inject HttpClient Http
 @inject AuthService AuthService
+@inject IConfiguration Configuration
 
 @if (_isLoading)
 {
@@ -54,6 +55,7 @@ else
     private int _totalPages = 1;
     private const int PageSize = 15;
     private bool _isLoading;
+    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     protected override async Task OnInitializedAsync()
     {
@@ -66,7 +68,7 @@ else
 
         try
         {
-            var url = $"http://localhost:5191/PocketItem/GetPocketItemsByPocketId?PocketId={PocketId}&Page={_currentPage}&PageSize={PageSize}";
+            var url = $"{ApiBaseUrl}/PocketItem/GetPocketItemsByPocketId?PocketId={PocketId}&Page={_currentPage}&PageSize={PageSize}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 

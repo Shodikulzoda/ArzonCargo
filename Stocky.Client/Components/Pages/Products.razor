@@ -6,6 +6,7 @@
 @using Stocky.Shared.Models
 @using Stocky.Shared.Models.Enums
 @attribute [Authorize]
+@inject IConfiguration Configuration
 
 <PageTitle>Продукты</PageTitle>
 
@@ -93,6 +94,7 @@ else
     private readonly int _pageSize = 15;
     private bool _isLoading;
     private string _searchQuery = "";
+    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     protected override async Task OnInitializedAsync()
     {
@@ -104,7 +106,7 @@ else
         _isLoading = true;
         try
         {
-            var url = $"http://localhost:5191/Product/ProductPagination?Page={_currentPage}&PageSize={_pageSize}";
+            var url = $"{ApiBaseUrl}/Product/ProductPagination?Page={_currentPage}&PageSize={_pageSize}";
             _productPage = await Http.GetFromJsonAsync<PageData<Product>>(url);
 
             _productPage.Items = _productPage.Items
@@ -198,7 +200,7 @@ else
         _isLoading = true;
         try
         {
-            var url = $"http://localhost:5191/Product/Search?Text={Uri.EscapeDataString(_searchQuery)}";
+            var url = $"{ApiBaseUrl}/Product/Search?Text={Uri.EscapeDataString(_searchQuery)}";
             _productPage.Items = await Http.GetFromJsonAsync<IEnumerable<Product>>(url) ?? [];
 
             _totalPages = 1;

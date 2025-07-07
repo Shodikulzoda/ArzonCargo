@@ -7,6 +7,7 @@
 @inject AuthService AuthService
 @inject IJSRuntime Js
 @inject IPrintingService PrintingService
+@inject IConfiguration Configuration
 
 <MudDialog>
     <DialogContent>
@@ -88,6 +89,7 @@
     private string? _message = "";
     private string? _productBarCode;
     private List<PocketItem> _pocketItems = new();
+    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     private void Cancel() => MudDialog.Cancel();
 
@@ -101,7 +103,7 @@
 
     private async Task CreatePocket()
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5191/Pocket/CreatePocket")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiBaseUrl}/Pocket/CreatePocket")
         {
             Content = JsonContent.Create(_pocketModel)
         };
@@ -133,7 +135,7 @@
             ProductBarCode = _productBarCode
         };
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5191/PocketItem/Add")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiBaseUrl}/PocketItem/Add")
         {
             Content = JsonContent.Create(pocketItem)
         };
@@ -153,7 +155,7 @@
     {
         if (_pocketModel?.BarCode is null) return;
 
-        var request = new HttpRequestMessage(HttpMethod.Put, "http://localhost:5191/Pocket/UpdatePocket")
+        var request = new HttpRequestMessage(HttpMethod.Put, $"{ApiBaseUrl}/Pocket/UpdatePocket")
         {
             Content = JsonContent.Create(_pocketModel)
         };

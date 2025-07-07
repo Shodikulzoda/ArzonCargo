@@ -2,6 +2,7 @@
 @using Stocky.Shared.Models
 @inject HttpClient Http
 @inject IJSRuntime Js
+@inject IConfiguration Configuration
 
 <PageTitle>Сканер штрихкодов</PageTitle>
 
@@ -34,7 +35,7 @@
         <MudTable Items="_products" Elevation="2" Dense="true" Hover="true">
             <HeaderContent>
                 <MudTh>Штрихкод</MudTh>
-                <MudTh></MudTh> <!-- Кнопка удаления -->
+                <MudTh></MudTh> 
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Barcode">@context.BarCode</MudTd>
@@ -70,7 +71,8 @@
     private string _message = string.Empty;
     private string _errorMessage = string.Empty;
     private readonly List<Product> _products = [];
-
+    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -91,7 +93,7 @@
         }
 
         var response = await Http.PostAsync(
-            $"http://localhost:5191/Product/Add?BarCode={Uri.EscapeDataString(_barcode)}",
+            $"{ApiBaseUrl}/Product/Add?BarCode={Uri.EscapeDataString(_barcode)}",
             null
         );
 

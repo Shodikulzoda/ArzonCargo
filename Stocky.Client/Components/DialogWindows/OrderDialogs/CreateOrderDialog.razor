@@ -2,6 +2,7 @@
 @inject HttpClient Http
 @inject AuthService AuthService
 @using MudBlazor.Components.Service
+@inject IConfiguration Configuration
 
 <MudDialog>
     <DialogContent>
@@ -21,6 +22,7 @@
     [Parameter] public string ContentText { get; set; }
     [Parameter] public string ButtonText { get; set; } = "Создать";
     [Parameter] public Color Color { get; set; } = Color.Default;
+    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     protected override void OnParametersSet()
     {
@@ -36,7 +38,7 @@
         _isLoading = true;
         try
         {
-            var url = $"http://localhost:5191/Order/CreateOrder?UserId={UserId}";
+            var url = $"{ApiBaseUrl}/Order/CreateOrder?UserId={UserId}";
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 

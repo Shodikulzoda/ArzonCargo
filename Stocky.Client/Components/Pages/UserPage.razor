@@ -12,6 +12,7 @@
 @using MudBlazor.Components.DialogWindows.UserDialogs
 @using MudBlazor.Components.Service
 @using Stocky.Shared.Models
+@inject IConfiguration Configuration
 
 <PageTitle>Управление пользователями</PageTitle>
 
@@ -60,11 +61,11 @@ else
             <MudTd>@context.Address</MudTd>
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.ViewList" Color="Color.Info"
-                               OnClick="@(() => UserOrders(context.Id))" />
+                               OnClick="@(() => UserOrders(context.Id))"/>
             </MudTd>
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.ShoppingBag" Color="Color.Primary"
-                               OnClick="@(() => UserPockets(context.Id))" />
+                               OnClick="@(() => UserPockets(context.Id))"/>
             </MudTd>
             <MudTd>
                 <MudMenu Icon="@Icons.Material.Filled.MoreVert">
@@ -90,6 +91,7 @@ else
     private bool _isLoading;
     private string _searchQuery = "";
     private bool _isAuthenticated;
+    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     protected override async Task OnInitializedAsync()
     {
@@ -110,7 +112,7 @@ else
 
         try
         {
-            var url = $"http://localhost:5191/User/UserPagination?Page={_currentPage}&PageSize={PageSize}";
+            var url = $"{ApiBaseUrl}/User/UserPagination?Page={_currentPage}&PageSize={PageSize}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
@@ -153,7 +155,7 @@ else
 
         try
         {
-            var url = $"http://localhost:5191/User/Search?Text={Uri.EscapeDataString(_searchQuery)}";
+            var url = $"{ApiBaseUrl}/User/Search?Text={Uri.EscapeDataString(_searchQuery)}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
@@ -284,4 +286,5 @@ else
         var dialog = await DialogService.ShowAsync<PocketsUserPaginationDialog>("Кошельки пользователя", parameters, options);
         await dialog.Result;
     }
+
 }

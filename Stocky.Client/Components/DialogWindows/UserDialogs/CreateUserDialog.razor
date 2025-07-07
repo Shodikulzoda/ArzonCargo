@@ -3,6 +3,7 @@
 @using Stocky.Shared.Models
 @inject HttpClient Http
 @inject AuthService AuthService
+@inject IConfiguration Configuration
 
 <MudDialog>
     <DialogContent>
@@ -20,6 +21,7 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
     [Parameter] public User UserModel { get; set; } = new();
+    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     private async Task Submit()
     {
@@ -27,7 +29,7 @@
         {
             Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
-            var response = await Http.PostAsJsonAsync("http://localhost:5191/User/CreateUser", UserModel);
+            var response = await Http.PostAsJsonAsync($"{ApiBaseUrl}/User/CreateUser", UserModel);
 
             if (response.IsSuccessStatusCode)
             {

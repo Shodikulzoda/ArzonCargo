@@ -1,14 +1,16 @@
 @using Stocky.Shared.Models
 @using Stocky.Shared.Models.Enums
 @inject HttpClient Http
+@inject IConfiguration Configuration
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
     [Parameter] public Product Product { get; set; } 
+    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     private async Task Submit()
     {
-        var response = await Http.PutAsJsonAsync("http://localhost:5191/Product/UpdateProduct", Product);
+        var response = await Http.PutAsJsonAsync($"{ApiBaseUrl}/Product/UpdateProduct", Product);
         if (response.IsSuccessStatusCode)
         {
             MudDialog.Close(DialogResult.Ok(true));

@@ -11,6 +11,7 @@
 @layout NoNavbar
 @inject IJSRuntime Js
 @inject IDialogService DialogService
+@inject IConfiguration Configuration
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center align-center" Style="height: 70vh;">
     <MudPaper Class="pa-6" Elevation="6" Style="width:100%; border-radius: 16px;">
@@ -95,6 +96,7 @@
     private bool _isLoged = false;
     private MudTextField<string> hiddenField;
     private string _hiddenFieldValue = string.Empty;
+    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     private AuthenticationData loginModel = new();
 
@@ -129,7 +131,7 @@
 
         try
         {
-            var response = await Http.PostAsJsonAsync("http://localhost:5191/api/Auth/Verify", loginModel);
+            var response = await Http.PostAsJsonAsync($"{ApiBaseUrl}/api/Auth/Verify", loginModel);
 
             if (response.IsSuccessStatusCode)
             {

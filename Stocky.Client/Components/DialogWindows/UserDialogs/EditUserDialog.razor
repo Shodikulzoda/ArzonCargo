@@ -3,14 +3,16 @@
 @using Stocky.Shared.Models
 @inject HttpClient Http
 @inject AuthService AuthService
+@inject IConfiguration Configuration
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
     [Parameter] public User UserModel { get; set; } = new();
+    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     private async Task Submit()
     {
-        var request = new HttpRequestMessage(HttpMethod.Put, "http://localhost:5191/User/UpdateUser");
+        var request = new HttpRequestMessage(HttpMethod.Put, $"{ApiBaseUrl}/User/UpdateUser");
         request.Content = JsonContent.Create(UserModel);
 
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
