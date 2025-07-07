@@ -17,9 +17,15 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter] public int UserId { get; set; }
-    [Parameter] public string ContentText { get; set; } = "Are you sure you want to create this order?";
+    [Parameter] public double TotalAmount { get; set; }
+    [Parameter] public string ContentText { get; set; }
     [Parameter] public string ButtonText { get; set; } = "Create";
     [Parameter] public Color Color { get; set; } = Color.Default;
+
+    protected override void OnParametersSet()
+    {
+        ContentText = $"The amount of order is: {TotalAmount}";
+    }
 
     private bool _isLoading;
 

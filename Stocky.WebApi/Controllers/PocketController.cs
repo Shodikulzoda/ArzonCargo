@@ -48,7 +48,7 @@ public class PocketController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<PageData<User>>> UserPagination(
+    public async Task<ActionResult<PageData<Pocket>>> PocketPagination(
         [FromQuery] GetPocketByPaginationQuery getPocketByPaginationQuery)
     {
         return Ok(await mediator.Send(getPocketByPaginationQuery));

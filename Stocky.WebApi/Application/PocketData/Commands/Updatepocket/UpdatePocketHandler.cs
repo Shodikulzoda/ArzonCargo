@@ -8,7 +8,6 @@ public record UpdatePocketCommand : IRequest<Pocket>
 {
     public int Id { get; set; }
     public double TotalWeight { get; set; }
-    public double TotalAmount { get; set; }
     public int UserId { get; set; }
 }
 
@@ -23,7 +22,7 @@ public class UpdatePocketHandler(IPocketRepository pocketRepository)
 
         pocket.TotalWeight = request.TotalWeight;
         pocket.UserId = request.UserId;
-        pocket.TotalAmount = request.TotalAmount;
+        pocket.TotalAmount = request.TotalWeight * 28;
 
         await pocketRepository.Update(pocket);
 

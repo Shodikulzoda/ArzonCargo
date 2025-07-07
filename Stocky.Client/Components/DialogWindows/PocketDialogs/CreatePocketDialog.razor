@@ -15,9 +15,9 @@
                 <MudText Typo="Typo.h5">Create New Pocket</MudText>
 
                 <MudStack Spacing="2">
-                    <MudTextField @bind-Value="_pocketModel.TotalAmount" Label="Total Amount" Variant="Variant.Outlined" />
-                    <MudTextField @bind-Value="_pocketModel.TotalWeight" Label="Total Weight" Variant="Variant.Outlined" />
-                    <MudTextField @bind-Value="_pocketModel.UserId" Label="User ID" Variant="Variant.Outlined" />
+                    <MudTextField @bind-Value="_pocketModel.TotalWeight" Label="Total Weight"
+                                  Variant="Variant.Outlined"/>
+                    <MudTextField @bind-Value="_pocketModel.UserId" Label="User ID" Variant="Variant.Outlined"/>
                 </MudStack>
 
                 <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreatePocket">
@@ -26,7 +26,7 @@
 
                 @if (_pocketCreated)
                 {
-                    <MudDivider Class="my-4" />
+                    <MudDivider Class="my-4"/>
 
                     <MudText Typo="Typo.h6" Class="mt-2">Pocket Barcode: @_pocketModel.BarCode</MudText>
 
@@ -36,7 +36,7 @@
                                       Immediate="true"
                                       OnKeyDown="HandleKeyDown"
                                       Class="barcode-text"
-                                      Variant="Variant.Outlined" />
+                                      Variant="Variant.Outlined"/>
 
                         <MudStack Direction="Row" Spacing="2">
                             <MudButton OnClick="AddProductToPocket" Color="Color.Warning" Variant="Variant.Filled">
@@ -190,4 +190,5 @@
             await AddProductToPocket();
         }
     }
+
 }

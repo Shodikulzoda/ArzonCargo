@@ -1,4 +1,5 @@
 @using System.Net.Http.Headers
+@using System.Text.Json
 @using MudBlazor.Components.Service
 @using Stocky.Shared.Models
 @inject HttpClient Http
@@ -59,16 +60,16 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadOrders();
+        await LoadOrderItems();
     }
 
-    private async Task LoadOrders()
+    private async Task LoadOrderItems()
     {
         _isLoading = true;
 
         try
         {
-            var url = $"http://localhost:5191/OrderItem/GetOrdersByUserId?OrderId={OrderId}&Page={_currentPage}&PageSize={PageSize}";
+            var url = $"http://localhost:5191/OrderItem/GetOrderItemsByOrderId?OrderId={OrderId}&Page={_currentPage}&PageSize={PageSize}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
@@ -76,6 +77,13 @@ else
             var response = await Http.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
+                var json = await response.Content.ReadAsStringAsync();
+
+                _orderItems = JsonSerializer.Deserialize<PageData<OrderItem>>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
                 _orderItems.TotalPages = (int)Math.Ceiling((double)_orderItems.TotalCount / PageSize);
             }
             else
@@ -96,7 +104,7 @@ else
         if (_currentPage < _totalPages)
         {
             _currentPage++;
-            await LoadOrders();
+            await LoadOrderItems();
         }
     }
 
@@ -105,7 +113,7 @@ else
         if (_currentPage > 1)
         {
             _currentPage--;
-            await LoadOrders();
+            await LoadOrderItems();
         }
     }
 

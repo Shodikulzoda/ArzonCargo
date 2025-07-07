@@ -20,7 +20,7 @@
                   AdornmentIcon="@Icons.Material.Filled.Search"
                   Immediate="true"
                   OnKeyDown="HandleKeyDown"
-                  Margin="Margin.Dense" />
+                  Margin="Margin.Dense"/>
 
     <MudButton OnClick="SearchPocket" Color="Color.Primary" Variant="Variant.Filled">
         Search
@@ -39,10 +39,20 @@ else
 {
     <MudTable Items="_pocketPage?.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
         <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.Id)">Id</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.BarCode)">BarCode</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalAmount)">Total Amount</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalWeight)">Total Weight</MudTableSortLabel></MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.Id)">Id</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.BarCode)">BarCode</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalAmount)">Total Amount
+                </MudTableSortLabel>
+            </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalWeight)">Total Weight
+                </MudTableSortLabel>
+            </MudTh>
             <MudTh>UserId</MudTh>
             <MudTh>Complete Order</MudTh>
         </HeaderContent>
@@ -55,7 +65,7 @@ else
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.Add"
                                Color="Color.Primary"
-                               OnClick="@(() => CreateOrder(context.UserId))"/>
+                               OnClick="@(() => CreateOrder(context.UserId, context.TotalAmount))"/>
             </MudTd>
         </RowTemplate>
     </MudTable>
@@ -92,7 +102,7 @@ else
         _isLoading = true;
         try
         {
-            var url = $"http://localhost:5191/Pocket/UserPagination?Page={_currentPage}&PageSize={_pageSize}";
+            var url = $"http://localhost:5191/Pocket/PocketPagination?Page={_currentPage}&PageSize={_pageSize}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
@@ -134,7 +144,7 @@ else
         _isLoading = true;
         try
         {
-            var url = $"http://localhost:5191/AddingPocket/Search?Text={Uri.EscapeDataString(_searchQuery)}";
+            var url = $"http://localhost:5191/Pocket/GetPocketBySearch?Text={Uri.EscapeDataString(_searchQuery)}";
             var results = await Http.GetFromJsonAsync<IEnumerable<Pocket>>(url);
             _pocketPage.Items = results?.ToList() ?? [];
 
@@ -150,11 +160,12 @@ else
         _isLoading = false;
     }
 
-    private async Task CreateOrder(int userId)
+    private async Task CreateOrder(int userId, double totalAmount)
     {
         var parameters = new DialogParameters
         {
-            { "UserId", userId }
+            { "UserId", userId },
+            { "TotalAmount", totalAmount }
         };
 
         var options = new DialogOptions
@@ -216,4 +227,5 @@ else
             await SearchPocket();
         }
     }
+
 }
