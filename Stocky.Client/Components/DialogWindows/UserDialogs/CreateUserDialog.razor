@@ -1,5 +1,8 @@
+@using System.Net.Http.Headers
+@using MudBlazor.Components.Service
 @using Stocky.Shared.Models
 @inject HttpClient Http
+@inject AuthService AuthService
 
 <MudDialog>
     <DialogContent>
@@ -20,14 +23,24 @@
 
     private async Task Submit()
     {
-        var response = await Http.PostAsJsonAsync("http://localhost:5191/User/CreateUser", UserModel);
-        if (response.IsSuccessStatusCode)
+        try
         {
-            MudDialog.Close(DialogResult.Ok(true));
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+            var response = await Http.PostAsJsonAsync("http://localhost:5191/User/CreateUser", UserModel);
+
+            if (response.IsSuccessStatusCode)
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Console.WriteLine("Create failed: " + response.StatusCode + " - " + response.ReasonPhrase);
+            }
         }
-        else
+        catch (Exception ex)
         {
-            Console.WriteLine("Create failed: " + response.ReasonPhrase);
+            Console.WriteLine("Exception during user creation: " + ex.Message);
         }
     }
 

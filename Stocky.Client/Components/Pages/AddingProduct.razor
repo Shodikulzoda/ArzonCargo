@@ -48,7 +48,6 @@
         </MudTable>
     </MudPaper>
 }
-
 <script>
     window.focusElement = () => {
         const el = document.querySelector('.barcode-text input');
@@ -56,6 +55,13 @@
             el.value = '';
             el.focus();
         }
+    };
+    
+    window.enableGlobalFocus = () => {
+        document.addEventListener('click', () => {
+            el.value = '';
+            window.focusElement();
+        });
     };
 </script>
 
@@ -68,7 +74,10 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
+        {
+            await Js.InvokeVoidAsync("enableGlobalFocus");
             await Js.InvokeVoidAsync("focusElement");
+        }
     }
 
     private async Task SubmitBarcode()
@@ -121,5 +130,4 @@
             await SubmitBarcode();
         }
     }
-
 }

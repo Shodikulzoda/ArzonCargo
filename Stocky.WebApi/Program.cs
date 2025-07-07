@@ -23,7 +23,7 @@ builder.Services.AddDbContext<ApplicationContext>(options =>
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Bank application APIs", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Stocky application APIs", Version = "v1" });
 });
 
 builder.Services.UseJwtToken();
