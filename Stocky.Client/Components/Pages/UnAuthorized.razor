@@ -1,6 +1,9 @@
 @page "/UnAuthorized"
 @using MudBlazor.Components.Layout
+@using MudBlazor.Components.Service
 @layout EmptyLayout
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
 
 <MudPaper Class="pa-6 mx-auto mt-12" Style="max-width: 400px;" Elevation="4" Square="true">
     <MudText Typo="Typo.h5" Color="Color.Error" Align="Align.Center" GutterBottom="true">
@@ -10,3 +13,14 @@
         You are not authorized to access this page.
     </MudText>
 </MudPaper>
+
+@code {
+
+    protected override Task OnInitializedAsync()
+    {
+        AuthService.ClearToken();
+        NavigationManager.NavigateTo("/", true);
+        return Task.CompletedTask;
+    }
+
+}
