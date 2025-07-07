@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using MudBlazor.Components.DialogWindows.ProductDialogs
 @using Stocky.Shared.Models
+@using Stocky.Shared.Models.Enums
 @attribute [Authorize]
 
 <PageTitle>Products</PageTitle>
@@ -18,7 +19,8 @@
                   Immediate="true"
                   OnKeyDown="HandleKeyDown"
                   Margin="Margin.Dense"/>
-    <MudButton OnClick="SearchProduct" Color="Color.Primary" Variant="Variant.Filled">GetAddingPocketBySearch</MudButton>
+    <MudButton OnClick="SearchProduct" Color="Color.Primary" Variant="Variant.Filled">GetAddingPocketBySearch
+    </MudButton>
 </div>
 
 @if (_isLoading)
@@ -41,17 +43,37 @@ else
             <MudTh>Actions</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="Name">@context.BarCode</MudTd>
-            <MudTd DataLabel="Address">@context.Status</MudTd>
-            <MudTd>
-                <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                               Color="Color.Primary"
-                               OnClick="@(() => Update(context))"/>
-                <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                               Color="Color.Error"
-                               OnClick="@(() => Delete(context.Id))"/>
-            </MudTd>
+            @if (@context.Status == Status.Completed)
+            {
+                <MudTd Style="@($"color:{Theme.PaletteLight.White};background:{Theme.PaletteLight.SuccessDarken};")"
+                       DataLabel="Id">@context.Id</MudTd>
+                <MudTd Style="@($"color:{Theme.PaletteLight.White};background:{Theme.PaletteLight.SuccessDarken};")"
+                       DataLabel="Name">@context.BarCode</MudTd>
+                <MudTd Style="@($"color:{Theme.PaletteLight.White};background:{Theme.PaletteLight.SuccessDarken};")"
+                       DataLabel="Address">@context.Status</MudTd>
+                <MudTd Style="@($"color:{Theme.PaletteLight.White};background:{Theme.PaletteLight.SuccessDarken};")">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Color="Color.Primary"
+                                   OnClick="@(() => Update(context))"/>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Color="Color.Error"
+                                   OnClick="@(() => Delete(context.Id))"/>
+                </MudTd>
+            }
+            else
+            {
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Name">@context.BarCode</MudTd>
+                <MudTd DataLabel="Address">@context.Status</MudTd>
+                <MudTd>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Color="Color.Primary"
+                                   OnClick="@(() => Update(context))"/>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                   Color="Color.Error"
+                                   OnClick="@(() => Delete(context.Id))"/>
+                </MudTd>
+            }
         </RowTemplate>
     </MudTable>
 
@@ -63,6 +85,8 @@ else
 }
 
 @code {
+    private MudTheme Theme = new MudTheme();
+
     private PageData<Product>? _productPage = new();
 
     private int _currentPage = 1;
@@ -81,7 +105,7 @@ else
         _isLoading = true;
         try
         {
-            string url = $"http://localhost:5191/Product/ProductPagination?Page={_currentPage}&PageSize={_pageSize}";
+            var url = $"http://localhost:5191/Product/ProductPagination?Page={_currentPage}&PageSize={_pageSize}";
             _productPage = await Http.GetFromJsonAsync<PageData<Product>>(url);
 
             if (_productPage?.Items != null)
