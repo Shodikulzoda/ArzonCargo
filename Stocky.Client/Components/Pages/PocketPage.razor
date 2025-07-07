@@ -9,13 +9,13 @@
 @inject IDialogService DialogService
 @inject AuthService AuthService
 
-<PageTitle>AddingPockets</PageTitle>
+<PageTitle>Добавление Пакетов</PageTitle>
 
-<MudText Typo="Typo.h4" GutterBottom="true">Pockets Table</MudText>
+<MudText Typo="Typo.h4" GutterBottom="true">Таблица Пакетов</MudText>
 
 <div class="mb-4 d-flex gap-2">
     <MudTextField @bind-Value="_searchQuery"
-                  Placeholder="Search by barcode, user, etc..."
+                  Placeholder="Поиск по штрихкоду, пользователю и т.д..."
                   Adornment="Adornment.Start"
                   AdornmentIcon="@Icons.Material.Filled.Search"
                   Immediate="true"
@@ -23,11 +23,11 @@
                   Margin="Margin.Dense"/>
 
     <MudButton OnClick="SearchPocket" Color="Color.Primary" Variant="Variant.Filled">
-        Search
+        Поиск
     </MudButton>
 
     <MudButton OnClick="OpenCreatePocketDialog" Color="Color.Success" Variant="Variant.Filled">
-        Create Pocket
+        Создать Пакет
     </MudButton>
 </div>
 
@@ -37,24 +37,24 @@
 }
 else
 {
-    <MudTable Items="_pocketPage?.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
+    <MudTable Items="_pocketPage?.Items" Hover="true" SortLabel="Сортировать по" Elevation="1" Dense="true">
         <HeaderContent>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.Id)">Id</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.BarCode)">BarCode</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.BarCode)">Штрихкод</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalAmount)">Total Amount
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalAmount)">Общая сумма
                 </MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalWeight)">Total Weight
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalWeight)">Общий вес
                 </MudTableSortLabel>
             </MudTh>
-            <MudTh>UserId</MudTh>
-            <MudTh>Complete Order</MudTh>
+            <MudTh>Id пользователя</MudTh>
+            <MudTh>Завершить заказ</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Id">@context.Id</MudTd>
@@ -71,9 +71,9 @@ else
     </MudTable>
 
     <div class="mt-4 d-flex justify-between">
-        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Back</MudButton>
+        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Назад</MudButton>
         <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
-        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Next</MudButton>
+        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Вперёд</MudButton>
     </div>
 }
 
@@ -175,7 +175,7 @@ else
             FullWidth = true
         };
 
-        var dialogReference = await DialogService.ShowAsync<CreateOrderDialog>("Create Order", parameters, options);
+        var dialogReference = await DialogService.ShowAsync<CreateOrderDialog>("Создать заказ", parameters, options);
 
         var result = await dialogReference.Result;
         if (result is { Canceled: false })
@@ -193,7 +193,7 @@ else
             FullWidth = true
         };
 
-        var dialogReference = await DialogService.ShowAsync<CreatePocketDialog>("Create Pocket", new DialogParameters(), options);
+        var dialogReference = await DialogService.ShowAsync<CreatePocketDialog>("Создать пакет", new DialogParameters(), options);
 
         var result = await dialogReference.Result;
         if (result is { Canceled: false })

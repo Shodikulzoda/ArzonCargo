@@ -4,29 +4,26 @@
 
 <MudNavMenu>
 
-    @* <MudNavLink Href="home" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home"> *@
-    @*     Home *@
-    @* </MudNavLink> *@
-    <MudNavLink Href="home" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">
-        Users Page
+    <MudNavLink Href="home" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ShoppingCart">
+        Заказы клиентов
     </MudNavLink>
 
-    <MudNavLink Href="pockets" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">
-        Pockets Page
+    <MudNavLink Href="pockets" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Schedule">
+        Незавершённые заказы
     </MudNavLink>
 
-    <MudNavLink Href="adding-product" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">
-        Adding Product
+    <MudNavLink Href="adding-product" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PlaylistAdd">
+        Добавление продукта
     </MudNavLink>
 
-    <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">
-        Products Page
+    <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Inventory">
+        Все продукты
     </MudNavLink>
 
     <MudSpacer/>
 
     <MudNavLink OnClick="Logout" Icon="@Icons.Material.Filled.ExitToApp" Color="Color.Error">
-        Logout
+        Выйти
     </MudNavLink>
 
 </MudNavMenu>
@@ -38,5 +35,4 @@
         AuthService.ClearToken();
         Navigation.NavigateTo("/", true);
     }
-
 }

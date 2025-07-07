@@ -12,27 +12,27 @@
     <DialogContent>
         <MudPaper Class="pa-6 mx-auto" Style="max-width:600px;">
             <MudStack Spacing="3">
-                <MudText Typo="Typo.h5">Create New Pocket</MudText>
+                <MudText Typo="Typo.h5">Создать новый пакет</MudText>
 
                 <MudStack Spacing="2">
-                    <MudTextField @bind-Value="_pocketModel.TotalWeight" Label="Total Weight"
+                    <MudTextField @bind-Value="_pocketModel.TotalWeight" Label="Общий вес"
                                   Variant="Variant.Outlined"/>
-                    <MudTextField @bind-Value="_pocketModel.UserId" Label="User ID" Variant="Variant.Outlined"/>
+                    <MudTextField @bind-Value="_pocketModel.UserId" Label="ID пользователя" Variant="Variant.Outlined"/>
                 </MudStack>
 
                 <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreatePocket">
-                    Create Pocket
+                    Создать пакет
                 </MudButton>
 
                 @if (_pocketCreated)
                 {
                     <MudDivider Class="my-4"/>
 
-                    <MudText Typo="Typo.h6" Class="mt-2">Pocket Barcode: @_pocketModel.BarCode</MudText>
+                    <MudText Typo="Typo.h6" Class="mt-2">Штрихкод пакета: @_pocketModel.BarCode</MudText>
 
                     <MudStack Spacing="2">
                         <MudTextField @bind-Value="_productBarCode"
-                                      Label="Scan Product Barcode"
+                                      Label="Сканировать штрихкод товара"
                                       Immediate="true"
                                       OnKeyDown="HandleKeyDown"
                                       Class="barcode-text"
@@ -40,17 +40,17 @@
 
                         <MudStack Direction="Row" Spacing="2">
                             <MudButton OnClick="AddProductToPocket" Color="Color.Warning" Variant="Variant.Filled">
-                                Add Product
+                                Добавить товар
                             </MudButton>
                             <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="FinishPocket">
-                                Finish Sale
+                                Завершить продажу
                             </MudButton>
                         </MudStack>
                     </MudStack>
 
                     <MudTable Items="_pocketItems" Class="mt-4" Dense="true" Hover="true" Elevation="0">
                         <HeaderContent>
-                            <MudTh>Barcode</MudTh>
+                            <MudTh>Штрихкод</MudTh>
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd>@context.ProductBarCode</MudTd>
@@ -67,7 +67,7 @@
     </DialogContent>
 
     <DialogActions>
-        <MudButton Color="Color.Secondary" Variant="Variant.Outlined" OnClick="Cancel">Close</MudButton>
+        <MudButton Color="Color.Secondary" Variant="Variant.Outlined" OnClick="Cancel">Закрыть</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -119,10 +119,10 @@
     {
         if (string.IsNullOrWhiteSpace(_productBarCode) || _pocketModel?.Id == 0) return;
 
-        // Prevent duplicate barcodes
+        // Исключить дублирование
         if (_pocketItems.Any(item => item.ProductBarCode == _productBarCode))
         {
-            _message = $"Product with barcode {_productBarCode} already added.";
+            _message = $"Товар с штрихкодом {_productBarCode} уже добавлен.";
             await Js.InvokeVoidAsync("focusElement");
             return;
         }
@@ -162,7 +162,7 @@
         var response = await Http.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {
-            _message = "Created successfully";
+            _message = "Создано успешно";
             _pocketItems.Clear();
             await Js.InvokeVoidAsync("focusElement");
 
@@ -190,5 +190,4 @@
             await AddProductToPocket();
         }
     }
-
 }

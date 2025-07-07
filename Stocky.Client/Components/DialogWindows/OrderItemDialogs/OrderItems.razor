@@ -11,39 +11,39 @@
 }
 else
 {
-    <MudTable Items="_orderItems.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
+    <MudTable Items="_orderItems.Items" Hover="true" SortLabel="Сортировать по" Elevation="1" Dense="true">
         <HeaderContent>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<OrderItem, object>(x => x.Id)">Id</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<OrderItem, object>(x => x.Id)">Идентификатор</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.OrderId)">BarCode</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.OrderId)">Штрихкод</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.ProductId)">TotalWeight
+                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.ProductId)">Общий вес
                 </MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.CreatedAt)">TotalAmount
+                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.CreatedAt)">Общая сумма
                 </MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.IsDeleted)">Status</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.IsDeleted)">Статус</MudTableSortLabel>
             </MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="OrderId">@context.OrderId</MudTd>
-            <MudTd DataLabel="ProductId">@context.ProductId</MudTd>
-            <MudTd DataLabel="CreateAt">@context.CreatedAt</MudTd>
-            <MudTd DataLabel="IsDelete">@context.IsDeleted</MudTd>
+            <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
+            <MudTd DataLabel="Штрихкод">@context.OrderId</MudTd>
+            <MudTd DataLabel="Общий вес">@context.ProductId</MudTd>
+            <MudTd DataLabel="Общая сумма">@context.CreatedAt</MudTd>
+            <MudTd DataLabel="Статус">@context.IsDeleted</MudTd>
         </RowTemplate>
     </MudTable>
 
     <div class="mt-4 d-flex justify-between">
-        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Back</MudButton>
+        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Назад</MudButton>
         <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
-        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Next</MudButton>
+        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Далее</MudButton>
     </div>
 }
 

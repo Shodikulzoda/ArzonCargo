@@ -8,7 +8,7 @@
         <MudText Typo="Typo.h6">@ContentText</MudText>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Secondary" OnClick="Cancel">Отмена</MudButton>
         <MudButton Color="@Color" OnClick="CreateOrder" Variant="Variant.Filled">@ButtonText</MudButton>
     </DialogActions>
 </MudDialog>
@@ -19,12 +19,12 @@
     [Parameter] public int UserId { get; set; }
     [Parameter] public double TotalAmount { get; set; }
     [Parameter] public string ContentText { get; set; }
-    [Parameter] public string ButtonText { get; set; } = "Create";
+    [Parameter] public string ButtonText { get; set; } = "Создать";
     [Parameter] public Color Color { get; set; } = Color.Default;
 
     protected override void OnParametersSet()
     {
-        ContentText = $"The amount of order is: {TotalAmount}";
+        ContentText = $"Отмена: {TotalAmount}";
     }
 
     private bool _isLoading;

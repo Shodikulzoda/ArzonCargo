@@ -7,20 +7,19 @@
 @using Stocky.Shared.Models.Enums
 @attribute [Authorize]
 
-<PageTitle>Products</PageTitle>
+<PageTitle>Продукты</PageTitle>
 
-<MudText Typo="Typo.h4" GutterBottom="true">Products Table</MudText>
+<MudText Typo="Typo.h4" GutterBottom="true">Таблица продуктов</MudText>
 
 <div class="mb-4 d-flex gap-2">
     <MudTextField @bind-Value="_searchQuery"
-                  Placeholder="GetAddingPocketBySearch by name, phone, etc..."
+                  Placeholder="Поиск по названию, телефону и т.д..."
                   Adornment="Adornment.Start"
                   AdornmentIcon="@Icons.Material.Filled.Search"
                   Immediate="true"
                   OnKeyDown="HandleKeyDown"
                   Margin="Margin.Dense"/>
-    <MudButton OnClick="SearchProduct" Color="Color.Primary" Variant="Variant.Filled">GetAddingPocketBySearch
-    </MudButton>
+    <MudButton OnClick="SearchProduct" Color="Color.Primary" Variant="Variant.Filled">Поиск</MudButton>
 </div>
 
 @if (_isLoading)
@@ -29,18 +28,18 @@
 }
 else
 {
-    <MudTable Items="_productPage?.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
+    <MudTable Items="_productPage?.Items" Hover="true" SortLabel="Сортировать по" Elevation="1" Dense="true">
         <HeaderContent>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<Product, object>(x => x.Id)">Id</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Product, object>(x => x.BarCode)">BarCode</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Product, object>(x => x.BarCode)">Штрихкод</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Product, object>(x => x.Status)">Status</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Product, object>(x => x.Status)">Статус</MudTableSortLabel>
             </MudTh>
-            <MudTh>Actions</MudTh>
+            <MudTh>Действия</MudTh>
         </HeaderContent>
         <RowTemplate>
             @if (@context.Status == Status.Completed)
@@ -78,9 +77,9 @@ else
     </MudTable>
 
     <div class="mt-4 d-flex justify-between">
-        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Back</MudButton>
+        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Назад</MudButton>
         <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
-        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Next</MudButton>
+        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Вперёд</MudButton>
     </div>
 }
 
@@ -143,7 +142,7 @@ else
             FullWidth = true
         };
 
-        var dialogReference = await DialogService.ShowAsync<DeleteProductDialog>("Delete Product", parameters, options);
+        var dialogReference = await DialogService.ShowAsync<DeleteProductDialog>("Удалить продукт", parameters, options);
 
         var dialogReferenceResult = await dialogReference.Result;
 
@@ -176,7 +175,7 @@ else
             FullWidth = true
         };
 
-        var dialog = await DialogService.ShowAsync<EditProductDialog>("Edit Product", parameters, options);
+        var dialog = await DialogService.ShowAsync<EditProductDialog>("Редактировать продукт", parameters, options);
         var result = await dialog.Result;
 
         if (result is not null)
@@ -207,7 +206,7 @@ else
         }
         catch (Exception ex)
         {
-            Console.WriteLine("GetPocketBySearch error: " + ex.Message);
+            Console.WriteLine("Ошибка поиска: " + ex.Message);
             _productPage.Items = [];
         }
 

@@ -13,26 +13,26 @@
 }
 else
 {
-    <MudTable Items="_orders.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
+    <MudTable Items="_orders.Items" Hover="true" SortLabel="Сортировать по" Elevation="1" Dense="true">
         <HeaderContent>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Order, object>(x => x.Id)">Id</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Order, object>(x => x.Id)">Идентификатор</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.BarCode)">BarCode</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.BarCode)">Штрихкод</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.TotalWeight)">TotalWeight</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.TotalWeight)">Общий вес</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.TotalAmount)">TotalAmount</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.TotalAmount)">Общая сумма</MudTableSortLabel>
             </MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="BarCode">@context.BarCode</MudTd>
-            <MudTd DataLabel="TotalWeight">@context.TotalWeight</MudTd>
-            <MudTd DataLabel="TotalAmount">@context.TotalAmount</MudTd>
+            <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
+            <MudTd DataLabel="Штрихкод">@context.BarCode</MudTd>
+            <MudTd DataLabel="Общий вес">@context.TotalWeight</MudTd>
+            <MudTd DataLabel="Общая сумма">@context.TotalAmount</MudTd>
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.ViewList"
                                Color="Color.Success"
@@ -42,9 +42,9 @@ else
     </MudTable>
 
     <div class="mt-4 d-flex justify-between">
-        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Back</MudButton>
+        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Назад</MudButton>
         <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
-        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Next</MudButton>
+        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Далее</MudButton>
     </div>
 }
 
@@ -115,7 +115,7 @@ else
             FullWidth = true
         };
 
-        var dialogReference = await DialogService.ShowAsync<OrderItems>("OrderItem Of Order", parameters, options);
+        var dialogReference = await DialogService.ShowAsync<OrderItems>("Элементы заказа", parameters, options);
         var dialogReferenceResult = await dialogReference.Result;
 
         if (dialogReferenceResult is not null)

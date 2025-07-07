@@ -13,28 +13,29 @@
             <MudPaper Class="pa-6" Elevation="3">
                 <MudForm>
                     <MudTextField T="string"
+                                  @ref="_firstInput"
                                   @bind-Value="Data.UserName"
-                                  Label="Username"
+                                  Label="Имя пользователя"
                                   Class="mb-4"
                                   Error="@_isLoged"
                                   OnKeyDown="HandleKeyDown"
-                                  ErrorText="Invalid username or password"/>
+                                  ErrorText="Неверное имя пользователя или пароль" />
 
                     <MudTextField T="string"
+                                  @ref="_secondInput"
                                   @bind-Value="Data.PasswordHash"
-                                  Label="Password"
+                                  Label="Пароль"
                                   InputType="InputType.Password"
                                   Class="mb-4"
                                   Error="@_isLoged"
-                                  @ref="_secondInput"
                                   OnKeyDown="Enter"
-                                  ErrorText="Invalid username or password"/>
+                                  ErrorText="Неверное имя пользователя или пароль" />
 
                     <MudButton Variant="Variant.Filled"
                                OnClick="Submit"
                                Color="Color.Primary"
                                FullWidth="true">
-                        Login
+                        Войти
                     </MudButton>
                 </MudForm>
             </MudPaper>
@@ -43,6 +44,7 @@
 </div>
 
 @code {
+    private MudTextField<string> _firstInput = null!;
     private MudTextField<string> _secondInput = null!;
 
     [Parameter] public AuthenticationData Data { get; set; } = new();
@@ -58,47 +60,73 @@
         }
     }
 
+    private bool _isSubmitting = false;
+
     private async Task Submit()
     {
-        var response = await Http.PostAsJsonAsync("http://localhost:5191/api/Auth/Verify", Data);
+        if (_isSubmitting)
+            return; 
 
-        if (response.IsSuccessStatusCode)
+        _isSubmitting = true;
+        _isLoged = false; 
+        StateHasChanged();
+
+        try
         {
-            var resultText = await response.Content.ReadAsStringAsync();
+            var response = await Http.PostAsJsonAsync("http://localhost:5191/api/Auth/Verify", Data);
 
-            var loginResponse = new LoginResponse
+            if (response.IsSuccessStatusCode)
             {
-                Token = resultText
-            };
+                var resultText = await response.Content.ReadAsStringAsync();
 
-            if (!string.IsNullOrWhiteSpace(loginResponse.Token))
+                var loginResponse = new LoginResponse
+                {
+                    Token = resultText
+                };
+
+                if (!string.IsNullOrWhiteSpace(loginResponse.Token))
+                {
+                    AuthService.SetToken(loginResponse.Token);
+                    _isLoged = false;
+                    Navigation.NavigateTo("/home");
+                }
+                else
+                {
+                    _isLoged = true;
+                }
+            }
+            else
             {
-                AuthService.SetToken(loginResponse.Token);
-                Navigation.NavigateTo("/home", true);
+                _isLoged = true;
             }
         }
-        else
+        catch
         {
             _isLoged = true;
         }
+        finally
+        {
+            _isSubmitting = false;
+            StateHasChanged();
+        }
     }
-
+    
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
-        if (e.Key == "Enter")
+        if (e.Key == "Tab")
         {
             await _secondInput.FocusAsync();
         }
     }
-
+    
     private async Task Enter(KeyboardEventArgs e)
     {
-        if (e.Code is "Enter" or "NumpadEnter")
+        if (e.Key is "Enter" or "NumpadEnter")
         {
             await Submit();
         }
     }
-
+    
     public class LoginResponse
     {
         public string? Token { get; set; }

@@ -13,27 +13,27 @@
 @using MudBlazor.Components.Service
 @using Stocky.Shared.Models
 
-<PageTitle>User Management</PageTitle>
+<PageTitle>Управление пользователями</PageTitle>
 
 @if (_isAuthenticated)
 {
     Navigation.NavigateTo("/UnAuthorized", true);
 }
 
-<MudText Typo="Typo.h4" GutterBottom="true">User Management</MudText>
+<MudText Typo="Typo.h4" GutterBottom="true">Заказы клиентов</MudText>
 
 <div class="mb-4 d-flex gap-2">
     <MudTextField @bind-Value="_searchQuery"
-                  Placeholder="Search users by name, phone, etc..."
+                  Placeholder="Поиск пользователей по имени, телефону и т.д..."
                   Adornment="Adornment.Start"
                   AdornmentIcon="@Icons.Material.Filled.Search"
                   Immediate="true"
                   OnKeyDown="HandleKeyDown"
                   Margin="Margin.Dense"/>
-    <MudButton OnClick="SearchUsers" Color="Color.Primary" Variant="Variant.Filled">Search</MudButton>
+    <MudButton OnClick="SearchUsers" Color="Color.Primary" Variant="Variant.Filled">Поиск</MudButton>
     <MudButton OnClick="OpenCreateDialog" Color="Color.Success" Variant="Variant.Filled"
                StartIcon="@Icons.Material.Filled.Add">
-        Add User
+        Добавить
     </MudButton>
 </div>
 
@@ -46,12 +46,12 @@ else
     <MudTable Items="_userPage?.Items" Hover="true" Elevation="1" Dense="true">
         <HeaderContent>
             <MudTh>Id</MudTh>
-            <MudTh>Name</MudTh>
-            <MudTh>Phone</MudTh>
-            <MudTh>Address</MudTh>
-            <MudTh>Orders</MudTh>
-            <MudTh>Pockets</MudTh>
-            <MudTh>Actions</MudTh>
+            <MudTh>Имя</MudTh>
+            <MudTh>Телефон</MudTh>
+            <MudTh>Адрес</MudTh>
+            <MudTh>Заказы</MudTh>
+            <MudTh>Кошельки</MudTh>
+            <MudTh>Действия</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd>@context.Id</MudTd>
@@ -60,25 +60,25 @@ else
             <MudTd>@context.Address</MudTd>
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.ViewList" Color="Color.Info"
-                               OnClick="@(() => UserOrders(context.Id))"/>
+                               OnClick="@(() => UserOrders(context.Id))" />
             </MudTd>
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.ShoppingBag" Color="Color.Primary"
-                               OnClick="@(() => UserPockets(context.Id))"/>
+                               OnClick="@(() => UserPockets(context.Id))" />
             </MudTd>
             <MudTd>
                 <MudMenu Icon="@Icons.Material.Filled.MoreVert">
-                    <MudMenuItem OnClick="@(() => Update(context))">Edit</MudMenuItem>
-                    <MudMenuItem OnClick="@(() => Delete(context.Id))">Delete</MudMenuItem>
+                    <MudMenuItem OnClick="@(() => Update(context))">Редактировать</MudMenuItem>
+                    <MudMenuItem OnClick="@(() => Delete(context.Id))">Удалить</MudMenuItem>
                 </MudMenu>
             </MudTd>
         </RowTemplate>
     </MudTable>
 
     <div class="mt-4 d-flex justify-between">
-        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)">Back</MudButton>
+        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)">Назад</MudButton>
         <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
-        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)">Next</MudButton>
+        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)">Вперед</MudButton>
     </div>
 }
 
@@ -128,14 +128,14 @@ else
             }
             else
             {
-                Snackbar.Add("Error loading users.", Severity.Error);
+                Snackbar.Add("Ошибка при загрузке пользователей.", Severity.Error);
                 _userPage.Items = new List<User>();
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine("Load error: " + ex.Message);
-            Snackbar.Add("Unexpected error while loading users.", Severity.Error);
+            Snackbar.Add("Неожиданная ошибка при загрузке пользователей.", Severity.Error);
         }
 
         _isLoading = false;
@@ -169,20 +169,20 @@ else
             {
                 var json = await response.Content.ReadAsStringAsync();
                 var results = JsonSerializer.Deserialize<List<User>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                _userPage.Items = results ?? [];
+                _userPage.Items = results ?? new List<User>();
                 _totalPages = 1;
                 _currentPage = 1;
             }
             else
             {
-                Snackbar.Add("Search failed.", Severity.Error);
+                Snackbar.Add("Поиск не удался.", Severity.Error);
                 _userPage.Items = new List<User>();
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine("Search error: " + ex.Message);
-            Snackbar.Add("Unexpected error during search.", Severity.Error);
+            Snackbar.Add("Неожиданная ошибка при поиске.", Severity.Error);
         }
 
         _isLoading = false;
@@ -219,7 +219,7 @@ else
         var parameters = new DialogParameters { { "UserId", userId } };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
 
-        var dialog = await DialogService.ShowAsync<DeleteUserDialog>("Confirm Delete", parameters, options);
+        var dialog = await DialogService.ShowAsync<DeleteUserDialog>("Подтвердите удаление", parameters, options);
         var result = await dialog.Result;
 
         if (result is { Canceled: false })
@@ -237,7 +237,7 @@ else
 
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
 
-        var dialog = await DialogService.ShowAsync<EditUserDialog>("Edit User", parameters, options);
+        var dialog = await DialogService.ShowAsync<EditUserDialog>("Редактировать пользователя", parameters, options);
         var result = await dialog.Result;
 
         if (result != null)
@@ -254,7 +254,7 @@ else
         var parameters = new DialogParameters { { "UserModel", new User() } };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
 
-        var dialog = await DialogService.ShowAsync<CreateUserDialog>("Create User", parameters, options);
+        var dialog = await DialogService.ShowAsync<CreateUserDialog>("Создать пользователя", parameters, options);
         var result = await dialog.Result;
 
         if (result is { Canceled: false })
@@ -268,7 +268,7 @@ else
         var parameters = new DialogParameters { { "UserId", userId } };
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
 
-        var dialog = await DialogService.ShowAsync<OrdersPaginationUserDialog>("User Orders", parameters, options);
+        var dialog = await DialogService.ShowAsync<OrdersPaginationUserDialog>("Заказы пользователя", parameters, options);
         await dialog.Result;
     }
 
@@ -276,14 +276,12 @@ else
     {
         var parameters = new DialogParameters
         {
-            {
-                "UserId", userId
-            }
+            { "UserId", userId }
         };
-        
+
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
 
-        var dialog = await DialogService.ShowAsync<PocketsUserPaginationDialog>("User Pockets", parameters, options);
+        var dialog = await DialogService.ShowAsync<PocketsUserPaginationDialog>("Кошельки пользователя", parameters, options);
         await dialog.Result;
     }
 }

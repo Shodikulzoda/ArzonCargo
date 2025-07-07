@@ -3,12 +3,12 @@
 @inject HttpClient Http
 @inject IJSRuntime Js
 
-<PageTitle>Barcode Scanner</PageTitle>
+<PageTitle>Сканер штрихкодов</PageTitle>
 
 <MudPaper Class="p-4 mx-auto mt-6" Style="max-width: 600px;">
-    <MudText Typo="Typo.h5" GutterBottom>Barcode Scanner</MudText>
+    <MudText Typo="Typo.h5" GutterBottom>Сканер штрихкодов</MudText>
 
-    <MudTextField Label="Enter Barcode"
+    <MudTextField Label="Введите штрихкод"
                   @bind-Value="_barcode"
                   Variant="Variant.Filled"
                   Adornment="Adornment.Start"
@@ -18,7 +18,7 @@
                   OnKeyDown="HandleKeyPress"/>
 
     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitBarcode" Class="mt-2 me-2">
-        Add
+        Добавить
     </MudButton>
 
     <MudText Color="Color.Success" Class="mt-2">@_message</MudText>
@@ -29,19 +29,19 @@
 @if (_products.Any())
 {
     <MudPaper Class="p-4 mx-auto mt-4" Style="max-width: 600px;">
-        <MudText Typo="Typo.h6">Added Products</MudText>
+        <MudText Typo="Typo.h6">Добавленные продукты</MudText>
 
         <MudTable Items="_products" Elevation="2" Dense="true" Hover="true">
             <HeaderContent>
-                <MudTh>Barcode</MudTh>
-                <MudTh></MudTh> <!-- For Delete button -->
+                <MudTh>Штрихкод</MudTh>
+                <MudTh></MudTh> <!-- Кнопка удаления -->
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Barcode">@context.BarCode</MudTd>
                 <MudTd>
                     <MudButton Variant="Variant.Text" Color="Color.Error" Size="Size.Small"
                                OnClick="@(() => RemoveProduct(context.BarCode))">
-                        Delete
+                        Удалить
                     </MudButton>
                 </MudTd>
             </RowTemplate>
@@ -76,7 +76,7 @@
         if (string.IsNullOrWhiteSpace(_barcode))
         {
             _message = string.Empty;
-            _errorMessage = "Enter the barcode!";
+            _errorMessage = "Введите штрихкод!";
             await Js.InvokeVoidAsync("focusElement");
             return;
         }
@@ -92,12 +92,12 @@
             if (_products.Any(p => p.BarCode == _barcode))
                 _products.Add(new Product { BarCode = _barcode });
 
-            _message = "Barcode added successfully!";
+            _message = "Штрихкод успешно добавлен!";
             _errorMessage = string.Empty;
         }
         else
         {
-            _errorMessage = $"The product with barCode: {_barcode} is already exist!";
+            _errorMessage = $"Продукт со штрихкодом: {_barcode} уже существует!";
         }
 
         _barcode = "";
@@ -110,7 +110,7 @@
         if (product != null)
         {
             _products.Remove(product);
-            _errorMessage = $"Removed barcode '{barcode}' from the list.";
+            _errorMessage = $"Штрихкод '{barcode}' удалён из списка.";
         }
     }
 

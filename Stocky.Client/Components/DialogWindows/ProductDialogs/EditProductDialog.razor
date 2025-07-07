@@ -24,16 +24,16 @@
 
 <MudDialog>
     <DialogContent>
-        <MudText Typo="Typo.h6">Edit Product</MudText>
+        <MudText Typo="Typo.h6">Редактировать продукт</MudText>
 
-        <MudTextField Label="Product Id"
+        <MudTextField Label="ID продукта"
                       Variant="Variant.Outlined"
                       @bind-Value="Product.Id"
                       Margin="Margin.Dense"
                       ReadOnly="false" />
 
         <MudSelect T="Status"
-                   Label="Status"
+                   Label="Статус"
                    @bind-Value="Product.Status"
                    Variant="Variant.Outlined"
                    Margin="Margin.Dense">
@@ -45,7 +45,7 @@
     </DialogContent>
 
     <DialogActions>
-        <MudButton Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit" Variant="Variant.Filled">Save</MudButton>
+        <MudButton Color="Color.Secondary" OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit" Variant="Variant.Filled">Сохранить</MudButton>
     </DialogActions>
 </MudDialog>

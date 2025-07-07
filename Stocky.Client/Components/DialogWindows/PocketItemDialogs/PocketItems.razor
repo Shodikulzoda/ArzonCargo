@@ -7,43 +7,41 @@
 
 @if (_isLoading)
 {
-    <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
 }
 else
 {
-    <MudTable Items="_pocketItems.Items" Hover="true" SortLabel="Sort By" Elevation="1" Dense="true">
+    <MudTable Items="_pocketItems.Items" Hover="true" SortLabel="Сортировать по" Elevation="1" Dense="true">
         <HeaderContent>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<PocketItem, object>(x => x.Id)">Id</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<PocketItem, object>(x => x.Id)">ID</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.PocketId)">BarCode</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.PocketId)">Пакет</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.ProductId)">TotalWeight
-                </MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.ProductId)">Продукт</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.CreatedAt)">TotalAmount
-                </MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.CreatedAt)">Дата создания</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.IsDeleted)">Status</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.IsDeleted)">Статус</MudTableSortLabel>
             </MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="OrderId">@context.PocketId</MudTd>
-            <MudTd DataLabel="ProductId">@context.ProductId</MudTd>
-            <MudTd DataLabel="CreateAt">@context.CreatedAt</MudTd>
-            <MudTd DataLabel="IsDelete">@context.IsDeleted</MudTd>
+            <MudTd DataLabel="ID">@context.Id</MudTd>
+            <MudTd DataLabel="Пакет">@context.PocketId</MudTd>
+            <MudTd DataLabel="Продукт">@context.ProductId</MudTd>
+            <MudTd DataLabel="Дата создания">@context.CreatedAt.ToString("g")</MudTd>
+            <MudTd DataLabel="Статус">@((context.IsDeleted) ? "Удалён" : "Активен")</MudTd>
         </RowTemplate>
     </MudTable>
 
     <div class="mt-4 d-flex justify-between">
-        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Back</MudButton>
+        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Назад</MudButton>
         <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
-        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Next</MudButton>
+        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Далее</MudButton>
     </div>
 }
 
@@ -52,7 +50,6 @@ else
     [Parameter] public int PocketId { get; set; }
 
     private PageData<PocketItem>? _pocketItems = new();
-
     private int _currentPage = 1;
     private int _totalPages = 1;
     private const int PageSize = 15;
@@ -60,10 +57,10 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadPocketItmes();
+        await LoadPocketItems();
     }
 
-    private async Task LoadPocketItmes()
+    private async Task LoadPocketItems()
     {
         _isLoading = true;
 
@@ -71,7 +68,6 @@ else
         {
             var url = $"http://localhost:5191/PocketItem/GetPocketItemsByPocketId?PocketId={PocketId}&Page={_currentPage}&PageSize={PageSize}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
-
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
             var response = await Http.SendAsync(request);
@@ -83,7 +79,7 @@ else
                 {
                     PropertyNameCaseInsensitive = true
                 });
-                
+
                 _pocketItems.TotalPages = (int)Math.Ceiling((double)_pocketItems.TotalCount / PageSize);
             }
             else
@@ -93,7 +89,7 @@ else
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Failed to load orders: " + ex.Message);
+            Console.WriteLine("Не удалось загрузить товары в пакете: " + ex.Message);
         }
 
         _isLoading = false;
@@ -104,7 +100,7 @@ else
         if (_currentPage < _totalPages)
         {
             _currentPage++;
-            await LoadPocketItmes();
+            await LoadPocketItems();
         }
     }
 
@@ -113,7 +109,7 @@ else
         if (_currentPage > 1)
         {
             _currentPage--;
-            await LoadPocketItmes();
+            await LoadPocketItems();
         }
     }
 
