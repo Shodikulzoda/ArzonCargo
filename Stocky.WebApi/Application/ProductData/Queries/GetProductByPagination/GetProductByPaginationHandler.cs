@@ -1,5 +1,6 @@
 using MediatR;
 using Stocky.Shared.Models;
+using Stocky.Shared.Models.Enums;
 using Stocky.WebApi.Application.Common;
 using Stocky.WebApi.Application.Interfaces;
 

@@ -45,13 +45,13 @@ else
         <RowTemplate>
             @if (@context.Status == Status.Completed)
             {
-                <MudTd Style="@($"color:{Theme.PaletteLight.White};background:{Theme.PaletteLight.SuccessDarken};")"
+                <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
                        DataLabel="Id">@context.Id</MudTd>
-                <MudTd Style="@($"color:{Theme.PaletteLight.White};background:{Theme.PaletteLight.SuccessDarken};")"
+                <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
                        DataLabel="Name">@context.BarCode</MudTd>
-                <MudTd Style="@($"color:{Theme.PaletteLight.White};background:{Theme.PaletteLight.SuccessDarken};")"
+                <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
                        DataLabel="Address">@context.Status</MudTd>
-                <MudTd Style="@($"color:{Theme.PaletteLight.White};background:{Theme.PaletteLight.SuccessDarken};")">
+                <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")">
                     <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                    Color="Color.Primary"
                                    OnClick="@(() => Update(context))"/>
@@ -85,7 +85,7 @@ else
 }
 
 @code {
-    private MudTheme Theme = new MudTheme();
+    private MudTheme _theme = new();
 
     private PageData<Product>? _productPage = new();
 
@@ -107,6 +107,9 @@ else
         {
             var url = $"http://localhost:5191/Product/ProductPagination?Page={_currentPage}&PageSize={_pageSize}";
             _productPage = await Http.GetFromJsonAsync<PageData<Product>>(url);
+
+            _productPage.Items = _productPage.Items
+                .OrderByDescending(x => x.Status == Status.Created);
 
             if (_productPage?.Items != null)
             {

@@ -23,10 +23,6 @@
         Products Page
     </MudNavLink>
 
-    <MudNavLink Href="create-pocket" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">
-        Adding Pocket
-    </MudNavLink>
-
     <MudSpacer/>
 
     <MudNavLink OnClick="Logout" Icon="@Icons.Material.Filled.ExitToApp" Color="Color.Error">
@@ -36,9 +32,11 @@
 </MudNavMenu>
 
 @code {
+
     private void Logout()
     {
         AuthService.ClearToken();
         Navigation.NavigateTo("/", true);
     }
+
 }

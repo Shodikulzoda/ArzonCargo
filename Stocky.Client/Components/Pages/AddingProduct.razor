@@ -22,6 +22,8 @@
     </MudButton>
 
     <MudText Color="Color.Success" Class="mt-2">@_message</MudText>
+    <MudText Color="Color.Error" Class="mt-2">@_errorMessage</MudText>
+
 </MudPaper>
 
 @if (_products.Any())
@@ -58,8 +60,9 @@
 </script>
 
 @code {
-    private string _barcode = "";
-    private string _message = "";
+    private string _barcode = string.Empty;
+    private string _message = string.Empty;
+    private string _errorMessage = string.Empty;
     private readonly List<Product> _products = [];
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -72,7 +75,8 @@
     {
         if (string.IsNullOrWhiteSpace(_barcode))
         {
-            _message = "Please enter a barcode.";
+            _message = string.Empty;
+            _errorMessage = "Enter the barcode!";
             await Js.InvokeVoidAsync("focusElement");
             return;
         }
@@ -89,23 +93,24 @@
                 _products.Add(new Product { BarCode = _barcode });
 
             _message = "Barcode added successfully!";
+            _errorMessage = string.Empty;
         }
         else
         {
-            _message = "Failed to add barcode.";
+            _errorMessage = $"The product with barCode: {_barcode} is already exist!";
         }
 
         _barcode = "";
         await Js.InvokeVoidAsync("focusElement");
     }
-    
+
     private void RemoveProduct(string? barcode)
     {
         var product = _products.FirstOrDefault(p => p.BarCode == barcode);
         if (product != null)
         {
             _products.Remove(product);
-            _message = $"Removed barcode '{barcode}' from the list.";
+            _errorMessage = $"Removed barcode '{barcode}' from the list.";
         }
     }
 
