@@ -25,6 +25,10 @@
                     Создать пакет
                 </MudButton>
 
+                <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="FinishPocket">
+                    Завершить продажу
+                </MudButton>
+
                 @if (_pocketCreated)
                 {
                     <MudDivider Class="my-4"/>
@@ -43,9 +47,6 @@
                             <MudButton OnClick="AddProductToPocket" Color="Color.Warning" Variant="Variant.Filled">
                                 Добавить товар
                             </MudButton>
-                            <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="FinishPocket">
-                                Завершить продажу
-                            </MudButton>
                         </MudStack>
                     </MudStack>
 
@@ -59,10 +60,9 @@
                     </MudTable>
                 }
 
-                @if (!string.IsNullOrWhiteSpace(_message))
-                {
-                    <MudText Color="Color.Success" Class="mt-3">@_message</MudText>
-                }
+                <MudText Color="Color.Success" Class="mt-3">@_message</MudText>
+                <MudText Color="Color.Error" Class="mt-3">@_errorMessage</MudText>
+
             </MudStack>
         </MudPaper>
     </DialogContent>
@@ -87,9 +87,10 @@
     private Pocket _pocketModel = new();
     private bool _pocketCreated;
     private string? _message = "";
+    private string? _errorMessage = "";
     private string? _productBarCode;
-    private List<PocketItem> _pocketItems = new();
-    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
+    private List<PocketItem> _pocketItems = [];
+    private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     private void Cancel() => MudDialog.Cancel();
 
@@ -125,6 +126,7 @@
         if (_pocketItems.Any(item => item.ProductBarCode == _productBarCode))
         {
             _message = $"Товар с штрихкодом {_productBarCode} уже добавлен.";
+            _errorMessage = string.Empty;
             await Js.InvokeVoidAsync("focusElement");
             return;
         }
@@ -139,6 +141,7 @@
         {
             Content = JsonContent.Create(pocketItem)
         };
+
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
         var response = await Http.SendAsync(request);
@@ -146,14 +149,24 @@
         {
             _pocketItems.Add(pocketItem);
             _productBarCode = "";
-            _message = null;
+            _message = string.Empty;
             await Js.InvokeVoidAsync("focusElement");
         }
     }
 
     private async Task FinishPocket()
     {
-        if (_pocketModel?.BarCode is null) return;
+        if (_pocketItems.Count <= 0)
+        {
+            _errorMessage = "no pocket was added";
+            _message = string.Empty;
+            return;
+        }
+
+        if (_pocketModel?.BarCode is null)
+        {
+            return;
+        }
 
         var request = new HttpRequestMessage(HttpMethod.Put, $"{ApiBaseUrl}/Pocket/UpdatePocket")
         {
@@ -165,13 +178,14 @@
         if (response.IsSuccessStatusCode)
         {
             _message = "Создано успешно";
+            _errorMessage = string.Empty;
             _pocketItems.Clear();
             await Js.InvokeVoidAsync("focusElement");
 
             var qrBytes = GenerateQrCode(10);
             var base64Qr = Convert.ToBase64String(qrBytes);
 
-            string rawHtml = string.Join(
+            var rawHtml = string.Join(
                 Environment.NewLine,
                 "<div style='width:57mm;height:57mm;padding:0;margin-left:1mm; margin-right:1mm; text-align:center;font-family:sans-serif;'>",
                 "<h2 style='margin:0;'>ArzonCargo</h2>",
@@ -182,6 +196,8 @@
             );
 
             await PrintingService.Print(rawHtml, PrintType.RawHtml);
+
+            MudDialog.Cancel();
         }
     }
 
@@ -192,4 +208,5 @@
             await AddProductToPocket();
         }
     }
+
 }
