@@ -86,7 +86,7 @@ else
     private readonly int _pageSize = 15;
     private bool _isLoading;
     private string _searchQuery = "";
-    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
+    private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     protected override async Task OnInitializedAsync()
     {

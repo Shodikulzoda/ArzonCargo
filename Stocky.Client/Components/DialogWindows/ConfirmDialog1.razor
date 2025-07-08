@@ -1,0 +1,38 @@
+@using MudBlazor.Components.Service
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<MudDialog @onkeydown="OnKeyDown" Focusable="true" AutoFocus="true">
+    <DialogContent>
+        <MudText Typo="Typo.h6">@ContentText</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Color="Color.Secondary">Нет</MudButton>
+        <MudButton OnClick="Confirm" Color="Color.Primary" AutoFocus="true">Да</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    [Parameter] public string ContentText { get; set; } = "Продукт не добавлен в базу данных. Хотите добавить?";
+
+    private async Task Confirm()
+    {
+        Navigation.NavigateTo("/", true);
+        await AuthService.ClearTokenAsync();
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task OnKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key is "Enter" or "NumpadEnter")
+        {
+            Navigation.NavigateTo("/", true);
+            await AuthService.ClearTokenAsync();
+            await Confirm();
+        }
+    }
+
+}

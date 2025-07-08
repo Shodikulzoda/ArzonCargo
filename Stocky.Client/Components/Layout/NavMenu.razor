@@ -1,6 +1,8 @@
-﻿@using MudBlazor.Components.Service
+﻿@using MudBlazor.Components.DialogWindows
+@using MudBlazor.Components.Service
 @inject AuthService AuthService
 @inject NavigationManager Navigation
+@inject IDialogService DialogService
 
 <MudNavMenu>
     @if (AuthService.IsAdmin)
@@ -34,6 +36,7 @@
 </MudNavMenu>
 
 @code {
+
     protected override async Task OnInitializedAsync()
     {
         AuthService.OnChange += StateHasChanged;
@@ -47,7 +50,7 @@
 
     private async Task Logout()
     {
-        await AuthService.ClearTokenAsync();
-        Navigation.NavigateTo("/", true);
+        await DialogService.ShowAsync<ConfirmDialog1>("Создать заказ");
     }
+
 }
