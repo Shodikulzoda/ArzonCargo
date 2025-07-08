@@ -1,101 +1,101 @@
-@using System.Net.Http.Headers
-@using Append.Blazor.Printing
-@using MudBlazor.Components.Service
-@using QRCoder
-@using Stocky.Shared.Models
-@inject HttpClient Http
-@inject AuthService AuthService
-@inject IJSRuntime Js
-@inject IPrintingService PrintingService
-@inject IConfiguration Configuration
-@inject IDialogService DialogService
-
-<MudDialog>
-    <DialogContent>
-        <MudPaper Class="pa-6 mx-auto" Style="max-width:600px;">
-            <MudStack Spacing="3">
-                <MudText Typo="Typo.h5">Создать новый пакет</MudText>
-
-                <MudAutocomplete T="User"
-                                 Label="Поиск клиента"
-                                 Variant="Variant.Outlined"
-                                 SearchFunc="SearchUsers"
-                                 ToStringFunc='u => $"{u.Name} - {u.Phone}"'   
-                                 @bind-Value="_selectedUser"
-                                 DebounceInterval="300"
-                                 MinCharacters="1"
-                                 Clearable="true" />
-
-                @* @if (_selectedUser != null) *@
-                @* { *@
-                @*     <MudText Typo="Typo.subtitle2">Имя: @_selectedUser.Name</MudText> *@
-                @*     <MudText Typo="Typo.subtitle2">Телефон: @_selectedUser.Phone</MudText> *@
-                @*     <MudText Typo="Typo.subtitle2">Адрес: @_selectedUser.Address</MudText> *@
-                @* } *@
-
-                <MudTextField @bind-Value="_pocketModel.TotalWeight"
-                              Label="Общий вес"
-                              Variant="Variant.Outlined"/>
-
-                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreatePocket">
-                    Создать пакет
-                </MudButton>
-
-                <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="FinishPocket">
-                    Завершить продажу
-                </MudButton>
-
-                @if (_pocketCreated)
-                {
-                    <MudDivider Class="my-4"/>
-
-                    <MudText Typo="Typo.h6" Class="mt-2">Штрихкод пакета: @_pocketModel.BarCode</MudText>
-
-                    <MudStack Spacing="2">
-                        <MudTextField @bind-Value="_productBarCode"
-                                      Label="Сканировать штрихкод товара"
-                                      Immediate="true"
-                                      OnKeyDown="HandleKeyDown"
-                                      Class="barcode-text"
-                                      Variant="Variant.Outlined"/>
-
-                        <MudButton OnClick="AddProductToPocket" Color="Color.Warning" Variant="Variant.Filled">
-                            Добавить товар
-                        </MudButton>
-                    </MudStack>
-
-                    <MudTable Items="_pocketItems" Class="mt-4" Dense="true" Hover="true" Elevation="0">
-                        <HeaderContent>
-                            <MudTh>Штрихкод</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd>@context.ProductBarCode</MudTd>
-                        </RowTemplate>
-                    </MudTable>
-                }
-
-                <MudText Color="Color.Success" Class="mt-3">@_message</MudText>
-                <MudText Color="Color.Error" Class="mt-3">@_errorMessage</MudText>
-            </MudStack>
-        </MudPaper>
-    </DialogContent>
-
-    <DialogActions>
-        <MudButton Color="Color.Secondary" Variant="Variant.Outlined" OnClick="Cancel">Закрыть</MudButton>
-    </DialogActions>
-</MudDialog>
-
-<script>
-    window.focusElement = () => {
-        const el = document.querySelector('.barcode-text input');
-        if (el) {
-            el.value = '';
-            el.focus();
-        }
-    };
-</script>
-
-@code {
+    @using System.Net.Http.Headers
+    @using Append.Blazor.Printing
+    @using MudBlazor.Components.Service
+    @using QRCoder
+    @using Stocky.Shared.Models
+    @inject HttpClient Http
+    @inject AuthService AuthService
+    @inject IJSRuntime Js
+    @inject IPrintingService PrintingService
+    @inject IConfiguration Configuration
+    @inject IDialogService DialogService
+    
+    <MudDialog>
+        <DialogContent>
+            <MudPaper Class="pa-6 mx-auto" Style="max-width:600px;">
+                <MudStack Spacing="3">
+                    <MudText Typo="Typo.h5">Создать новый пакет</MudText>
+    
+                    <MudAutocomplete T="User"
+                                     Label="Поиск клиента"
+                                     Variant="Variant.Outlined"
+                                     SearchFunc="SearchUsers"
+                                     ToStringFunc='u => $"{u.Name} - {u.Phone}"'
+                                     @bind-Value="_selectedUser"
+                                     DebounceInterval="300"
+                                     MinCharacters="1"
+                                     Clearable="true"/>
+    
+                    @* @if (_selectedUser != null) *@
+                    @* { *@
+                    @*     <MudText Typo="Typo.subtitle2">Имя: @_selectedUser.Name</MudText> *@
+                    @*     <MudText Typo="Typo.subtitle2">Телефон: @_selectedUser.Phone</MudText> *@
+                    @*     <MudText Typo="Typo.subtitle2">Адрес: @_selectedUser.Address</MudText> *@
+                    @* } *@
+    
+                    <MudTextField @bind-Value="_pocketModel.TotalWeight"
+                                  Label="Общий вес"
+                                  Variant="Variant.Outlined"/>
+    
+                    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreatePocket">
+                        Создать пакет
+                    </MudButton>
+    
+                    <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="FinishPocket">
+                        Завершить продажу
+                    </MudButton>
+    
+                    @if (_pocketCreated)
+                    {
+                        <MudDivider Class="my-4"/>
+    
+                        <MudText Typo="Typo.h6" Class="mt-2">Штрихкод пакета: @_pocketModel.BarCode</MudText>
+    
+                        <MudStack Spacing="2">
+                            <MudTextField @bind-Value="_productBarCode"
+                                          Label="Сканировать штрихкод товара"
+                                          Immediate="true"
+                                          OnKeyDown="HandleKeyDown"
+                                          Class="barcode-text"
+                                          Variant="Variant.Outlined"/>
+    
+                            <MudButton OnClick="AddProductToPocket" Color="Color.Warning" Variant="Variant.Filled">
+                                Добавить товар
+                            </MudButton>
+                        </MudStack>
+    
+                        <MudTable Items="_pocketItems" Class="mt-4" Dense="true" Hover="true" Elevation="0">
+                            <HeaderContent>
+                                <MudTh>Штрихкод</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd>@context.ProductBarCode</MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    }
+    
+                    <MudText Color="Color.Success" Class="mt-3">@_message</MudText>
+                    <MudText Color="Color.Error" Class="mt-3">@_errorMessage</MudText>
+                </MudStack>
+            </MudPaper>
+        </DialogContent>
+    
+        <DialogActions>
+            <MudButton Color="Color.Secondary" Variant="Variant.Outlined" OnClick="Cancel">Закрыть</MudButton>
+        </DialogActions>
+    </MudDialog>
+    
+    <script>
+        window.focusElement = () => {
+            const el = document.querySelector('.barcode-text input');
+            if (el) {
+                el.value = '';
+                el.focus();
+            }
+        };
+    </script>
+    
+    @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
     private Pocket _pocketModel = new();
     private bool _pocketCreated;
@@ -160,6 +160,8 @@
         {
             _pocketModel = await response.Content.ReadFromJsonAsync<Pocket>() ?? new();
             _pocketCreated = true;
+
+            // Do NOT focus here automatically
         }
     }
 
@@ -176,7 +178,6 @@
             return;
         }
 
-        // Try get product by barcode
         HttpResponseMessage response;
         try
         {
@@ -189,7 +190,6 @@
 
         if (response == null || !response.IsSuccessStatusCode)
         {
-            // Product not found → ask for confirmation
             var parameters = new DialogParameters
             {
                 ["ContentText"] = $"Товар с кодом {_productBarCode} не найден. Хотите добавить его?"
@@ -207,40 +207,39 @@
             {
                 _message = "";
                 _errorMessage = $"Товар не добавлен.";
-                await Js.InvokeVoidAsync("focusElement");
+                await Js.InvokeVoidAsync("focusElement"); // Focus because we're staying on the barcode input
             }
         }
         else
         {
-            // Product found → add normally
             await ActuallyAddProduct();
         }
     }
 
-private async Task ActuallyAddProduct()
-{
-    var pocketItem = new PocketItem
+    private async Task ActuallyAddProduct()
     {
-        PocketId = _pocketModel.Id,
-        ProductBarCode = _productBarCode
-    };
+        var pocketItem = new PocketItem
+        {
+            PocketId = _pocketModel.Id,
+            ProductBarCode = _productBarCode
+        };
 
-    var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiBaseUrl}/PocketItem/Add")
-    {
-        Content = JsonContent.Create(pocketItem)
-    };
-    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiBaseUrl}/PocketItem/Add")
+        {
+            Content = JsonContent.Create(pocketItem)
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
-    var response = await Http.SendAsync(request);
-    if (response.IsSuccessStatusCode)
-    {
-        _pocketItems.Add(pocketItem);
-        _productBarCode = "";
-        _message = "Товар добавлен.";
-        _errorMessage = "";
-        await Js.InvokeVoidAsync("focusElement");
+        var response = await Http.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            _pocketItems.Add(pocketItem);
+            _productBarCode = "";
+            _message = "Товар добавлен.";
+            _errorMessage = "";
+            await Js.InvokeVoidAsync("focusElement"); // Focus here to quickly scan next barcode
+        }
     }
-}
 
     private async Task FinishPocket()
     {
@@ -268,7 +267,6 @@ private async Task ActuallyAddProduct()
             _message = "Создано успешно";
             _errorMessage = string.Empty;
             _pocketItems.Clear();
-            await Js.InvokeVoidAsync("focusElement");
 
             var qrBytes = GenerateQrCode(10);
             var base64Qr = Convert.ToBase64String(qrBytes);
@@ -287,7 +285,7 @@ private async Task ActuallyAddProduct()
             MudDialog.Cancel();
         }
     }
-    
+
     private async Task<IEnumerable<User>> SearchUsers(string text, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(text) || text.Length < 1)
@@ -297,9 +295,8 @@ private async Task ActuallyAddProduct()
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiBaseUrl}/User/Search?Text={text}");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
-
-            // IMPORTANT: Use cancellationToken here if needed
             var response = await Http.SendAsync(request, cancellationToken);
+
             if (!response.IsSuccessStatusCode)
                 return [];
 
@@ -310,7 +307,6 @@ private async Task ActuallyAddProduct()
             return [];
         }
     }
-
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {

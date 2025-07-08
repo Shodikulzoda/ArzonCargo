@@ -1,7 +1,10 @@
+@using System.Net.Http.Headers
+@using MudBlazor.Components.Service
 @using Stocky.Shared.Models
 @using Stocky.Shared.Models.Enums
 @inject HttpClient Http
 @inject IConfiguration Configuration
+@inject AuthService AuthService
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
@@ -10,7 +13,17 @@
 
     private async Task Submit()
     {
-        var response = await Http.PutAsJsonAsync($"{ApiBaseUrl}/Product/UpdateProduct", Product);
+        var url = $"{ApiBaseUrl}/Product/UpdateProduct";
+
+        var request = new HttpRequestMessage(HttpMethod.Put, url)
+        {
+            Content = JsonContent.Create(Product)
+        };
+
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+        var response = await Http.SendAsync(request);
+
         if (response.IsSuccessStatusCode)
         {
             MudDialog.Close(DialogResult.Ok(true));
@@ -20,6 +33,7 @@
             Console.WriteLine("Update failed: " + response.ReasonPhrase);
         }
     }
+
 
     private void Cancel() => MudDialog.Cancel();
 }

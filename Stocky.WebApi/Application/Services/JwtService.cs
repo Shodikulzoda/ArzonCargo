@@ -18,11 +18,12 @@ public class JwtService(IConfiguration configuration) : IJwtService
 
         var claims = new List<Claim>
         {
-            new("id", authenticationData.Id.ToString()),
-            new("name", authenticationData.UserName),
-            new("role", authenticationData.Role.ToString()),
-            new("date", authenticationData.CreatedAt.ToString(CultureInfo.CurrentCulture))
+            new Claim("id", authenticationData.Id.ToString()),
+            new Claim("name", authenticationData.UserName),
+            new Claim(ClaimTypes.Role, authenticationData.Role.ToString()),
+            new Claim("date", authenticationData.CreatedAt.ToString(CultureInfo.CurrentCulture))
         };
+
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ??
                                                                   throw new InvalidOperationException("" +

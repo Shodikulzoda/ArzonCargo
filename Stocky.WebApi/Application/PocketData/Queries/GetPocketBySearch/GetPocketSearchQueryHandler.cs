@@ -20,13 +20,13 @@ public class GetPocketSearchQueryHandler(IPocketRepository pocketRepository)
             return [];
         }
 
+        pocketQuery.Text = pocketQuery.Text.ToLower();
         var pockets = await pocketRepository.Queryable
             .Where(x =>
-                EF.Functions.Like(x.BarCode.ToString(), $"%{pocketQuery.Text}%") ||
-                EF.Functions.Like(x.UserId.ToString(), $"%{pocketQuery.Text}%") ||
-                EF.Functions.Like(x.Id.ToString(), $"%{pocketQuery.Text}%") ||
-                EF.Functions.Like(x.TotalWeight.ToString(), $"%{pocketQuery.Text}%") ||
-                EF.Functions.Like(x.TotalAmount.ToString(), $"%{pocketQuery.Text}%"))
+                EF.Functions.Like(x.BarCode.ToString().ToLower(), $"%{pocketQuery.Text}%") ||
+                EF.Functions.Like(x.UserId.ToString().ToLower(), $"%{pocketQuery.Text}%") ||
+                EF.Functions.Like(x.TotalWeight.ToString().ToLower(), $"%{pocketQuery.Text}%") ||
+                EF.Functions.Like(x.TotalAmount.ToString().ToLower(), $"%{pocketQuery.Text}%"))
             .ToListAsync(cancellationToken);
 
         return pockets;

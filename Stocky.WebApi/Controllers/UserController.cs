@@ -12,7 +12,7 @@ using Stocky.WebApi.Application.UserData.Queries.GetUserBySearch;
 
 namespace Stocky.WebApi.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("[controller]/[action]")]
 public class UserController(IMediator mediator) : ControllerBase

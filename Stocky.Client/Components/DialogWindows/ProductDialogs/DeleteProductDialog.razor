@@ -1,5 +1,8 @@
+@using System.Net.Http.Headers
+@using MudBlazor.Components.Service
 @inject HttpClient Http
 @inject IConfiguration Configuration
+@inject AuthService AuthService
 
 <MudDialog>
     <DialogContent>
@@ -43,7 +46,10 @@
         try
         {
             var url = $"{ApiBaseUrl}Product/DeleteUser?Id={ProductId}";
-            var response = await Http.DeleteAsync(url);
+            var request = new HttpRequestMessage(HttpMethod.Delete, url);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+            var response = await Http.SendAsync(request);
 
             if (response.IsSuccessStatusCode)
             {

@@ -1,54 +1,58 @@
 @page "/adding-product"
+@using MudBlazor.Components.Service
 @using Stocky.Shared.Models
 @inject HttpClient Http
 @inject IJSRuntime Js
 @inject IConfiguration Configuration
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Сканер штрихкодов</PageTitle>
 
-<MudPaper Class="p-4 mx-auto mt-6" Style="max-width: 600px;">
-    <MudText Typo="Typo.h5" GutterBottom>Сканер штрихкодов</MudText>
-
-    <MudTextField Label="Введите штрихкод"
-                  @bind-Value="_barcode"
-                  Variant="Variant.Filled"
-                  Adornment="Adornment.Start"
-                  AdornmentIcon="@Icons.Material.Filled.QrCode"
-                  Immediate="true"
-                  Class="barcode-text"
-                  OnKeyDown="HandleKeyPress"/>
-
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitBarcode" Class="mt-2 me-2">
-        Добавить
-    </MudButton>
-
-    <MudText Color="Color.Success" Class="mt-2">@_message</MudText>
-    <MudText Color="Color.Error" Class="mt-2">@_errorMessage</MudText>
-
-</MudPaper>
-
-@if (_products.Any())
+@if (!_isAuthorized)
 {
-    <MudPaper Class="p-4 mx-auto mt-4" Style="max-width: 600px;">
-        <MudText Typo="Typo.h6">Добавленные продукты</MudText>
-
-        <MudTable Items="_products" Elevation="2" Dense="true" Hover="true">
-            <HeaderContent>
-                <MudTh>Штрихкод</MudTh>
-                <MudTh></MudTh> 
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Barcode">@context.BarCode</MudTd>
-                <MudTd>
-                    <MudButton Variant="Variant.Text" Color="Color.Error" Size="Size.Small"
-                               OnClick="@(() => RemoveProduct(context.BarCode))">
-                        Удалить
-                    </MudButton>
-                </MudTd>
-            </RowTemplate>
-        </MudTable>
-    </MudPaper>
+    <MudText Color="Color.Error" Typo="Typo.h6">Доступ запрещён. Перенаправление...</MudText>
 }
+else
+{
+    <MudPaper Class="p-4 mx-auto mt-6" Style="max-width: 600px;">
+        <MudText Typo="Typo.h5" GutterBottom>Сканер штрихкодов</MudText>
+
+        <MudTextField Label="Введите штрихкод"
+                      @bind-Value="_barcode"
+                      Variant="Variant.Filled"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.QrCode"
+                      Immediate="true"
+                      Class="barcode-text"
+                      OnKeyDown="HandleKeyPress"/>
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitBarcode" Class="mt-2 me-2">
+            Добавить
+        </MudButton>
+
+        <MudText Color="Color.Success" Class="mt-2">@_message</MudText>
+        <MudText Color="Color.Error" Class="mt-2">@_errorMessage</MudText>
+    </MudPaper>
+
+    @if (_products.Any())
+    {
+        <MudPaper Class="p-4 mx-auto mt-4" Style="max-width: 600px;">
+            <MudText Typo="Typo.h6">Добавленные продукты</MudText>
+
+            <MudTable Items="_products" Elevation="2" Dense="true" Hover="true">
+                <HeaderContent>
+                    <MudTh>Штрихкод</MudTh>
+                    <MudTh></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Barcode">@context.BarCode</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudPaper>
+    }
+}
+
 <script>
     window.focusElement = () => {
         const el = document.querySelector('.barcode-text input');
@@ -57,11 +61,14 @@
             el.focus();
         }
     };
-    
+        
     window.enableGlobalFocus = () => {
         document.addEventListener('click', () => {
-            el.value = '';
-            window.focusElement();
+            const el = document.querySelector('.barcode-text input');
+            if (el) {
+                el.value = '';
+                el.focus();
+            }
         });
     };
 </script>
@@ -70,12 +77,27 @@
     private string _barcode = string.Empty;
     private string _message = string.Empty;
     private string _errorMessage = string.Empty;
-    private readonly List<Product> _products = [];
+    private readonly List<Product> _products = new();
     private string ApiBaseUrl => Configuration["ApiBaseUrl"];
-    
+    private bool _isAuthorized = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthService.LoadTokenAsync();
+
+        if (string.IsNullOrWhiteSpace(AuthService.Token))
+        {
+            NavigationManager.NavigateTo("/Unauthorized", true);
+            return;
+        }
+
+        _isAuthorized = true;
+    }
+
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && _isAuthorized)
         {
             await Js.InvokeVoidAsync("enableGlobalFocus");
             await Js.InvokeVoidAsync("focusElement");
@@ -84,43 +106,52 @@
 
     private async Task SubmitBarcode()
     {
+        _message = "";
+        _errorMessage = "";
+
         if (string.IsNullOrWhiteSpace(_barcode))
         {
-            _message = string.Empty;
             _errorMessage = "Введите штрихкод!";
             await Js.InvokeVoidAsync("focusElement");
             return;
         }
 
-        var response = await Http.PostAsync(
-            $"{ApiBaseUrl}/Product/Add?BarCode={Uri.EscapeDataString(_barcode)}",
-            null
-        );
+        Http.DefaultRequestHeaders.Authorization = null;
+        if (!string.IsNullOrEmpty(AuthService.Token))
+        {
+            Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", AuthService.Token);
+        }
+
+        var url = $"{ApiBaseUrl}/Product/Add?BarCode={Uri.EscapeDataString(_barcode)}";
+
+        var response = await Http.PostAsync(url, null);
+
+        var responseBody = await response.Content.ReadAsStringAsync();
+
+        Console.WriteLine($"StatusCode: {response.StatusCode}");
+        Console.WriteLine($"Response body: {responseBody}");
 
         if (response.IsSuccessStatusCode)
         {
-            if (_products.Any(p => p.BarCode == _barcode))
+            if (!_products.Any(p => p.BarCode == _barcode))
+            {
                 _products.Add(new Product { BarCode = _barcode });
+            }
 
             _message = "Штрихкод успешно добавлен!";
-            _errorMessage = string.Empty;
+            _barcode = "";
+            await Js.InvokeVoidAsync("focusElement");
         }
         else
         {
-            _errorMessage = $"Продукт со штрихкодом: {_barcode} уже существует!";
-        }
-
-        _barcode = "";
-        await Js.InvokeVoidAsync("focusElement");
-    }
-
-    private void RemoveProduct(string? barcode)
-    {
-        var product = _products.FirstOrDefault(p => p.BarCode == barcode);
-        if (product != null)
-        {
-            _products.Remove(product);
-            _errorMessage = $"Штрихкод '{barcode}' удалён из списка.";
+            if (responseBody.Contains("Product with this barcode already exists"))
+            {
+                _errorMessage = "Штрихкод уже добавлен!";
+            }
+            else
+            {
+                _errorMessage = $"Ошибка: {responseBody}";
+            }
         }
     }
 

@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stocky.Shared.Models;
 using Stocky.WebApi.Application.ProductData.Commands.CreateProduct;
@@ -16,36 +17,42 @@ namespace Stocky.WebApi.Controllers;
 [Route("[controller]/[action]")]
 public class ProductController(IMediator mediator) : ControllerBase
 {
+    [Authorize(Roles = "Adder,Admin")]
     [HttpPost]
     public async Task<IActionResult> Add([FromQuery] CreateProductCommand createProductCommand)
     {
         return Ok(await mediator.Send(createProductCommand));
     }
-
+    
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
         return Ok(await mediator.Send(new GetAllProductQuery()));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetProductById([FromQuery] GetProductByIdQuery getProductByIdQuery)
     {
         return Ok(await mediator.Send(getProductByIdQuery));
     }
-
+    
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetByBarCode([FromQuery] GetByBarCodeQuery query)
     {
         return Ok(await mediator.Send(query));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<ActionResult<PageData<Product>>> Search([FromQuery] GetProductBySearchQuery getProductBySearchQuery)
     {
         return Ok(await mediator.Send(getProductBySearchQuery));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<ActionResult<PageData<Product>>> ProductPagination(
         [FromQuery] GetProductByPaginationQuery getProductByPaginationQuery)
@@ -55,12 +62,14 @@ public class ProductController(IMediator mediator) : ControllerBase
         return Ok(paginatedList);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut]
     public async Task<IActionResult> UpdateProduct(UpdateProductCommand updateProductCommand)
     {
         return Ok(await mediator.Send(updateProductCommand));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete]
     public async Task<IActionResult> DeleteUser([FromQuery] DeleteProductCommand deleteProductCommand)
     {

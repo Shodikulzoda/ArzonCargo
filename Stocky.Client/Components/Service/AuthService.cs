@@ -1,42 +1,103 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.JSInterop;
 
 namespace MudBlazor.Components.Service
 {
-    public class AuthService(IJSRuntime jsRuntime)
+    public class AuthService : IDisposable
     {
+        private readonly IJSRuntime jsRuntime;
         private const string TokenKey = "authToken";
+
         public string Token { get; private set; } = "";
         public string? Role { get; private set; }
 
-        public void SetToken(string token)
+        public event Action? OnChange;
+
+        public bool IsAdmin => string.Equals(Role, "admin", StringComparison.OrdinalIgnoreCase);
+        public bool IsAdder => string.Equals(Role, "adder", StringComparison.OrdinalIgnoreCase);
+
+        public AuthService(IJSRuntime jsRuntime)
+        {
+            this.jsRuntime = jsRuntime;
+        }
+
+        private void NotifyStateChanged() => OnChange?.Invoke();
+
+        public async Task SetTokenAsync(string token)
         {
             Token = token;
-            _ = jsRuntime.InvokeVoidAsync("localStorage.setItem", TokenKey, token);
-
-            var handler = new JwtSecurityTokenHandler();
-
-            var jwtToken = handler.ReadJwtToken(token);
-
-            // Standard claim type for role is "role" or ClaimTypes.Role
-            Role = jwtToken.Claims.FirstOrDefault(c =>
-                c.Type is ClaimTypes.Role or "role")?.Value;
+            await jsRuntime.InvokeVoidAsync("localStorage.setItem", TokenKey, token);
+            ParseRoleFromToken(token);
+            NotifyStateChanged();
         }
 
         public async Task LoadTokenAsync()
         {
             var token = await jsRuntime.InvokeAsync<string>("localStorage.getItem", TokenKey);
-            Token = token;
+            Token = token ?? "";
+
+            if (!string.IsNullOrEmpty(Token))
+            {
+                ParseRoleFromToken(Token);
+            }
+            else
+            {
+                Role = null;
+            }
+
+            NotifyStateChanged();
         }
 
-        public void ClearToken()
+        public async Task ClearTokenAsync()
         {
             Token = "";
-            _ = jsRuntime.InvokeVoidAsync("localStorage.removeItem", TokenKey);
+            await jsRuntime.InvokeVoidAsync("localStorage.removeItem", TokenKey);
+            Role = null;
+            NotifyStateChanged();
+        }
+        
+        public async Task<string?> GetUserRoleAsync()
+        {
+            if (string.IsNullOrEmpty(Token))
+                return null;
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(Token);
+
+            // Выведем все claims в лог, чтобы понять, какие там есть
+            foreach (var claim in jwt.Claims)
+            {
+                Console.WriteLine($"Claim type: {claim.Type}, value: {claim.Value}");
+            }
+
+            var roleClaim = jwt.Claims.FirstOrDefault(c => c.Type == "role" || c.Type == ClaimTypes.Role || c.Type == "roles");
+            return roleClaim?.Value;
         }
 
-        public bool IsAdmin => Role == "Admin";
-        public bool IsAdder => Role == "Adder";
+
+        private void ParseRoleFromToken(string token)
+        {
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+
+                Role = jwtToken.Claims.FirstOrDefault(c =>
+                    c.Type == ClaimTypes.Role || c.Type == "role")?.Value;
+            }
+            catch
+            {
+                Role = null; // Если токен невалиден, сбрасываем роль
+            }
+        }
+
+        public void Dispose()
+        {
+            OnChange = null;
+        }
     }
 }

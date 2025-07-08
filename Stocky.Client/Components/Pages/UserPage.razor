@@ -103,10 +103,21 @@ else
             return;
         }
 
+        // Get user role (adjust method to how you get the role)
+        var role = await AuthService.GetUserRoleAsync();
+
+        // If role is not Admin (or is Adder), redirect to Unauthorized
+        if (role != "Admin")
+        {
+            Navigation.NavigateTo("/Unauthorized", true);
+            return;
+        }
+
         await LoadUsers();
     }
 
-    private async Task LoadUsers()
+
+        private async Task LoadUsers()
     {
         _isLoading = true;
 

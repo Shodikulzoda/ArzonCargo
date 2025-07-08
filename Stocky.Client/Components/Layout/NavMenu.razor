@@ -21,26 +21,33 @@
             Все продукты
         </MudNavLink>
     }
-
-    <MudNavLink OnClick="Logout" Icon="@Icons.Material.Filled.ExitToApp" Color="Color.Error">
-        Выйти
-    </MudNavLink>
-
-    @if (AuthService.IsAdder)
+    else if (AuthService.IsAdder)
     {
         <MudNavLink Href="adding-product" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PlaylistAdd">
             Добавление продукта
         </MudNavLink>
     }
 
+    <MudNavLink OnClick="Logout" Icon="@Icons.Material.Filled.ExitToApp" Color="Color.Error">
+        Выйти
+    </MudNavLink>
 </MudNavMenu>
 
 @code {
-
-    private void Logout()
+    protected override async Task OnInitializedAsync()
     {
-        AuthService.ClearToken();
-        Navigation.NavigateTo("/", true);
+        AuthService.OnChange += StateHasChanged;
+        await AuthService.LoadTokenAsync();
     }
 
+    public void Dispose()
+    {
+        AuthService.OnChange -= StateHasChanged;
+    }
+
+    private async Task Logout()
+    {
+        await AuthService.ClearTokenAsync();
+        Navigation.NavigateTo("/", true);
+    }
 }

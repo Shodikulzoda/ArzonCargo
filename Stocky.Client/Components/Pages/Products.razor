@@ -1,87 +1,99 @@
 @page "/products"
-@inject HttpClient Http
-@inject IDialogService DialogService
-@using Microsoft.AspNetCore.Authorization
+@using System.Net.Http.Headers
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.Authorization
 @using MudBlazor.Components.DialogWindows.ProductDialogs
+@using MudBlazor.Components.Service
 @using Stocky.Shared.Models
 @using Stocky.Shared.Models.Enums
-@attribute [Authorize]
+@inject HttpClient Http
+@inject IDialogService DialogService
 @inject IConfiguration Configuration
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AuthService AuthService
 
 <PageTitle>Продукты</PageTitle>
 
-<MudText Typo="Typo.h4" GutterBottom="true">Таблица продуктов</MudText>
-
-<div class="mb-4 d-flex gap-2">
-    <MudTextField @bind-Value="_searchQuery"
-                  Placeholder="Поиск по названию, телефону и т.д..."
-                  Adornment="Adornment.Start"
-                  AdornmentIcon="@Icons.Material.Filled.Search"
-                  Immediate="true"
-                  OnKeyDown="HandleKeyDown"
-                  Margin="Margin.Dense"/>
-    <MudButton OnClick="SearchProduct" Color="Color.Primary" Variant="Variant.Filled">Поиск</MudButton>
-</div>
-
-@if (_isLoading)
+@if (!_isAuthorized)
 {
-    <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
+    <MudText Color="Color.Error" Typo="Typo.h6">Доступ запрещён. Перенаправление...</MudText>
 }
 else
 {
-    <MudTable Items="_productPage?.Items" Hover="true" SortLabel="Сортировать по" Elevation="1" Dense="true">
-        <HeaderContent>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<Product, object>(x => x.Id)">Id</MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<Product, object>(x => x.BarCode)">Штрихкод</MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<Product, object>(x => x.Status)">Статус</MudTableSortLabel>
-            </MudTh>
-            <MudTh>Действия</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            @if (@context.Status == Status.Completed)
-            {
-                <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
-                       DataLabel="Id">@context.Id</MudTd>
-                <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
-                       DataLabel="Name">@context.BarCode</MudTd>
-                <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
-                       DataLabel="Address">@context.Status</MudTd>
-                <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")">
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                                   Color="Color.Primary"
-                                   OnClick="@(() => Update(context))"/>
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                   Color="Color.Error"
-                                   OnClick="@(() => Delete(context.Id))"/>
-                </MudTd>
-            }
-            else
-            {
-                <MudTd DataLabel="Id">@context.Id</MudTd>
-                <MudTd DataLabel="Name">@context.BarCode</MudTd>
-                <MudTd DataLabel="Address">@context.Status</MudTd>
-                <MudTd>
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                                   Color="Color.Primary"
-                                   OnClick="@(() => Update(context))"/>
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                   Color="Color.Error"
-                                   OnClick="@(() => Delete(context.Id))"/>
-                </MudTd>
-            }
-        </RowTemplate>
-    </MudTable>
+    <MudText Typo="Typo.h4" GutterBottom="true">Таблица продуктов</MudText>
 
-    <div class="mt-4 d-flex justify-between">
-        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Назад</MudButton>
-        <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
-        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Вперёд</MudButton>
+    <div class="mb-4 d-flex gap-2">
+        <MudTextField @bind-Value="_searchQuery"
+                      Placeholder="Поиск по названию, телефону и т.д..."
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      Immediate="true"
+                      OnKeyDown="HandleKeyDown"
+                      Margin="Margin.Dense"/>
+        <MudButton OnClick="SearchProduct" Color="Color.Primary" Variant="Variant.Filled">Поиск</MudButton>
     </div>
+
+    @if (_isLoading)
+    {
+        <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
+    }
+    else
+    {
+        <MudTable Items="_productPage?.Items" Hover="true" SortLabel="Сортировать по" Elevation="1" Dense="true">
+            <HeaderContent>
+                <MudTh>
+                    <MudTableSortLabel SortBy="new Func<Product, object>(x => x.Id)">Id</MudTableSortLabel>
+                </MudTh>
+                <MudTh>
+                    <MudTableSortLabel SortBy="new Func<Product, object>(x => x.BarCode)">Штрихкод</MudTableSortLabel>
+                </MudTh>
+                <MudTh>
+                    <MudTableSortLabel SortBy="new Func<Product, object>(x => x.Status)">Статус</MudTableSortLabel>
+                </MudTh>
+                <MudTh>Действия</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                @if (@context.Status == Status.Completed)
+                {
+                    <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
+                           DataLabel="Id">@context.Id</MudTd>
+                    <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
+                           DataLabel="Name">@context.BarCode</MudTd>
+                    <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
+                           DataLabel="Address">@context.Status</MudTd>
+                    <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Color="Color.Primary"
+                                       OnClick="@(() => Update(context))"/>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Color="Color.Error"
+                                       OnClick="@(() => Delete(context.Id))"/>
+                    </MudTd>
+                }
+                else
+                {
+                    <MudTd DataLabel="Id">@context.Id</MudTd>
+                    <MudTd DataLabel="Name">@context.BarCode</MudTd>
+                    <MudTd DataLabel="Address">@context.Status</MudTd>
+                    <MudTd>
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Color="Color.Primary"
+                                       OnClick="@(() => Update(context))"/>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Color="Color.Error"
+                                       OnClick="@(() => Delete(context.Id))"/>
+                    </MudTd>
+                }
+            </RowTemplate>
+        </MudTable>
+
+        <div class="mt-4 d-flex justify-between">
+            <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Назад</MudButton>
+            <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
+            <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Вперёд</MudButton>
+        </div>
+    }
 }
 
 @code {
@@ -94,10 +106,30 @@ else
     private readonly int _pageSize = 15;
     private bool _isLoading;
     private string _searchQuery = "";
+    private bool _isAuthorized = false;
     private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     protected override async Task OnInitializedAsync()
     {
+        await AuthService.LoadTokenAsync();
+
+        if (string.IsNullOrEmpty(AuthService.Token))
+        {
+            // Нет токена — редирект
+            NavigationManager.NavigateTo("/Unauthorized", true);
+            return;
+        }
+
+        var role = await AuthService.GetUserRoleAsync();
+
+        if (role != "Admin")
+        {
+            NavigationManager.NavigateTo("/Unauthorized", true);
+            return;
+        }
+
+        _isAuthorized = true;
+
         await LoadProducts();
     }
 
@@ -107,27 +139,43 @@ else
         try
         {
             var url = $"{ApiBaseUrl}/Product/ProductPagination?Page={_currentPage}&PageSize={_pageSize}";
-            _productPage = await Http.GetFromJsonAsync<PageData<Product>>(url);
 
-            _productPage.Items = _productPage.Items
-                .OrderByDescending(x => x.Status == Status.Created);
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
-            if (_productPage?.Items != null)
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
             {
-                _totalPages = (int)Math.Ceiling((double)_productPage.TotalCount / _pageSize);
+                var json = await response.Content.ReadAsStringAsync();
+                _productPage = JsonSerializer.Deserialize<PageData<Product>>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (_productPage?.Items != null)
+                {
+                    _productPage.Items = _productPage.Items.OrderByDescending(x => x.Status == Status.Created).ToList();
+                    _totalPages = (int)Math.Ceiling((double)_productPage.TotalCount / _pageSize);
+                }
+                else
+                {
+                    _productPage.Items = new List<Product>();
+                }
             }
             else
             {
-                _productPage.Items = [];
+                Console.WriteLine($"Ошибка загрузки продуктов: {response.StatusCode}");
+                _productPage = new PageData<Product> { Items = new List<Product>(), TotalCount = 0 };
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error loading users: " + ex.Message);
-            _productPage.Items = [];
+            Console.WriteLine("Error loading products: " + ex.Message);
+            _productPage = new PageData<Product> { Items = new List<Product>(), TotalCount = 0 };
         }
-
         _isLoading = false;
+        StateHasChanged();
     }
 
     private async Task Delete(int productId)
@@ -145,15 +193,11 @@ else
         };
 
         var dialogReference = await DialogService.ShowAsync<DeleteProductDialog>("Удалить продукт", parameters, options);
-
         var dialogReferenceResult = await dialogReference.Result;
 
-        if (dialogReferenceResult is not null)
+        if (dialogReferenceResult is not null && !dialogReferenceResult.Canceled)
         {
-            if (!dialogReferenceResult.Canceled)
-            {
-                await LoadProducts();
-            }
+            await LoadProducts();
         }
     }
 
@@ -180,12 +224,9 @@ else
         var dialog = await DialogService.ShowAsync<EditProductDialog>("Редактировать продукт", parameters, options);
         var result = await dialog.Result;
 
-        if (result is not null)
+        if (result is not null && !result.Canceled)
         {
-            if (!result.Canceled)
-            {
-                await LoadProducts();
-            }
+            await LoadProducts();
         }
     }
 
@@ -201,20 +242,39 @@ else
         try
         {
             var url = $"{ApiBaseUrl}/Product/Search?Text={Uri.EscapeDataString(_searchQuery)}";
-            _productPage.Items = await Http.GetFromJsonAsync<IEnumerable<Product>>(url) ?? [];
 
-            _totalPages = 1;
-            _currentPage = 1;
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var searchResult = JsonSerializer.Deserialize<IEnumerable<Product>>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                _productPage.Items = searchResult?.ToList() ?? new List<Product>();
+                _totalPages = 1;
+                _currentPage = 1;
+            }
+            else
+            {
+                Console.WriteLine($"Ошибка поиска продуктов: {response.StatusCode}");
+                _productPage.Items = new List<Product>();
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine("Ошибка поиска: " + ex.Message);
-            _productPage.Items = [];
+            _productPage.Items = new List<Product>();
         }
-
         _isLoading = false;
         StateHasChanged();
     }
+
 
     private async Task Increment()
     {
@@ -241,5 +301,4 @@ else
             await SearchProduct();
         }
     }
-
 }

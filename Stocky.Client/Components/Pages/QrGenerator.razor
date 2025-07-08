@@ -1,9 +1,15 @@
 @page "/QrGenerator"
 @using System.Text
 @using Append.Blazor.Printing
+@using Microsoft.AspNetCore.Components.Authorization
+@using MudBlazor.Components.Service
 @using QRCoder
 @using Color = MudBlazor.Color
 @inject IPrintingService PrintingService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AuthService AuthService
+
 
 <MudPaper Class="pa-4 mx-auto" Style="max-width:400px;">
     <MudText Typo="Typo.h5">Generate Login QR Code</MudText>
@@ -30,6 +36,26 @@
     private string? Login { get; set; }
     private string? Password { get; set; }
     private string? QRCodeBase64 { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        // Load token or any other setup you do in AuthService
+        await AuthService.LoadTokenAsync();
+
+        if (string.IsNullOrEmpty(AuthService.Token))
+        {
+            NavigationManager.NavigateTo("/Unauthorized", true);
+            return;
+        }
+
+        var role = await AuthService.GetUserRoleAsync();
+
+        if (role != "Admin")
+        {
+            NavigationManager.NavigateTo("/Unauthorized", true);
+            return;
+        }
+    }
+
 
     private async Task GenerateQRCode()
     {

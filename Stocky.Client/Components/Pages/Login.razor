@@ -1,6 +1,4 @@
 @page "/"
-@using System.ComponentModel.DataAnnotations
-@using MudBlazor
 @using MudBlazor.Components.DialogWindows
 @using MudBlazor.Components.Layout
 @using MudBlazor.Components.Service
@@ -139,8 +137,16 @@
 
                 if (!string.IsNullOrWhiteSpace(token))
                 {
-                    AuthService.SetToken(token);
-                    Navigation.NavigateTo("/home");
+                    await AuthService.SetTokenAsync(token);
+
+                    if (AuthService.IsAdder)
+                    {
+                        Navigation.NavigateTo("/adding-product", true);
+                    }
+                    else
+                    {
+                        Navigation.NavigateTo("/home", true);
+                    }
                     return;
                 }
             }

@@ -9,6 +9,7 @@
 @inject IDialogService DialogService
 @inject AuthService AuthService
 @inject IConfiguration Configuration
+@inject NavigationManager NavigationManager
 
 <PageTitle>Добавление Пакетов</PageTitle>
 
@@ -93,11 +94,23 @@ else
 
         if (string.IsNullOrEmpty(AuthService.Token))
         {
+            // Нет токена — редирект
+            NavigationManager.NavigateTo("/Unauthorized", true);
+            return;
+        }
+
+        var role = await AuthService.GetUserRoleAsync();
+
+        if (role != "Admin")
+        {
+            // Если роль не админ — редирект
+            NavigationManager.NavigateTo("/Unauthorized", true);
             return;
         }
 
         await LoadPockets();
     }
+
 
     private async Task LoadPockets()
     {

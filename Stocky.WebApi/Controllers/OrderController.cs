@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stocky.Shared.Models;
 using Stocky.WebApi.Application.OrderData.Commands.CreateOrder;
@@ -11,6 +12,7 @@ using Stocky.WebApi.Application.OrderData.Queries.OrderByPagination;
 
 namespace Stocky.WebApi.Controllers;
 
+[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("[controller]/[action]")]
 public class OrderController(IMediator mediator) : ControllerBase

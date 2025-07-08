@@ -20,12 +20,13 @@ public class GetUserSearchQueryHandler(IUserRepository userRepository)
             return [];
         }
 
+        var text = userQuery.Text.ToLower();
+        
         var listUser = await userRepository.Queryable
             .Where(x =>
-                EF.Functions.Like(x.Name, $"%{userQuery.Text}%") ||
-                EF.Functions.Like(x.Phone, $"%{userQuery.Text}%") ||
-                EF.Functions.Like(x.Address, $"%{userQuery.Text}%") ||
-                EF.Functions.Like(x.Id.ToString(), $"%{userQuery.Text}%"))
+                EF.Functions.Like(x.Name.ToLower(), $"%{text}%") ||
+                EF.Functions.Like(x.Phone.ToLower(), $"%{text}%") ||
+                EF.Functions.Like(x.Address.ToLower(), $"%{text}%"))
             .ToListAsync(cancellationToken);
 
         return listUser;

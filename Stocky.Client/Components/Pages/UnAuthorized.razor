@@ -18,7 +18,7 @@
 
     protected override Task OnInitializedAsync()
     {
-        AuthService.ClearToken();
+        AuthService.ClearTokenAsync();
         NavigationManager.NavigateTo("/", true);
         return Task.CompletedTask;
     }

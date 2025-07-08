@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stocky.WebApi.Application.AuthenticationData.Commands;
 
@@ -8,6 +9,7 @@ namespace Stocky.WebApi.Controllers;
 [Route("api/[controller]/[action]")]
 public class AuthController(IMediator mediator) : ControllerBase
 {
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> CreateUsersLogin(CreateLoginCommand? request)
     {
