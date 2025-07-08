@@ -8,20 +8,22 @@
 <MudDialog>
     <DialogContent>
         <MudText Typo="Typo.h6">Создать нового пользователя</MudText>
-        <MudTextField Label="Имя" @bind-Value="UserModel.Name" Variant="Variant.Outlined" Margin="Margin.Dense" />
-        <MudTextField Label="Телефон" @bind-Value="UserModel.Phone" Variant="Variant.Outlined" Margin="Margin.Dense" />
-        <MudTextField Label="Адрес" @bind-Value="UserModel.Address" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        <MudTextField Label="Имя" @bind-Value="UserModel.Name" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+        <MudTextField Label="Телефон" @bind-Value="UserModel.Phone" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+        <MudTextField Label="Адрес" @bind-Value="UserModel.Address" Variant="Variant.Outlined"
+                      Margin="Margin.Dense" @onkeydown="OnKeyDown"/>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Secondary" OnClick="Cancel">Отмена</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit" Variant="Variant.Filled">Создать</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit" Variant="Variant.Filled">Создать
+        </MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
     [Parameter] public User UserModel { get; set; } = new();
-    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
+    private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     private async Task Submit()
     {
@@ -43,6 +45,16 @@
         catch (Exception ex)
         {
             Console.WriteLine("Exception during user creation: " + ex.Message);
+        }
+
+        Cancel();
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key is "Enter" or "NumpadEnter")
+        {
+            await Submit();
         }
     }
 

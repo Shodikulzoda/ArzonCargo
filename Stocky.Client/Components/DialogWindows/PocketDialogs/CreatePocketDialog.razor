@@ -189,7 +189,7 @@
             };
             var options = new DialogOptions { CloseOnEscapeKey = true };
 
-            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Подтверждение", parameters, options);
+            var dialog = await DialogService.ShowAsync<ProductAddingConfirmDialog>("Подтверждение", parameters, options);
             var dialogResult = await dialog.Result;
 
             if (!dialogResult.Canceled)
