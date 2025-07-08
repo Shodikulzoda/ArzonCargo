@@ -3,28 +3,35 @@
 @inject NavigationManager Navigation
 
 <MudNavMenu>
+    @if (AuthService.IsAdmin)
+    {
+        <MudNavLink Href="home" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ShoppingCart">
+            Заказы клиентов
+        </MudNavLink>
 
-    <MudNavLink Href="home" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ShoppingCart">
-        Заказы клиентов
-    </MudNavLink>
+        <MudNavLink Href="pockets" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Schedule">
+            Незавершённые заказы
+        </MudNavLink>
 
-    <MudNavLink Href="pockets" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Schedule">
-        Незавершённые заказы
-    </MudNavLink>
+        <MudNavLink Href="adding-product" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PlaylistAdd">
+            Добавление продукта
+        </MudNavLink>
 
-    <MudNavLink Href="adding-product" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PlaylistAdd">
-        Добавление продукта
-    </MudNavLink>
-
-    <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Inventory">
-        Все продукты
-    </MudNavLink>
-
-    <MudSpacer/>
+        <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Inventory">
+            Все продукты
+        </MudNavLink>
+    }
 
     <MudNavLink OnClick="Logout" Icon="@Icons.Material.Filled.ExitToApp" Color="Color.Error">
         Выйти
     </MudNavLink>
+
+    @if (AuthService.IsAdder)
+    {
+        <MudNavLink Href="adding-product" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PlaylistAdd">
+            Добавление продукта
+        </MudNavLink>
+    }
 
 </MudNavMenu>
 
@@ -35,4 +42,5 @@
         AuthService.ClearToken();
         Navigation.NavigateTo("/", true);
     }
+
 }
