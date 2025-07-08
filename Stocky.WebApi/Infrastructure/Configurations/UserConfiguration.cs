@@ -11,5 +11,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Name).HasMaxLength(100);
         builder.Property(u => u.Phone).HasMaxLength(20);
         builder.Property(u => u.Address).HasMaxLength(255);
+        
+        builder.HasIndex(u => u.Phone).IsUnique();
     }
 }

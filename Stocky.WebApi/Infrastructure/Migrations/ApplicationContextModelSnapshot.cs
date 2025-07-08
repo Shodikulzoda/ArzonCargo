@@ -8,7 +8,7 @@ using Stocky.WebApi.Infrastructure.Databases;
 
 #nullable disable
 
-namespace Stocky.WebApi.Migrations
+namespace Stocky.WebApi.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
     partial class ApplicationContextModelSnapshot : ModelSnapshot
@@ -239,6 +239,9 @@ namespace Stocky.WebApi.Migrations
                         .HasColumnType("character varying(20)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Phone")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });

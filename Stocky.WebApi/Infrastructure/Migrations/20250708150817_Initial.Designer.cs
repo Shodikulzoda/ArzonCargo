@@ -9,11 +9,11 @@ using Stocky.WebApi.Infrastructure.Databases;
 
 #nullable disable
 
-namespace Stocky.WebApi.Migrations
+namespace Stocky.WebApi.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250705173130_FirstMigration")]
-    partial class FirstMigration
+    [Migration("20250708150817_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace Stocky.WebApi.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ReferenceClass.Models.AuthenticationData", b =>
+            modelBuilder.Entity("Stocky.Shared.Models.AuthenticationData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -59,7 +59,7 @@ namespace Stocky.WebApi.Migrations
                     b.ToTable("AuthenticationData");
                 });
 
-            modelBuilder.Entity("ReferenceClass.Models.Order", b =>
+            modelBuilder.Entity("Stocky.Shared.Models.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -92,7 +92,7 @@ namespace Stocky.WebApi.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("ReferenceClass.Models.OrderItem", b =>
+            modelBuilder.Entity("Stocky.Shared.Models.OrderItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -121,7 +121,7 @@ namespace Stocky.WebApi.Migrations
                     b.ToTable("OrderItems");
                 });
 
-            modelBuilder.Entity("ReferenceClass.Models.Pocket", b =>
+            modelBuilder.Entity("Stocky.Shared.Models.Pocket", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -154,7 +154,7 @@ namespace Stocky.WebApi.Migrations
                     b.ToTable("Pockets");
                 });
 
-            modelBuilder.Entity("ReferenceClass.Models.PocketItem", b =>
+            modelBuilder.Entity("Stocky.Shared.Models.PocketItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -186,7 +186,7 @@ namespace Stocky.WebApi.Migrations
                     b.ToTable("PocketItem");
                 });
 
-            modelBuilder.Entity("ReferenceClass.Models.Product", b =>
+            modelBuilder.Entity("Stocky.Shared.Models.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -215,7 +215,7 @@ namespace Stocky.WebApi.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("ReferenceClass.Models.User", b =>
+            modelBuilder.Entity("Stocky.Shared.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -243,12 +243,15 @@ namespace Stocky.WebApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Phone")
+                        .IsUnique();
+
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ReferenceClass.Models.Order", b =>
+            modelBuilder.Entity("Stocky.Shared.Models.Order", b =>
                 {
-                    b.HasOne("ReferenceClass.Models.User", "User")
+                    b.HasOne("Stocky.Shared.Models.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -257,15 +260,15 @@ namespace Stocky.WebApi.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ReferenceClass.Models.OrderItem", b =>
+            modelBuilder.Entity("Stocky.Shared.Models.OrderItem", b =>
                 {
-                    b.HasOne("ReferenceClass.Models.Order", "Order")
+                    b.HasOne("Stocky.Shared.Models.Order", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ReferenceClass.Models.Product", "Product")
+                    b.HasOne("Stocky.Shared.Models.Product", "Product")
                         .WithMany("OrderItems")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -276,9 +279,9 @@ namespace Stocky.WebApi.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("ReferenceClass.Models.Pocket", b =>
+            modelBuilder.Entity("Stocky.Shared.Models.Pocket", b =>
                 {
-                    b.HasOne("ReferenceClass.Models.User", "User")
+                    b.HasOne("Stocky.Shared.Models.User", "User")
                         .WithMany("Pockets")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -287,15 +290,15 @@ namespace Stocky.WebApi.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ReferenceClass.Models.PocketItem", b =>
+            modelBuilder.Entity("Stocky.Shared.Models.PocketItem", b =>
                 {
-                    b.HasOne("ReferenceClass.Models.Pocket", "Pocket")
+                    b.HasOne("Stocky.Shared.Models.Pocket", "Pocket")
                         .WithMany("PocketItems")
                         .HasForeignKey("PocketId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ReferenceClass.Models.Product", "Product")
+                    b.HasOne("Stocky.Shared.Models.Product", "Product")
                         .WithMany("PocketItems")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -306,24 +309,24 @@ namespace Stocky.WebApi.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("ReferenceClass.Models.Order", b =>
+            modelBuilder.Entity("Stocky.Shared.Models.Order", b =>
                 {
                     b.Navigation("OrderItems");
                 });
 
-            modelBuilder.Entity("ReferenceClass.Models.Pocket", b =>
+            modelBuilder.Entity("Stocky.Shared.Models.Pocket", b =>
                 {
                     b.Navigation("PocketItems");
                 });
 
-            modelBuilder.Entity("ReferenceClass.Models.Product", b =>
+            modelBuilder.Entity("Stocky.Shared.Models.Product", b =>
                 {
                     b.Navigation("OrderItems");
 
                     b.Navigation("PocketItems");
                 });
 
-            modelBuilder.Entity("ReferenceClass.Models.User", b =>
+            modelBuilder.Entity("Stocky.Shared.Models.User", b =>
                 {
                     b.Navigation("Orders");
 
