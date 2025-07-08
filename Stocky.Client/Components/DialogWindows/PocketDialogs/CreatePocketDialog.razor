@@ -1,3 +1,4 @@
+@using System.Net
 @using System.Net.Http.Headers
 @using Append.Blazor.Printing
 @using MudBlazor.Components.Service
@@ -20,18 +21,11 @@
                                  Label="Поиск клиента"
                                  Variant="Variant.Outlined"
                                  SearchFunc="SearchUsers"
-                                 ToStringFunc='u => $"{u.Name} - {u.Phone}"'
+                                 ToStringFunc='u => u != null ? $"{u.Name} - {u.Phone}" : string.Empty'
                                  @bind-Value="_selectedUser"
                                  DebounceInterval="300"
-                                 MinCharacters="1"
+                                 MinCharacters="2"
                                  Clearable="true"/>
-
-                @* @if (_selectedUser != null) *@
-                @* { *@
-                @*     <MudText Typo="Typo.subtitle2">Имя: @_selectedUser.Name</MudText> *@
-                @*     <MudText Typo="Typo.subtitle2">Телефон: @_selectedUser.Phone</MudText> *@
-                @*     <MudText Typo="Typo.subtitle2">Адрес: @_selectedUser.Address</MudText> *@
-                @* } *@
 
                 <MudTextField @bind-Value="_pocketModel.TotalWeight"
                               Label="Общий вес"
@@ -158,37 +152,36 @@
         var response = await Http.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {
-            _pocketModel = await response.Content.ReadFromJsonAsync<Pocket>() ?? new();
+            _pocketModel = await response.Content.ReadFromJsonAsync<Pocket>() ?? new Pocket();
             _pocketCreated = true;
-
-            // Do NOT focus here automatically
         }
     }
 
     private async Task AddProductToPocket()
     {
         if (string.IsNullOrWhiteSpace(_productBarCode) || _pocketModel?.Id == 0)
+        {
             return;
+        }
 
         if (_pocketItems.Any(item => item.ProductBarCode == _productBarCode))
         {
             _message = $"Товар с штрихкодом {_productBarCode} уже добавлен.";
             _errorMessage = string.Empty;
             await Js.InvokeVoidAsync("focusElement");
+
             return;
         }
 
-        HttpResponseMessage response;
-        try
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiBaseUrl}/Product/GetByBarCode?BarCode={_productBarCode}")
         {
-            response = await Http.GetAsync($"{ApiBaseUrl}/Product/GetByBarCode?BarCode={_productBarCode}");
-        }
-        catch
-        {
-            response = null!;
-        }
+            Content = JsonContent.Create(_pocketModel)
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
-        if (response == null || !response.IsSuccessStatusCode)
+        var response = await Http.SendAsync(request);
+
+        if (response == null || response.StatusCode == HttpStatusCode.NotFound)
         {
             var parameters = new DialogParameters
             {
@@ -196,7 +189,7 @@
             };
             var options = new DialogOptions { CloseOnEscapeKey = true };
 
-            var dialog = DialogService.Show<ConfirmDialog>("Подтверждение", parameters, options);
+            var dialog = await DialogService.ShowAsync<ConfirmDialog>("Подтверждение", parameters, options);
             var dialogResult = await dialog.Result;
 
             if (!dialogResult.Canceled)
@@ -205,14 +198,19 @@
             }
             else
             {
-                _message = "";
+                _message = string.Empty;
                 _errorMessage = $"Товар не добавлен.";
                 await Js.InvokeVoidAsync("focusElement"); // Focus because we're staying on the barcode input
             }
         }
-        else
+        else if (response.IsSuccessStatusCode)
         {
             await ActuallyAddProduct();
+        }
+        else if (response.StatusCode == HttpStatusCode.InternalServerError)
+        {
+            _message = string.Empty;
+            _errorMessage = "Товар не найден в базе данных.";
         }
     }
 

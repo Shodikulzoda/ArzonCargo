@@ -33,12 +33,12 @@ public class ProductRepository(ApplicationContext context) : BaseRepository<Prod
 
     public async Task<bool> Delete(int id)
     {
-        var product = await _context1.Products.FirstOrDefaultAsync(x=>x.Id==id);
+        var product = await _context1.Products.FirstOrDefaultAsync(x => x.Id == id);
         if (product is null)
         {
             return false;
         }
-        
+
         _context1.Products.Remove(product);
         await _context1.SaveChangesAsync();
 
@@ -49,7 +49,7 @@ public class ProductRepository(ApplicationContext context) : BaseRepository<Prod
     {
         return await _context1.Products.FirstOrDefaultAsync(o => o.Id == id);
     }
-    
+
     public async Task<Product?> GetByBarCode(string? barCode)
     {
         return await _context1.Products.FirstOrDefaultAsync(o => o.BarCode == barCode);

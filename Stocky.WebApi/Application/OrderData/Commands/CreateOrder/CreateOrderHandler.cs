@@ -1,5 +1,6 @@
 using MediatR;
 using Stocky.Shared.Models;
+using Stocky.Shared.Models.Enums;
 using Stocky.WebApi.Application.Interfaces;
 
 namespace Stocky.WebApi.Application.OrderData.Commands.CreateOrder;
@@ -14,7 +15,8 @@ public class CreateOrderHandler(
     IUserRepository userRepository,
     IOrderItemRepository orderItemRepository,
     IPocketItemRepository pocketItemRepository,
-    IPocketRepository pocketRepository)
+    IPocketRepository pocketRepository,
+    IProductRepository productRepository)
     : IRequestHandler<CreateOrderCommand, Order>
 {
     public async Task<Order> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -36,7 +38,12 @@ public class CreateOrderHandler(
             CreatedAt = x.CreatedAt,
             IsDeleted = x.IsDeleted
         }).ToList();
-
+        
+        foreach (var item in orderItems)
+        {
+            item.Product.Status = Status.Completed;
+        }
+        
         var order = new Order()
         {
             BarCode = pocketById.BarCode,
@@ -58,6 +65,8 @@ public class CreateOrderHandler(
                 await pocketItemRepository.Delete(pocketItem.Id);
             }
         }
+
+        orderItems.Select(x => productRepository.Update(x.Product));
 
         await pocketRepository.Delete(pocketById.Id);
 

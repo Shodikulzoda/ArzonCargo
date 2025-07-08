@@ -17,7 +17,7 @@
 
     private void OnKeyDown(KeyboardEventArgs args)
     {
-        if (args.Key == "Enter" || args.Key == "NumpadEnter")
+        if (args.Key is "Enter" or "NumpadEnter")
         {
             Confirm();
         }

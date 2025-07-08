@@ -1,5 +1,6 @@
 using MediatR;
 using Stocky.Shared.Models;
+using Stocky.Shared.Models.Enums;
 using Stocky.WebApi.Application.Interfaces;
 
 namespace Stocky.WebApi.Application.PocketItemData.Commands.CreatePocketItem;
@@ -27,6 +28,11 @@ public class CreatePocketItemHandler(
         var productById = await productRepository.GetById(request.ProductId);
         var pocketById = await pocketRepository.GetById(request.PocketId);
         var productByBarCode = await productRepository.GetByBarCode(request.ProductBarCode);
+
+        if (productByBarCode is not null && productByBarCode.Status == Status.Completed)
+        {
+            throw new Exception("This product is already completed");
+        }
 
         if (productByBarCode is not null)
         {
@@ -63,7 +69,7 @@ public class CreatePocketItemHandler(
         };
 
         await pocketItemRepository.Add(pocketItem1);
-        
+
         return pocketItem1;
     }
 }
