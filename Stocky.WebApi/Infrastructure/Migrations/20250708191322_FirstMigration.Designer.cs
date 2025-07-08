@@ -9,11 +9,11 @@ using Stocky.WebApi.Infrastructure.Databases;
 
 #nullable disable
 
-namespace Stocky.WebApi.Infrastructure.Migrations
+namespace Stocky.WebApi.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250708150817_Initial")]
-    partial class Initial
+    [Migration("20250708191322_FirstMigration")]
+    partial class FirstMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

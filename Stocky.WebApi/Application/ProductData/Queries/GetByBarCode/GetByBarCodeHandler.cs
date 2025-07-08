@@ -17,12 +17,16 @@ public class GetProductByBarCodeHandler(IProductRepository productRepository)
     public async Task<Product> Handle(GetByBarCodeQuery request, CancellationToken cancellationToken)
     {
         var product = await productRepository.Queryable
-            .FirstOrDefaultAsync(x => x.BarCode == request.BarCode && x.Status == Status.Created,
-                cancellationToken);
+            .FirstOrDefaultAsync(x => x.BarCode == request.BarCode, cancellationToken);
 
         if (product == null)
         {
-            throw new Exception("Product not found");
+            return null;
+        }
+
+        if (product.Status == Status.Completed)
+        {
+            throw new Exception("status of the product was completed");
         }
 
         return product;

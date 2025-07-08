@@ -23,7 +23,7 @@ public class ProductController(IMediator mediator) : ControllerBase
     {
         return Ok(await mediator.Send(createProductCommand));
     }
-    
+
     [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -37,17 +37,25 @@ public class ProductController(IMediator mediator) : ControllerBase
     {
         return Ok(await mediator.Send(getProductByIdQuery));
     }
-    
+
     [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetByBarCode([FromQuery] GetByBarCodeQuery query)
     {
+        var response = await mediator.Send(query);
+
+        if (response is null)
+        {
+            return NotFound("the product by this barcode is already complated");
+        }
+
         return Ok(await mediator.Send(query));
     }
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
-    public async Task<ActionResult<PageData<Product>>> Search([FromQuery] GetProductBySearchQuery getProductBySearchQuery)
+    public async Task<ActionResult<PageData<Product>>> Search(
+        [FromQuery] GetProductBySearchQuery getProductBySearchQuery)
     {
         return Ok(await mediator.Send(getProductBySearchQuery));
     }

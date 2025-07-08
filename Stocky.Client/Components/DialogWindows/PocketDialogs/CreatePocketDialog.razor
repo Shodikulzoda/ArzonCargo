@@ -39,6 +39,9 @@
                     Завершить продажу
                 </MudButton>
 
+                <MudText Color="Color.Success" Class="mt-3">@_message</MudText>
+                <MudText Color="Color.Error" Class="mt-3">@_errorMessage</MudText>
+
                 @if (_pocketCreated)
                 {
                     <MudDivider Class="my-4"/>
@@ -67,9 +70,6 @@
                         </RowTemplate>
                     </MudTable>
                 }
-
-                <MudText Color="Color.Success" Class="mt-3">@_message</MudText>
-                <MudText Color="Color.Error" Class="mt-3">@_errorMessage</MudText>
             </MudStack>
         </MudPaper>
     </DialogContent>
@@ -93,15 +93,31 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
     private Pocket _pocketModel = new();
     private bool _pocketCreated;
-    private string? _message = "";
-    private string? _errorMessage = "";
+    private string? _message = string.Empty;
+    private string? _errorMessage = string.Empty;
     private string? _productBarCode;
+    private string? _pocketId = string.Empty;
     private List<PocketItem> _pocketItems = [];
     private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     private User? _selectedUser;
 
-    private void Cancel() => MudDialog.Cancel();
+    private async Task Cancel()
+    {
+        var url = $"{ApiBaseUrl}/Pocket/DeletePocket?Id={_pocketModel.Id}";
+        var request = new HttpRequestMessage(HttpMethod.Delete, url);
+
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+        var response = await Http.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+
+        MudDialog.Cancel();
+    }
 
     private async Task<IEnumerable<User>> SearchUsers(string text)
     {
@@ -110,6 +126,8 @@
 
         try
         {
+            _pocketId = text;
+
             var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiBaseUrl}/User/Search?Text={text}");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
@@ -143,6 +161,17 @@
 
     private async Task CreatePocket()
     {
+        if (_selectedUser is null)
+        {
+            _errorMessage = "вы не выбрали пользователя";
+            _message = string.Empty;
+
+            return;
+        }
+
+        _message = string.Empty;
+        _errorMessage = string.Empty;
+
         var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiBaseUrl}/Pocket/CreatePocket")
         {
             Content = JsonContent.Create(_pocketModel)
@@ -152,7 +181,13 @@
         var response = await Http.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {
-            _pocketModel = await response.Content.ReadFromJsonAsync<Pocket>() ?? new Pocket();
+            var createdPocket = await response.Content.ReadFromJsonAsync<Pocket>();
+            if (createdPocket != null)
+            {
+                _pocketModel = createdPocket;
+                _pocketModel.Id = createdPocket.Id;
+            }
+
             _pocketCreated = true;
         }
     }
@@ -210,7 +245,7 @@
         else if (response.StatusCode == HttpStatusCode.InternalServerError)
         {
             _message = string.Empty;
-            _errorMessage = "Товар не найден в базе данных.";
+            _errorMessage = "статус продукта уже завершен";
         }
     }
 
@@ -243,7 +278,7 @@
     {
         if (_pocketItems.Count <= 0)
         {
-            _errorMessage = "no pocket was added";
+            _errorMessage = "вы не добавили ни одного продукта";
             _message = string.Empty;
             return;
         }
