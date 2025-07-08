@@ -89,9 +89,9 @@ else
     private int _totalPages = 1;
     private const int PageSize = 15;
     private bool _isLoading;
-    private string _searchQuery = "";
+    private string _searchQuery = string.Empty;
     private bool _isAuthenticated;
-    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
+    private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     protected override async Task OnInitializedAsync()
     {

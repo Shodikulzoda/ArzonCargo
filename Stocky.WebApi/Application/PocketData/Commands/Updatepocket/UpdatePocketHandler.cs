@@ -11,18 +11,21 @@ public record UpdatePocketCommand : IRequest<Pocket>
     public int UserId { get; set; }
 }
 
-public class UpdatePocketHandler(IPocketRepository pocketRepository)
+public class UpdatePocketHandler(IPocketRepository pocketRepository, IConfiguration configuration)
     : IRequestHandler<UpdatePocketCommand, Pocket?>
 {
     public async Task<Pocket?> Handle(UpdatePocketCommand request, CancellationToken cancellationToken)
     {
+        var t = configuration.GetValue<int>("SumOfKg:SumOfPerKg");
         var pocket = await pocketRepository.GetById(request.Id);
         if (pocket is null)
+        {
             return null;
+        }
 
         pocket.TotalWeight = request.TotalWeight;
         pocket.UserId = request.UserId;
-        pocket.TotalAmount = request.TotalWeight * 28;
+        pocket.TotalAmount = request.TotalWeight * t;
 
         await pocketRepository.Update(pocket);
 

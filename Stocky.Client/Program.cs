@@ -14,7 +14,6 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<IPrintingService, PrintingService>();
 
-
 builder.Services.AddScoped<AuthService>();
 
 var app = builder.Build();
