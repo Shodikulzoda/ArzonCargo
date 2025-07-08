@@ -8,6 +8,7 @@
 @inject IJSRuntime Js
 @inject IPrintingService PrintingService
 @inject IConfiguration Configuration
+@inject IDialogService DialogService
 
 <MudDialog>
     <DialogContent>
@@ -15,11 +16,26 @@
             <MudStack Spacing="3">
                 <MudText Typo="Typo.h5">Создать новый пакет</MudText>
 
-                <MudStack Spacing="2">
-                    <MudTextField @bind-Value="_pocketModel.TotalWeight" Label="Общий вес"
-                                  Variant="Variant.Outlined"/>
-                    <MudTextField @bind-Value="_pocketModel.UserId" Label="ID пользователя" Variant="Variant.Outlined"/>
-                </MudStack>
+                <MudAutocomplete T="User"
+                                 Label="Поиск клиента"
+                                 Variant="Variant.Outlined"
+                                 SearchFunc="SearchUsers"
+                                 ToStringFunc='u => $"{u.Name} - {u.Phone}"'   
+                                 @bind-Value="_selectedUser"
+                                 DebounceInterval="300"
+                                 MinCharacters="1"
+                                 Clearable="true" />
+
+                @* @if (_selectedUser != null) *@
+                @* { *@
+                @*     <MudText Typo="Typo.subtitle2">Имя: @_selectedUser.Name</MudText> *@
+                @*     <MudText Typo="Typo.subtitle2">Телефон: @_selectedUser.Phone</MudText> *@
+                @*     <MudText Typo="Typo.subtitle2">Адрес: @_selectedUser.Address</MudText> *@
+                @* } *@
+
+                <MudTextField @bind-Value="_pocketModel.TotalWeight"
+                              Label="Общий вес"
+                              Variant="Variant.Outlined"/>
 
                 <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreatePocket">
                     Создать пакет
@@ -43,11 +59,9 @@
                                       Class="barcode-text"
                                       Variant="Variant.Outlined"/>
 
-                        <MudStack Direction="Row" Spacing="2">
-                            <MudButton OnClick="AddProductToPocket" Color="Color.Warning" Variant="Variant.Filled">
-                                Добавить товар
-                            </MudButton>
-                        </MudStack>
+                        <MudButton OnClick="AddProductToPocket" Color="Color.Warning" Variant="Variant.Filled">
+                            Добавить товар
+                        </MudButton>
                     </MudStack>
 
                     <MudTable Items="_pocketItems" Class="mt-4" Dense="true" Hover="true" Elevation="0">
@@ -62,7 +76,6 @@
 
                 <MudText Color="Color.Success" Class="mt-3">@_message</MudText>
                 <MudText Color="Color.Error" Class="mt-3">@_errorMessage</MudText>
-
             </MudStack>
         </MudPaper>
     </DialogContent>
@@ -92,7 +105,39 @@
     private List<PocketItem> _pocketItems = [];
     private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
 
+    private User? _selectedUser;
+
     private void Cancel() => MudDialog.Cancel();
+
+    private async Task<IEnumerable<User>> SearchUsers(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text) || text.Length < 1)
+            return [];
+
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiBaseUrl}/User/Search?Text={text}");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+            var response = await Http.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+                return [];
+
+            return await response.Content.ReadFromJsonAsync<List<User>>() ?? [];
+        }
+        catch
+        {
+            return [];
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (_selectedUser != null)
+        {
+            _pocketModel.UserId = _selectedUser.Id;
+        }
+    }
 
     private byte[] GenerateQrCode(int size)
     {
@@ -120,9 +165,9 @@
 
     private async Task AddProductToPocket()
     {
-        if (string.IsNullOrWhiteSpace(_productBarCode) || _pocketModel?.Id == 0) return;
+        if (string.IsNullOrWhiteSpace(_productBarCode) || _pocketModel?.Id == 0)
+            return;
 
-        // Исключить дублирование
         if (_pocketItems.Any(item => item.ProductBarCode == _productBarCode))
         {
             _message = $"Товар с штрихкодом {_productBarCode} уже добавлен.";
@@ -131,28 +176,71 @@
             return;
         }
 
-        var pocketItem = new PocketItem
+        // Try get product by barcode
+        HttpResponseMessage response;
+        try
         {
-            PocketId = _pocketModel.Id,
-            ProductBarCode = _productBarCode
-        };
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiBaseUrl}/PocketItem/Add")
+            response = await Http.GetAsync($"{ApiBaseUrl}/Product/GetByBarCode?BarCode={_productBarCode}");
+        }
+        catch
         {
-            Content = JsonContent.Create(pocketItem)
-        };
+            response = null!;
+        }
 
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
-
-        var response = await Http.SendAsync(request);
-        if (response.IsSuccessStatusCode)
+        if (response == null || !response.IsSuccessStatusCode)
         {
-            _pocketItems.Add(pocketItem);
-            _productBarCode = "";
-            _message = string.Empty;
-            await Js.InvokeVoidAsync("focusElement");
+            // Product not found → ask for confirmation
+            var parameters = new DialogParameters
+            {
+                ["ContentText"] = $"Товар с кодом {_productBarCode} не найден. Хотите добавить его?"
+            };
+            var options = new DialogOptions { CloseOnEscapeKey = true };
+
+            var dialog = DialogService.Show<ConfirmDialog>("Подтверждение", parameters, options);
+            var dialogResult = await dialog.Result;
+
+            if (!dialogResult.Canceled)
+            {
+                await ActuallyAddProduct();
+            }
+            else
+            {
+                _message = "";
+                _errorMessage = $"Товар не добавлен.";
+                await Js.InvokeVoidAsync("focusElement");
+            }
+        }
+        else
+        {
+            // Product found → add normally
+            await ActuallyAddProduct();
         }
     }
+
+private async Task ActuallyAddProduct()
+{
+    var pocketItem = new PocketItem
+    {
+        PocketId = _pocketModel.Id,
+        ProductBarCode = _productBarCode
+    };
+
+    var request = new HttpRequestMessage(HttpMethod.Post, $"{ApiBaseUrl}/PocketItem/Add")
+    {
+        Content = JsonContent.Create(pocketItem)
+    };
+    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+    var response = await Http.SendAsync(request);
+    if (response.IsSuccessStatusCode)
+    {
+        _pocketItems.Add(pocketItem);
+        _productBarCode = "";
+        _message = "Товар добавлен.";
+        _errorMessage = "";
+        await Js.InvokeVoidAsync("focusElement");
+    }
+}
 
     private async Task FinishPocket()
     {
@@ -191,15 +279,38 @@
                 "<h2 style='margin:0;'>ArzonCargo</h2>",
                 "<div style='font-size:3mm;margin:0'><b>+992 92 788 0989</b></div>",
                 $"<img src='data:image/png;base64,{base64Qr}' style='width:40mm;height:40mm;margin:1mm 0;' />",
-                "<div style='font-size:3mm;'><b>Номер клиента: +992 92 677 4545</b></div>",
+                $"<div style='font-size:3mm;'><b>Номер клиента: {_selectedUser?.Phone}</b></div>",
                 "</div>"
             );
 
             await PrintingService.Print(rawHtml, PrintType.RawHtml);
-
             MudDialog.Cancel();
         }
     }
+    
+    private async Task<IEnumerable<User>> SearchUsers(string text, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(text) || text.Length < 1)
+            return [];
+
+        try
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiBaseUrl}/User/Search?Text={text}");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+            // IMPORTANT: Use cancellationToken here if needed
+            var response = await Http.SendAsync(request, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+                return [];
+
+            return await response.Content.ReadFromJsonAsync<List<User>>(cancellationToken: cancellationToken) ?? [];
+        }
+        catch
+        {
+            return [];
+        }
+    }
+
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
@@ -208,5 +319,4 @@
             await AddProductToPocket();
         }
     }
-
 }

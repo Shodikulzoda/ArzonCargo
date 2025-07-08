@@ -14,10 +14,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <_ContentIncludedByDefault Remove="Pages1\Counter1.razor"/>
-        <_ContentIncludedByDefault Remove="Pages1\Home1.razor"/>
-        <_ContentIncludedByDefault Remove="DialogWindows\ConfirmDialog.razor"/>
-        <_ContentIncludedByDefault Remove="DialogWindows\EditUserDialog.razor"/>
+        <_ContentIncludedByDefault Remove="Pages1\Counter1.razor" />
+        <_ContentIncludedByDefault Remove="Pages1\Home1.razor" />
+        <_ContentIncludedByDefault Remove="DialogWindows\ConfirmDialog.razor" />
+        <_ContentIncludedByDefault Remove="DialogWindows\EditUserDialog.razor" />
     </ItemGroup>
 
     <ItemGroup>
