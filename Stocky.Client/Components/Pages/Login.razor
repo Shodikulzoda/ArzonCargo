@@ -6,33 +6,29 @@
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @inject AuthService AuthService
-@layout NoNavbar
+@inject IConfiguration Configuration
 @inject IJSRuntime Js
 @inject IDialogService DialogService
-@inject IConfiguration Configuration
+
+@layout NoNavbar
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center align-center" Style="height: 70vh;">
     <MudPaper Class="pa-6" Elevation="6" Style="width:100%; border-radius: 16px;">
         <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-4">Авторизация</MudText>
+
         <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
             <DataAnnotationsValidator/>
 
-            <MudTextField @ref="hiddenField"
-                          T="string"
-                          Label="We should't see this field"
-                          Immediate="true"
-                          Margin="Margin.Dense"
-                          Class="hidden-field"
-                          OnKeyDown="HandleKeyDown"/>
-
             <MudTextField T="string"
                           Label="Имя пользователя"
+                          @ref="usernameField"
                           @bind-Value="loginModel.UserName"
                           Required="true"
                           Immediate="true"
                           Margin="Margin.Dense"
                           Error="@_isLoged"
                           ErrorText="Неверное имя пользователя или пароль"
+                          OnKeyDown="HandleKeyDown"
                           Class="mb-3"/>
 
             <MudTextField T="string"
@@ -62,48 +58,18 @@
     </MudPaper>
 </MudContainer>
 
-<script>
-    window.focusElement = () => {
-        const el = document.querySelector('.hidden-field input');
-        if (el) {
-            el.value = '';
-            el.focus();
-        }
-    };
-
-    window.enableGlobalFocus = () => {
-        document.addEventListener('click', (event) => {
-            const clickedElement = event.target;
-
-            if (clickedElement && clickedElement.tagName === 'INPUT') {
-                clickedElement.focus();
-            } else {
-                window.focusElement();
-            }
-        });
-    };
-
-    window.addEventListener('load', () => {
-        window.focusElement();
-        window.enableGlobalFocus();
-    });
-</script>
-
 @code {
     private bool _isSubmitting = false;
     private bool _isLoged = false;
-    private MudTextField<string> hiddenField;
-    private string _hiddenFieldValue = string.Empty;
+    private MudTextField<string> usernameField;
     private string ApiBaseUrl => Configuration["ApiBaseUrl"];
-
     private AuthenticationData loginModel = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await Js.InvokeVoidAsync("enableGlobalFocus");
-            await Js.InvokeVoidAsync("focusElement");
+            await Js.InvokeVoidAsync("eval", "document.querySelector('input').focus();");
         }
     }
 
@@ -114,10 +80,6 @@
         if (!string.IsNullOrWhiteSpace(AuthService.Token))
         {
             Navigation.NavigateTo("/home", true);
-        }
-        else
-        {
-            await Js.InvokeVoidAsync("focusElement");
         }
     }
 
@@ -140,13 +102,10 @@
                     await AuthService.SetTokenAsync(token);
 
                     if (AuthService.IsAdder)
-                    {
                         Navigation.NavigateTo("/adding-product", true);
-                    }
                     else
-                    {
                         Navigation.NavigateTo("/home", true);
-                    }
+
                     return;
                 }
             }
@@ -168,38 +127,42 @@
     {
         if (e.Key == "Enter")
         {
-            try
+            if (!string.IsNullOrWhiteSpace(loginModel.UserName) && loginModel.UserName.Contains("|") == false)
             {
-                if (hiddenField.Value is not null)
+                try
                 {
-                    var decodedBytes = Convert.FromBase64String(hiddenField.Value);
+                    var decodedBytes = Convert.FromBase64String(loginModel.UserName);
                     var decodedString = System.Text.Encoding.UTF8.GetString(decodedBytes);
 
-                    var parameters = new DialogParameters
-                    {
-                        { "Message", decodedString }
-                    };
-                    _hiddenFieldValue = decodedString;
                     if (decodedString.Contains("|"))
                     {
-                        var splited = decodedString.Split("|");
-                        loginModel.UserName = splited[0];
-                        loginModel.PasswordHash = splited[1];
-
-                        await HandleLogin();
+                        var parts = decodedString.Split("|");
+                        if (parts.Length == 2)
+                        {
+                            loginModel.UserName = parts[0];
+                            loginModel.PasswordHash = parts[1];
+                            await HandleLogin();
+                            return;
+                        }
                     }
-                }
-            }
-            catch
-            {
-                var parameters = new DialogParameters
-                {
-                    { "Message", "Invalid Base64 string." }
-                };
 
-                await DialogService.ShowAsync<DynamicDialog>("Invalid Base64 string", parameters);
+                    await ShowDialog("Invalid format. Expected format: base64(login|password)");
+                }
+                catch
+                {
+                    await ShowDialog("Неверная строка Base64.");
+                }
             }
         }
     }
 
+    private async Task ShowDialog(string message)
+    {
+        var parameters = new DialogParameters
+        {
+            { "Message", message }
+        };
+
+        await DialogService.ShowAsync<DynamicDialog>("Ошибка", parameters);
+    }
 }

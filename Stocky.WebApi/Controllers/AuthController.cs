@@ -9,7 +9,7 @@ namespace Stocky.WebApi.Controllers;
 [Route("api/[controller]/[action]")]
 public class AuthController(IMediator mediator) : ControllerBase
 {
-    [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> CreateUsersLogin(CreateLoginCommand? request)
     {
