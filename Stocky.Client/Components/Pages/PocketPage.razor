@@ -203,19 +203,28 @@ else
     {
         var options = new DialogOptions
         {
-            CloseButton = true,
+            NoHeader = false,
+            CloseOnEscapeKey = false,         
+            Position = DialogPosition.Center,
             MaxWidth = MaxWidth.Medium,
-            FullWidth = true
+            BackdropClick = false,
+            FullWidth = true,
+            CloseButton = false,
         };
 
-        var dialogReference = await DialogService.ShowAsync<CreatePocketDialog>("Создать пакет", new DialogParameters(), options);
+        var dialogReference = await DialogService.ShowAsync<CreatePocketDialog>(
+            "Создать пакет",
+            new DialogParameters(),
+            options);
 
         var result = await dialogReference.Result;
+
         if (result is { Canceled: false })
         {
             await LoadPockets();
         }
     }
+
 
     private async Task Increment()
     {

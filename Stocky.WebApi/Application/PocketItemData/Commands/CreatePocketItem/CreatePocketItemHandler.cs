@@ -25,7 +25,6 @@ public class CreatePocketItemHandler(
             throw new Exception();
         }
 
-        var productById = await productRepository.GetById(request.ProductId);
         var pocketById = await pocketRepository.GetById(request.PocketId);
         var productByBarCode = await productRepository.GetByBarCode(request.ProductBarCode);
 
@@ -45,7 +44,11 @@ public class CreatePocketItemHandler(
                 Pocket = pocketById
             };
 
+            productByBarCode.Status = Status.Completed;
+            
             await pocketItemRepository.Add(pocketItem);
+            
+            productRepository.Update(productByBarCode);
 
             return pocketItem;
         }
@@ -55,21 +58,23 @@ public class CreatePocketItemHandler(
             BarCode = request.ProductBarCode
         };
 
-        await productRepository.Add(product);
+        var getProductAfterAdding = await productRepository.Add(product);
 
-        var productByBarCode1 = await productRepository.GetByBarCode(request.ProductBarCode);
-
-        var pocketItem1 = new PocketItem
+        var newPocketItem = new PocketItem
         {
-            ProductId = productByBarCode1.Id,
-            Product = productByBarCode1,
-            ProductBarCode = productByBarCode1.BarCode,
+            ProductId = getProductAfterAdding.Id,
+            Product = getProductAfterAdding,
+            ProductBarCode = getProductAfterAdding.BarCode,
             PocketId = pocketById.Id,
             Pocket = pocketById
         };
 
-        await pocketItemRepository.Add(pocketItem1);
+        getProductAfterAdding.Status = Status.Completed;
 
-        return pocketItem1;
+        await pocketItemRepository.Add(newPocketItem);
+
+        productRepository.Update(getProductAfterAdding);
+
+        return newPocketItem;
     }
 }

@@ -212,6 +212,7 @@
         {
             Content = JsonContent.Create(_pocketModel)
         };
+        
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
         var response = await Http.SendAsync(request);
@@ -245,7 +246,7 @@
         else if (response.StatusCode == HttpStatusCode.InternalServerError)
         {
             _message = string.Empty;
-            _errorMessage = "статус продукта уже завершен";
+            _errorMessage = "Cтатус продукта уже завершен";
         }
     }
 

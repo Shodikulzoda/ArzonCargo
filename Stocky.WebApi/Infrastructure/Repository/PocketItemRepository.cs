@@ -65,6 +65,7 @@ public class PocketItemRepository(ApplicationContext context)
     public async Task<IEnumerable<PocketItem?>> GetByPocketId(int id)
     {
         var pockets = await _context1.PocketItem.Where(x => x.PocketId == id).ToListAsync();
+
         if (pockets is null)
         {
             return null;
