@@ -29,7 +29,7 @@
                           Error="@_isLoged"
                           ErrorText="Неверное имя пользователя или пароль"
                           OnKeyDown="HandleKeyDown"
-                          Class="mb-3"/>
+                          Class="mb-3 username-field" />
 
             <MudTextField T="string"
                           Label="Пароль"
@@ -40,7 +40,7 @@
                           Margin="Margin.Dense"
                           Error="@_isLoged"
                           ErrorText="Неверное имя пользователя или пароль"
-                          Class="mb-4"/>
+                          Class="mb-4 password-field" />
 
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
@@ -58,6 +58,39 @@
     </MudPaper>
 </MudContainer>
 
+<script>
+    let lastFocused = 'username';
+
+    document.addEventListener('click', (event) => {
+        const usernameInput = document.querySelector('.username-field input');
+        const passwordInput = document.querySelector('.password-field input');
+
+        if (!usernameInput || !passwordInput) return;
+
+        const active = document.activeElement;
+
+        if (passwordInput === active || passwordInput.contains(active)) {
+            lastFocused = 'password';
+            return;
+        }
+
+        if (!usernameInput.contains(event.target) && !passwordInput.contains(event.target)) {
+            if (lastFocused !== 'password') {
+                usernameInput.focus();
+                lastFocused = 'username';
+            }
+        }
+    });
+
+    window.setInitialFocus = () => {
+        const usernameInput = document.querySelector('.username-field input');
+        if (usernameInput) {
+            usernameInput.focus();
+            lastFocused = 'username';
+        }
+    };
+</script>
+
 @code {
     private bool _isSubmitting = false;
     private bool _isLoged = false;
@@ -69,7 +102,7 @@
     {
         if (firstRender)
         {
-            await Js.InvokeVoidAsync("eval", "document.querySelector('input').focus();");
+            await Js.InvokeVoidAsync("setInitialFocus");
         }
     }
 
@@ -127,7 +160,7 @@
     {
         if (e.Key == "Enter")
         {
-            if (!string.IsNullOrWhiteSpace(loginModel.UserName) && loginModel.UserName.Contains("|") == false)
+            if (!string.IsNullOrWhiteSpace(loginModel.UserName) && !loginModel.UserName.Contains("|"))
             {
                 try
                 {
@@ -145,12 +178,10 @@
                             return;
                         }
                     }
-
-                    await ShowDialog("Invalid format. Expected format: base64(login|password)");
                 }
                 catch
                 {
-                    await ShowDialog("Неверная строка Base64.");
+                    // ignored
                 }
             }
         }

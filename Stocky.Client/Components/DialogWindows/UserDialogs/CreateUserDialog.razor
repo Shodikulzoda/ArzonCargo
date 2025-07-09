@@ -7,23 +7,59 @@
 
 <MudDialog>
     <DialogContent>
-        <MudText Typo="Typo.h6">Создать нового пользователя</MudText>
-        <MudTextField Label="Имя" @bind-Value="UserModel.Name" Variant="Variant.Outlined" Margin="Margin.Dense"/>
-        <MudTextField Label="Телефон" @bind-Value="UserModel.Phone" Variant="Variant.Outlined" Margin="Margin.Dense"/>
-        <MudTextField Label="Адрес" @bind-Value="UserModel.Address" Variant="Variant.Outlined"
-                      Margin="Margin.Dense" @onkeydown="OnKeyDown"/>
+
+        <MudTextField @ref="nameField"
+                      Label="Имя"
+                      @bind-Value="UserModel.Name"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      @onkeydown="e => OnKeyDown(e, 0)"/>
+
+        <MudTextField @ref="phoneField"
+                      Label="Телефон"
+                      @bind-Value="UserModel.Phone"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      @onkeydown="e => OnKeyDown(e, 1)"/>
+
+        <MudTextField @ref="addressField"
+                      Label="Адрес"
+                      @bind-Value="UserModel.Address"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      @onkeydown="e => OnKeyDown(e, 2)"/>
     </DialogContent>
+
     <DialogActions>
         <MudButton Color="Color.Secondary" OnClick="Cancel">Отмена</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit" Variant="Variant.Filled">Создать
-        </MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit" Variant="Variant.Filled">Создать</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
     [Parameter] public User UserModel { get; set; } = new();
+
     private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
+
+    private MudTextField<string> nameField;
+    private MudTextField<string> phoneField;
+    private MudTextField<string> addressField;
+
+    private bool _firstRender = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_firstRender)
+        {
+            _firstRender = false;
+            await nameField.FocusAsync();
+        }
+    }
 
     private async Task Submit()
     {
@@ -36,11 +72,10 @@
             if (response.IsSuccessStatusCode)
             {
                 MudDialog.Close(DialogResult.Ok(true));
+                return;
             }
-            else
-            {
-                Console.WriteLine("Create failed: " + response.StatusCode + " - " + response.ReasonPhrase);
-            }
+
+            Console.WriteLine("Create failed: " + response.StatusCode + " - " + response.ReasonPhrase);
         }
         catch (Exception ex)
         {
@@ -50,11 +85,30 @@
         Cancel();
     }
 
-    private async Task OnKeyDown(KeyboardEventArgs args)
+    private async Task OnKeyDown(KeyboardEventArgs e, int fieldIndex)
     {
-        if (args.Key is "Enter" or "NumpadEnter")
+        if (e.Key is "Enter" or "NumpadEnter")
         {
-            await Submit();
+            switch (fieldIndex)
+            {
+                case 0:
+                    if (!string.IsNullOrWhiteSpace(UserModel.Name))
+                        await phoneField.FocusAsync();
+                    break;
+                case 1:
+                    if (!string.IsNullOrWhiteSpace(UserModel.Phone))
+                        await addressField.FocusAsync();
+                    break;
+                case 2:
+                    if (!string.IsNullOrWhiteSpace(UserModel.Name) &&
+                        !string.IsNullOrWhiteSpace(UserModel.Phone) &&
+                        !string.IsNullOrWhiteSpace(UserModel.Address))
+                    {
+                        await Submit();
+                    }
+
+                    break;
+            }
         }
     }
 
