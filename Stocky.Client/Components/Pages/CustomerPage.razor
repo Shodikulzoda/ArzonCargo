@@ -1,0 +1,222 @@
+﻿@page "/goods"
+@inject HttpClient Http
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@using System.Net.Http.Headers
+@using System.Text.Json
+@using System.Net
+@using MudBlazor.Components.DialogWindows.OrderDialogs
+@using MudBlazor.Components.DialogWindows.PocketDialogs
+@using MudBlazor.Components.Layout
+@using MudBlazor.Components.Service
+@using Stocky.Shared.Models
+@inject IConfiguration Configuration
+@layout NoNavbar
+
+<PageTitle>Управление пользователями</PageTitle>
+
+@if (_isAuthenticated)
+{
+    Navigation.NavigateTo("/UnAuthorized", true);
+}
+
+<MudText Typo="Typo.h4" GutterBottom="true">Заказы</MudText>    
+
+@if (_isLoading)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
+}
+else
+{
+    <MudTable Items="_userPage?.Items" Hover="true" Elevation="1" Dense="true">
+        <HeaderContent>
+            <MudTh>Id</MudTh>
+            <MudTh>Имя</MudTh>
+            <MudTh>Телефон</MudTh>
+            <MudTh>Адрес</MudTh>
+            <MudTh>Заказы</MudTh>
+            <MudTh>Кошельки</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Id</MudTd>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.Phone</MudTd>
+            <MudTd>@context.Address</MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.ViewList" Color="Color.Info"
+                               OnClick="@(() => UserOrders(context.Id))"/>
+            </MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.ShoppingBag" Color="Color.Primary"
+                               OnClick="@(() => UserPockets(context.Id))"/>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+
+    <div class="mt-4 d-flex justify-between">
+        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)">Назад</MudButton>
+        <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
+        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)">Вперед</MudButton>
+    </div>
+}
+
+@code {
+    private PageData<User>? _userPage = new() { Items = new List<User>() };
+    private int _currentPage = 1;
+    private int _totalPages = 1;
+    private const int PageSize = 15;
+    private bool _isLoading;
+    private string _searchQuery = string.Empty;
+    private bool _isAuthenticated;
+    private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthService.LoadTokenAsync();
+
+        if (string.IsNullOrEmpty(AuthService.Token))
+        {
+            _isAuthenticated = true;
+            return;
+        }
+
+        // Get user role (adjust method to how you get the role)
+        var role = await AuthService.GetUserRoleAsync();
+
+        // If role is not Admin (or is Adder), redirect to Unauthorized
+        if (role != "Admin")
+        {
+            Navigation.NavigateTo("/Unauthorized", true);
+            return;
+        }
+
+        await LoadUsers();
+    }
+    
+    private async Task LoadUsers()
+    {
+        _isLoading = true;
+
+        try
+        {
+            var url = $"{ApiBaseUrl}/User/UserPagination?Page={_currentPage}&PageSize={PageSize}";
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                _userPage = JsonSerializer.Deserialize<PageData<User>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                _totalPages = (int)Math.Ceiling((double)(_userPage?.TotalCount ?? 0) / PageSize);
+            }
+            else if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                _isAuthenticated = true;
+            }
+            else
+            {
+                Snackbar.Add("Ошибка при загрузке пользователей.", Severity.Error);
+                _userPage.Items = new List<User>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Load error: " + ex.Message);
+            Snackbar.Add("Неожиданная ошибка при загрузке пользователей.", Severity.Error);
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task SearchUsers()
+    {
+        if (string.IsNullOrWhiteSpace(_searchQuery))
+        {
+            await LoadUsers();
+            return;
+        }
+
+        _isLoading = true;
+
+        try
+        {
+            var url = $"{ApiBaseUrl}/User/Search?Text={Uri.EscapeDataString(_searchQuery)}";
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+            var response = await Http.SendAsync(request);
+
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                _isAuthenticated = true;
+                return;
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var results = JsonSerializer.Deserialize<List<User>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                _userPage.Items = results ?? new List<User>();
+                _totalPages = 1;
+                _currentPage = 1;
+            }
+            else
+            {
+                Snackbar.Add("Поиск не удался.", Severity.Error);
+                _userPage.Items = new List<User>();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Search error: " + ex.Message);
+            Snackbar.Add("Неожиданная ошибка при поиске.", Severity.Error);
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task Increment()
+    {
+        if (_currentPage < _totalPages)
+        {
+            _currentPage++;
+            await LoadUsers();
+        }
+    }
+
+    private async Task Decrement()
+    {
+        if (_currentPage > 1)
+        {
+            _currentPage--;
+            await LoadUsers();
+        }
+    }
+    
+    private async Task UserOrders(int userId)
+    {
+        var parameters = new DialogParameters { { "UserId", userId } };
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+        var dialog = await DialogService.ShowAsync<OrdersPaginationUserDialog>("Заказы пользователя", parameters, options);
+        await dialog.Result;
+    }
+
+    private async Task UserPockets(int userId)
+    {
+        var parameters = new DialogParameters
+        {
+            { "UserId", userId }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+
+        var dialog = await DialogService.ShowAsync<PocketsUserPaginationDialog>("Кошельки пользователя", parameters, options);
+        await dialog.Result;
+    }
+
+}

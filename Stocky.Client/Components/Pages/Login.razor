@@ -49,12 +49,15 @@
                        FullWidth="true">
                 Войти
             </MudButton>
-        </EditForm>
 
-        @if (_isLoged)
-        {
-            <MudText Color="Color.Error" Class="mt-3">Ошибка входа. Проверьте введенные данные.</MudText>
-        }
+            <MudText Align="Align.Left" Class="mt-3">
+                Нет аккаунта?
+                <MudLink Href="/register" Target="_self" Class="ml-1">
+                    Зарегистрироваться
+                </MudLink>
+            </MudText>
+
+        </EditForm>
     </MudPaper>
 </MudContainer>
 
@@ -64,21 +67,25 @@
     document.addEventListener('click', (event) => {
         const usernameInput = document.querySelector('.username-field input');
         const passwordInput = document.querySelector('.password-field input');
+        const form = document.querySelector('form'); // select the form area
 
-        if (!usernameInput || !passwordInput) return;
+        if (!usernameInput || !passwordInput || !form) return;
 
-        const active = document.activeElement;
+        const clickedInsideForm = form.contains(event.target);
 
-        if (passwordInput === active || passwordInput.contains(active)) {
-            lastFocused = 'password';
-            return;
-        }
-
-        if (!usernameInput.contains(event.target) && !passwordInput.contains(event.target)) {
+        if (!clickedInsideForm) {
+            // If click is outside the form
             if (lastFocused !== 'password') {
                 usernameInput.focus();
                 lastFocused = 'username';
             }
+            return;
+        }
+
+        if (passwordInput === document.activeElement) {
+            lastFocused = 'password';
+        } else if (usernameInput === document.activeElement) {
+            lastFocused = 'username';
         }
     });
 
@@ -195,5 +202,10 @@
         };
 
         await DialogService.ShowAsync<DynamicDialog>("Ошибка", parameters);
+    }
+
+    private void NavigateToRegister()
+    {
+        Navigation.NavigateTo("/register");
     }
 }
