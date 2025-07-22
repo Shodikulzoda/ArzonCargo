@@ -1,0 +1,98 @@
+@page "/"
+@using System.Text.RegularExpressions
+@using MudBlazor.Components.Layout
+@inject NavigationManager Navigation
+@inject HttpClient Http
+@layout NoNavbar
+
+<PageTitle>Вход</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center align-center" Style="height: 70vh;">
+    <MudPaper Class="pa-6" Elevation="6" Style="width:100%; border-radius: 16px;">
+        <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-2">Введите номер телефона</MudText>
+        <MudText Typo="Typo.body2" Align="Align.Center" Color="Color.Secondary" Class="mb-4">
+            Используйте номер телефона, который вы указывали при оформлении заказа.
+        </MudText>
+
+        <EditForm Model="@phoneModel" OnValidSubmit="@SubmitForm">
+            <DataAnnotationsValidator />
+
+            <MudTextField T="string"
+                          Label="Номер телефона"
+                          @bind-Value="phoneModel.PhoneNumber"
+                          Immediate="true"
+                          Required="true"
+                          Error="@_hasError"
+                          ErrorText="@_errorMessage"
+                          Margin="Margin.Dense"
+                          OnBlur="ValidatePhoneNumber"
+                          Class="mb-4 w-100" />
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       ButtonType="ButtonType.Submit"
+                       FullWidth="true"
+                       Class="rounded-lg text-lg py-2">
+                Отправить
+            </MudButton>
+        </EditForm>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private PhoneModel phoneModel = new();
+    private bool _hasError;
+    private string _errorMessage = "";
+
+    private void ValidatePhoneNumber()
+    {
+        string digits = Regex.Replace(phoneModel.PhoneNumber ?? "", @"\D", "");
+        _hasError = digits.Length < 7;
+        _errorMessage = _hasError ? "Минимум 7 цифр" : "";
+    }
+
+    private async Task SubmitForm()
+    {
+        ValidatePhoneNumber();
+        if (_hasError)
+            return;
+
+        string digits = Regex.Replace(phoneModel.PhoneNumber ?? "", @"\D", "");
+        _hasError = false;
+        _errorMessage = "";
+
+        try
+        {
+            var response = await Http.GetAsync($"http://localhost:5191/User/Search?Text={digits}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _hasError = true;
+                _errorMessage = "Ошибка на сервере";
+                return;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (string.IsNullOrWhiteSpace(content) || content == "null")
+            {
+                _hasError = true;
+                _errorMessage = "Пользователь не найден";
+                return;
+            }
+
+            // User exists → navigate to goods page with phone query param
+            Navigation.NavigateTo($"/goods?phone={digits}", forceLoad: true);
+        }
+        catch (Exception)
+        {
+            _hasError = true;
+            _errorMessage = "Ошибка подключения к серверу";
+        }
+    }
+
+    public class PhoneModel
+    {
+        public string PhoneNumber { get; set; } = "";
+    }
+}

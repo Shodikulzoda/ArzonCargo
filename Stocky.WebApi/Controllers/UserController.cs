@@ -12,11 +12,11 @@ using Stocky.WebApi.Application.UserData.Queries.GetUserBySearch;
 
 namespace Stocky.WebApi.Controllers;
 
-[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("[controller]/[action]")]
 public class UserController(IMediator mediator) : ControllerBase
 {
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> CreateUser(CreateUserCommand? user)
     {
@@ -28,18 +28,21 @@ public class UserController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(user));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetUsers()
     {
         return Ok(await mediator.Send(new GetAllUserQuery()));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetUserById([FromQuery] UserByIdQuery user)
     {
         return Ok(await mediator.Send(user));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<ActionResult<PageData<User>>> UserPagination(
         [FromQuery] UsersByPaginationQuery usersByPaginationQuery)
@@ -55,12 +58,14 @@ public class UserController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(userQuery));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut]
     public async Task<IActionResult> UpdateUser(UpdateUserCommand user)
     {
         return Ok(await mediator.Send(user));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete]
     public async Task<IActionResult> DeleteUser([FromQuery] DeleteUserCommand user)
     {

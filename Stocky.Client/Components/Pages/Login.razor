@@ -1,4 +1,4 @@
-@page "/"
+@page "/admin"
 @using MudBlazor.Components.DialogWindows
 @using MudBlazor.Components.Layout
 @using MudBlazor.Components.Service
@@ -29,7 +29,7 @@
                           Error="@_isLoged"
                           ErrorText="Неверное имя пользователя или пароль"
                           OnKeyDown="HandleKeyDown"
-                          Class="mb-3 username-field" />
+                          Class="mb-3 username-field"/>
 
             <MudTextField T="string"
                           Label="Пароль"
@@ -40,7 +40,7 @@
                           Margin="Margin.Dense"
                           Error="@_isLoged"
                           ErrorText="Неверное имя пользователя или пароль"
-                          Class="mb-4 password-field" />
+                          Class="mb-4 password-field"/>
 
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
@@ -49,14 +49,6 @@
                        FullWidth="true">
                 Войти
             </MudButton>
-
-            <MudText Align="Align.Left" Class="mt-3">
-                Нет аккаунта?
-                <MudLink Href="/register" Target="_self" Class="ml-1">
-                    Зарегистрироваться
-                </MudLink>
-            </MudText>
-
         </EditForm>
     </MudPaper>
 </MudContainer>
@@ -67,14 +59,13 @@
     document.addEventListener('click', (event) => {
         const usernameInput = document.querySelector('.username-field input');
         const passwordInput = document.querySelector('.password-field input');
-        const form = document.querySelector('form'); // select the form area
+        const form = document.querySelector('form');
 
         if (!usernameInput || !passwordInput || !form) return;
 
         const clickedInsideForm = form.contains(event.target);
 
         if (!clickedInsideForm) {
-            // If click is outside the form
             if (lastFocused !== 'password') {
                 usernameInput.focus();
                 lastFocused = 'username';
@@ -204,8 +195,4 @@
         await DialogService.ShowAsync<DynamicDialog>("Ошибка", parameters);
     }
 
-    private void NavigateToRegister()
-    {
-        Navigation.NavigateTo("/register");
-    }
 }
