@@ -1,9 +1,7 @@
 @using System.Net.Http.Headers
-@using System.Net.Http.Json
 @inject HttpClient Http
 @inject AuthService AuthService
 @inject IConfiguration Configuration
-@using MudBlazor
 @using MudBlazor.Components.Service
 @using Stocky.Shared.Models
 @using Stocky.Shared.Models.Enums
@@ -12,14 +10,16 @@
     <DialogContent>
         <MudText Typo="Typo.h6" Class="mb-4">@ContentText</MudText>
 
-        <MudSelect T="PaymentMethod" Label="Тип оплаты" @bind-Value="_selectedPaymentMethod" Required="true" Class="mb-3">
+        <MudSelect T="PaymentMethod" Label="Тип оплаты" @bind-Value="_selectedPaymentMethod" Required="true"
+                   Class="mb-3">
             <MudSelectItem Value="PaymentMethod.Cash">Наличные</MudSelectItem>
             <MudSelectItem Value="PaymentMethod.DushanbeCity">Душанбе Сити</MudSelectItem>
             <MudSelectItem Value="PaymentMethod.Alif">Alif</MudSelectItem>
             <MudSelectItem Value="PaymentMethod.Eskhata">Eskhata</MudSelectItem>
         </MudSelect>
 
-        <MudTextField T="double" Label="Сумма" Variant="Variant.Outlined" @bind-Value="_amount" Required="true" Class="mb-3" />
+        <MudTextField T="double" Label="Сумма" Variant="Variant.Outlined" @bind-Value="_amount" Required="true"
+                      Class="mb-3"/>
     </DialogContent>
 
     <DialogActions>
@@ -27,7 +27,7 @@
         <MudButton Color="@Color" OnClick="CreateOrder" Variant="Variant.Filled" Disabled="_isLoading">
             @if (_isLoading)
             {
-                <MudProgressCircular Size="(Size)16" Indeterminate="true" Color="Color.Inherit" Class="mr-2" />
+                <MudProgressCircular Size="(Size)16" Indeterminate="true" Color="Color.Inherit" Class="mr-2"/>
             }
             @ButtonText
         </MudButton>
@@ -47,7 +47,6 @@
     private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
     private bool _isLoading;
 
-    // Local binding fields
     private double _amount;
     private PaymentMethod _selectedPaymentMethod = PaymentMethod.Cash;
 
@@ -69,7 +68,8 @@
             {
                 UserId = UserId,
                 TotalAmount = _amount,
-                Method = _selectedPaymentMethod
+                Method = _selectedPaymentMethod,
+                EmployeeId = Convert.ToInt32(AuthService.EmployeeId)
             };
 
             Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
@@ -78,6 +78,7 @@
             if (response.IsSuccessStatusCode)
             {
                 MudDialog.Close(DialogResult.Ok(true));
+                StateHasChanged();
             }
             else
             {
@@ -93,4 +94,5 @@
             _isLoading = false;
         }
     }
+
 }

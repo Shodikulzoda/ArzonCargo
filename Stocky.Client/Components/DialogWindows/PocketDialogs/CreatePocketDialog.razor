@@ -12,6 +12,7 @@
 @inject IPrintingService PrintingService
 @inject IConfiguration Configuration
 @inject IDialogService DialogService
+@inject NavigationManager Navigation
 @layout NoNavbar
 
 <MudDialog>
@@ -157,7 +158,6 @@
         }
     }
 
-
     protected override void OnAfterRender(bool firstRender)
     {
         if (_selectedUser != null)
@@ -219,7 +219,6 @@
             await Js.InvokeVoidAsync("focusElement"); // Focus after rendering
         }
     }
-
 
     private async Task AddProductToPocket()
     {
@@ -333,18 +332,26 @@
 
             var rawHtml = string.Join(
                 Environment.NewLine,
-                "<div style='width:57mm;height:57mm;padding:0;margin-left:1mm; margin-right:1mm; text-align:center;font-family:sans-serif;'>",
+                "<div style='width:60mm;height:60mm;padding:2mm;margin:auto; text-align:center;font-family:sans-serif;'>",
                 "<h2 style='margin:0;'>ArzonCargo</h2>",
                 "<div style='font-size:3mm;margin:0'><b>+992 92 788 0989</b></div>",
                 $"<img src='data:image/png;base64,{base64Qr}' style='width:40mm;height:40mm;margin:1mm 0;' />",
                 $"<div style='font-size:3mm;'><b>Номер клиента: {_selectedUser?.Phone}</b></div>",
+                $"<div style='font-size:3mm;'><b>Сумма: {_pocketModel.TotalAmount} сомони</b></div>",
+                $"<div style='font-size:3mm;'><b>Вес: {_pocketModel.TotalWeight} кг</b></div>",
+                "<div style='font-size:3mm;'><b>Instagram: @arzoncargo</b></div>",
                 "</div>"
             );
 
             await PrintingService.Print(rawHtml, PrintType.RawHtml);
+
             MudDialog.Cancel();
+
+            // ✅ Force page refresh
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
         }
     }
+
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {

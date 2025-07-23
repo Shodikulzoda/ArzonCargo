@@ -9,6 +9,7 @@ public record CreateOrderCommand : IRequest<Order>
 {
     public int UserId { get; set; }
     public double TotalAmount { get; set; }
+    public int EmployeeId { get; set; }
     public PaymentMethod Method { get; set; } 
 }
 
@@ -52,7 +53,8 @@ public class CreateOrderHandler(
             TotalWeight = pocketById.TotalWeight,
             TotalAmount = request.TotalAmount,
             UserId = pocketById.UserId,
-            Method = request.Method,    
+            Method = request.Method,  
+            EmployeeId = request.EmployeeId,
             OrderItems = orderItems,
             CreatedAt = DateTime.UtcNow
         };

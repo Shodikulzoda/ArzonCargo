@@ -38,7 +38,7 @@
                     <MudTd>@context.PocketId</MudTd>
                     <MudTd>@context.ProductId</MudTd>
                     <MudTd>@context.CreatedAt.ToString("g")</MudTd>
-                    <MudTd>@((context.IsDeleted) ? "Удалён" : "Активен")</MudTd>
+                    <MudTd>@(context.IsDeleted ? "Удалён" : "Активен")</MudTd>
                 </RowTemplate>
             </MudTable>
 
@@ -50,7 +50,7 @@
         }
     </DialogContent>
     <DialogActions>
-        <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => CreateOrder(PocketId, UserId, TotalAmount))">
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Filled" OnClick="@OpenCreateOrderDialog">
             Создать заказ
         </MudButton>
         <MudButton Color="Color.Error" Variant="Variant.Outlined" OnClick="Close">Закрыть</MudButton>
@@ -125,13 +125,13 @@
         }
     }
 
-    private async Task CreateOrder(int pocketId, int userId, double totalAmount)
+    private async Task OpenCreateOrderDialog()
     {
         var parameters = new DialogParameters
         {
-            { "PocketId", pocketId },
-            { "UserId", userId },
-            { "TotalAmount", totalAmount }
+            { "PocketId", PocketId },
+            { "UserId", UserId },
+            { "TotalAmount", TotalAmount }
         };
 
         var options = new DialogOptions
@@ -142,7 +142,13 @@
         };
 
         var dialogReference = await DialogService.ShowAsync<CreateOrderDialog>("Создать заказ", parameters, options);
-        await dialogReference.Result;
+        var result = await dialogReference.Result;
+
+        // If CreateOrderDialog closed successfully, close this dialog too
+        if (result is { Canceled: false, Data: true })
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
 
     private void Close() => MudDialog.Cancel();

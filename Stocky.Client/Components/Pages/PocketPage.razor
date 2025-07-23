@@ -42,7 +42,8 @@ else
     <MudTable Items="_pocketPage?.Items" Hover="true" SortLabel="Сортировать по" Elevation="1" Dense="true">
         <HeaderContent>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.User.Name)">Имя пользователя</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.User.Name)">Имя пользователя
+                </MudTableSortLabel>
             </MudTh>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.BarCode)">Штрихкод</MudTableSortLabel>
@@ -71,7 +72,8 @@ else
     <div class="mt-4 d-flex justify-between">
         <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Назад</MudButton>
         <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
-        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Вперёд</MudButton>
+        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Вперёд
+        </MudButton>
     </div>
 }
 
@@ -83,6 +85,8 @@ else
     private bool _isLoading;
     private string _searchQuery = "";
     private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -202,6 +206,7 @@ else
             "Создать пакет",
             new DialogParameters(),
             options);
+        StateHasChanged();
 
         var result = await dialogReference.Result;
         if (result is { Canceled: false })
@@ -235,4 +240,5 @@ else
             await SearchPocket();
         }
     }
+
 }

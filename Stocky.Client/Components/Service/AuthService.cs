@@ -14,7 +14,7 @@ public class AuthService : IDisposable
 
     public string Token { get; private set; } = "";
     public string? Username { get; private set; }
-
+    public string? EmployeeId { get; private set; }
     public string? Role { get; private set; }
 
     public event Action? OnChange;
@@ -35,6 +35,7 @@ public class AuthService : IDisposable
         await jsRuntime.InvokeVoidAsync("localStorage.setItem", TokenKey, token);
         ParseRoleFromToken(token);
         ParseUsernameFromToken(token);
+        ParseEmployeeIdFromToken(token);    
         NotifyStateChanged();
     }
 
@@ -47,6 +48,7 @@ public class AuthService : IDisposable
         {
             ParseRoleFromToken(Token);
             ParseUsernameFromToken(Token);
+            ParseEmployeeIdFromToken(token);
         }
         else
         {
@@ -122,6 +124,25 @@ public class AuthService : IDisposable
         catch
         {
             Username = null;
+        }
+    }
+
+    private void ParseEmployeeIdFromToken(string token)
+    {
+        try
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+
+            var idClaim = jwtToken.Claims.FirstOrDefault(c =>
+                c.Type == "id" || c.Type == ClaimTypes.NameIdentifier);
+
+            EmployeeId = idClaim?.Value;
+            Console.WriteLine($"Parsed EmployeeId: {EmployeeId}");
+        }
+        catch
+        {
+            EmployeeId = null;
         }
     }
 }
