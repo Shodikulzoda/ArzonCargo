@@ -4,4 +4,5 @@ public interface IAuthRepository : IBaseRepository<Shared.Models.AuthenticationD
 {
     Task<Shared.Models.AuthenticationData> Add(Shared.Models.AuthenticationData auth);
     Task<IEnumerable<Shared.Models.AuthenticationData>> GetAll();
+    Task<string> GetUserNameById(int id);
 }

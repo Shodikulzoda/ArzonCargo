@@ -1,4 +1,5 @@
 @using System.Net.Http.Headers
+@using System.Text
 @using System.Text.Json
 @using MudBlazor.Components.DialogWindows.OrderItemDialogs
 @using MudBlazor.Components.Service
@@ -19,6 +20,7 @@ else
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<Order, object>(x => x.Id)">Идентификатор</MudTableSortLabel>
             </MudTh>
+            <MudTh>Пользователь</MudTh>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.BarCode)">Штрихкод</MudTableSortLabel>
             </MudTh>
@@ -31,6 +33,7 @@ else
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
+            <MudTd DataLabel="Пользователь">@GetUsername(context.EmployeeId)</MudTd>
             <MudTd DataLabel="Штрихкод">@context.BarCode</MudTd>
             <MudTd DataLabel="Общий вес">@context.TotalWeight</MudTd>
             <MudTd DataLabel="Общая сумма">@context.TotalAmount</MudTd>
@@ -61,6 +64,8 @@ else
     private const int PageSize = 15;
     private bool _isLoading;
 
+    // Cache to store EmployeeId -> Username mappings
+    private Dictionary<int, string> _usernamesCache = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,19 +94,118 @@ else
                     PropertyNameCaseInsensitive = true
                 });
 
-                _orders.TotalPages = (int)Math.Ceiling((double)_orders.TotalCount / PageSize);
+                _totalPages = (int)Math.Ceiling((double)(_orders?.TotalCount ?? 0) / PageSize);
+
+                if (_orders?.Items != null)
+                {
+                    var uniqueEmployeeIds = _orders.Items
+                        .Select(o => o.EmployeeId)
+                        .Distinct()
+                        .Where(id => id != 0 && !_usernamesCache.ContainsKey(id))
+                        .ToList();
+
+                    var usernameTasks = uniqueEmployeeIds.Select(async empId =>
+                    {
+                        var username = await GetUsernameFromApi(empId);
+                        _usernamesCache[empId] = username;
+                    });
+
+                    await Task.WhenAll(usernameTasks);
+
+                    // Обновляем UI после загрузки имён
+                    StateHasChanged();
+                }
             }
             else
             {
-                _orders.Items = [];
+                _orders = new PageData<Order> { Items = Array.Empty<Order>(), TotalCount = 0 };
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine("Failed to load orders: " + ex.Message);
+            _orders = new PageData<Order> { Items = Array.Empty<Order>(), TotalCount = 0 };
         }
 
         _isLoading = false;
+    }
+
+
+    private async Task<string> GetUsernameFromApi(int employeeId)
+    {
+        try
+        {
+            var url = "http://localhost:5191/api/Auth/GetUserById";
+
+            var jsonContent = JsonSerializer.Serialize(new { id = employeeId });
+            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            var request = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = httpContent
+            };
+
+            // Add accept header like curl -H 'accept: */*'
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+
+            using var httpClient = new HttpClient();
+            var response = await httpClient.SendAsync(request);
+
+            Console.WriteLine($"Username API response: {response.StatusCode}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+
+                // Assuming UserResponse has a UserName property
+                var userResponse = JsonSerializer.Deserialize<UserResponse>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                return userResponse?.UserName ?? $"Пользователь {employeeId}";
+            }
+            else
+            {
+                Console.WriteLine($"Failed to fetch username for {employeeId}, status code: {response.StatusCode}");
+                return $"Пользователь {employeeId}";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception fetching username: {ex.Message}");
+            return $"Ошибка {employeeId}";
+        }
+    }
+
+
+
+
+
+    // This method is called by MudTable to display the username synchronously
+    // It returns cached username or "Загрузка..." while loading
+    private string GetUsername(int employeeId)
+    {
+        if (employeeId == 0)
+            return "Не указан";
+
+        if (_usernamesCache.TryGetValue(employeeId, out var username))
+            return username;
+
+        // Если имени нет — просто вернуть дефолтный текст
+        return $"Пользователь {employeeId}";
+    }
+
+
+    // Load username asynchronously and refresh UI after loading
+    private async Task LoadUsernameAsync(int employeeId)
+    {
+        if (!_usernamesCache.ContainsKey(employeeId))
+        {
+            var username = await GetUsernameFromApi(employeeId);
+            _usernamesCache[employeeId] = username;
+            StateHasChanged();
+        }
     }
 
     private async Task UserOrderItems(int orderId)
@@ -121,12 +225,9 @@ else
         var dialogReference = await DialogService.ShowAsync<OrderItems>("Элементы заказа", parameters, options);
         var dialogReferenceResult = await dialogReference.Result;
 
-        if (dialogReferenceResult is not null)
+        if (dialogReferenceResult is not null && !dialogReferenceResult.Canceled)
         {
-            if (!dialogReferenceResult.Canceled)
-            {
-                await LoadOrders();
-            }
+            await LoadOrders();
         }
     }
 
@@ -149,4 +250,10 @@ else
     }
 
     private void Close() => MudDialog.Cancel();
+    
+    public class UserResponse
+    {
+        public string UserName { get; set; }
+    }
+
 }

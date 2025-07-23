@@ -7,17 +7,32 @@ namespace Stocky.WebApi.Infrastructure.Repository;
 
 public class AuthRepository(ApplicationContext context) : BaseRepository<AuthenticationData>(context), IAuthRepository
 {
-    private readonly ApplicationContext _context1 = context;
+    private readonly ApplicationContext _context = context;
 
     public async Task<AuthenticationData> Add(AuthenticationData auth)
     {
-        _context1.AuthenticationData.Add(auth);
-        await _context1.SaveChangesAsync();
+        _context.AuthenticationData.Add(auth);
+        await _context.SaveChangesAsync();
         return auth;
     }
 
     public async Task<IEnumerable<AuthenticationData>> GetAll()
     {
-        return await _context1.AuthenticationData.ToListAsync();
+        return await _context.AuthenticationData.ToListAsync();
+    }
+
+    public async Task<string> GetUserNameById(int id)
+    {
+        var username = await _context.AuthenticationData
+            .Where(a => a.Id == id)
+            .Select(a => a.UserName)
+            .FirstOrDefaultAsync();
+
+        if (username is null)
+        {
+            throw new Exception("User not found");
+        }
+
+        return username;
     }
 }
