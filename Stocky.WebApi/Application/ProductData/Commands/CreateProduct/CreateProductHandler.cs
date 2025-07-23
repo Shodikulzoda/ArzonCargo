@@ -29,7 +29,7 @@ public class CreateProductHandler(IProductRepository productRepository)
         {
             throw new Exception("Product with this barcode already exists.");
         }
-        
+
         await productRepository.Add(product);
 
         return product;

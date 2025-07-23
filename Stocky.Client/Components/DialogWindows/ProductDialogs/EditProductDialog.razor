@@ -8,7 +8,7 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
-    [Parameter] public Product Product { get; set; } 
+    [Parameter] public Product Product { get; set; }
     private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     private async Task Submit()
@@ -46,7 +46,7 @@
                       Variant="Variant.Outlined"
                       @bind-Value="Product.Id"
                       Margin="Margin.Dense"
-                      ReadOnly="false" />
+                      ReadOnly="false"/>
 
         <MudSelect T="Status"
                    Label="Статус"

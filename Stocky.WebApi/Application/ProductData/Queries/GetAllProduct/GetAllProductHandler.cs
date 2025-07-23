@@ -13,7 +13,7 @@ public class GetAllProductHandler(IProductRepository productRepository)
         CancellationToken cancellationToken)
     {
         var products = await productRepository.GetAll();
-        
+
         return products;
     }
 }

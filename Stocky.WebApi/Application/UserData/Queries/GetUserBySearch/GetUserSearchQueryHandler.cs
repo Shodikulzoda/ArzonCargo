@@ -21,7 +21,7 @@ public class GetUserSearchQueryHandler(IUserRepository userRepository)
         }
 
         var text = userQuery.Text.ToLower();
-        
+
         var listUser = await userRepository.Queryable
             .Where(x =>
                 EF.Functions.Like(x.Name.ToLower(), $"%{text}%") ||

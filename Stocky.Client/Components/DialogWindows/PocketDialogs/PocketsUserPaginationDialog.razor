@@ -10,7 +10,7 @@
 
 @if (_isLoading)
 {
-    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+    <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
 }
 else
 {
@@ -26,7 +26,8 @@ else
                 <MudTableSortLabel SortBy="new Func<Pocket, object?>(x => x.TotalWeight)">Общий вес</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Pocket, object?>(x => x.TotalAmount)">Общая сумма</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Pocket, object?>(x => x.TotalAmount)">Общая сумма
+                </MudTableSortLabel>
             </MudTh>
             <MudTh>
                 <MudText>Товары</MudText>
@@ -40,7 +41,7 @@ else
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.ShoppingBag"
                                Color="Color.Success"
-                               OnClick="@(() => UserPocketItems(context.Id))" />
+                               OnClick="@(() => UserPocketItems(context.Id))"/>
             </MudTd>
         </RowTemplate>
     </MudTable>

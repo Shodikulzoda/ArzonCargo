@@ -8,7 +8,7 @@
 
 @if (_isLoading)
 {
-    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+    <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
 }
 else
 {
@@ -24,7 +24,8 @@ else
                 <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.ProductId)">Продукт</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.CreatedAt)">Дата создания</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.CreatedAt)">Дата создания
+                </MudTableSortLabel>
             </MudTh>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.IsDeleted)">Статус</MudTableSortLabel>
