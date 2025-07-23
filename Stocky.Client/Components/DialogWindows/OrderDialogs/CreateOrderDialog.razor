@@ -1,35 +1,61 @@
 @using System.Net.Http.Headers
+@using System.Net.Http.Json
 @inject HttpClient Http
 @inject AuthService AuthService
-@using MudBlazor.Components.Service
 @inject IConfiguration Configuration
+@using MudBlazor
+@using MudBlazor.Components.Service
+@using Stocky.Shared.Models
+@using Stocky.Shared.Models.Enums
 
 <MudDialog>
     <DialogContent>
-        <MudText Typo="Typo.h6">@ContentText</MudText>
+        <MudText Typo="Typo.h6" Class="mb-4">@ContentText</MudText>
+
+        <MudSelect T="PaymentMethod" Label="Тип оплаты" @bind-Value="_selectedPaymentMethod" Required="true" Class="mb-3">
+            <MudSelectItem Value="PaymentMethod.Cash">Наличные</MudSelectItem>
+            <MudSelectItem Value="PaymentMethod.DushanbeCity">Душанбе Сити</MudSelectItem>
+            <MudSelectItem Value="PaymentMethod.Alif">Alif</MudSelectItem>
+            <MudSelectItem Value="PaymentMethod.Eskhata">Eskhata</MudSelectItem>
+        </MudSelect>
+
+        <MudTextField T="double" Label="Сумма" Variant="Variant.Outlined" @bind-Value="_amount" Required="true" Class="mb-3" />
     </DialogContent>
+
     <DialogActions>
         <MudButton Color="Color.Secondary" OnClick="Cancel">Отмена</MudButton>
-        <MudButton Color="@Color" OnClick="CreateOrder" Variant="Variant.Filled">@ButtonText</MudButton>
+        <MudButton Color="@Color" OnClick="CreateOrder" Variant="Variant.Filled" Disabled="_isLoading">
+            @if (_isLoading)
+            {
+                <MudProgressCircular Size="(Size)16" Indeterminate="true" Color="Color.Inherit" Class="mr-2" />
+            }
+            @ButtonText
+        </MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
 
+    [Parameter] public int PocketId { get; set; }
     [Parameter] public int UserId { get; set; }
     [Parameter] public double TotalAmount { get; set; }
     [Parameter] public string? ContentText { get; set; }
     [Parameter] public string ButtonText { get; set; } = "Создать";
     [Parameter] public Color Color { get; set; } = Color.Default;
+
     private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
-
-    protected override void OnParametersSet()
-    {
-        ContentText = $"Отмена: {TotalAmount}";
-    }
-
     private bool _isLoading;
+
+    // Local binding fields
+    private double _amount;
+    private PaymentMethod _selectedPaymentMethod = PaymentMethod.Cash;
+
+    protected override void OnInitialized()
+    {
+        _amount = TotalAmount;
+        ContentText ??= $"Создать заказ на сумму {_amount}?";
+    }
 
     private void Cancel() => MudDialog.Cancel();
 
@@ -38,26 +64,33 @@
         _isLoading = true;
         try
         {
-            var url = $"{ApiBaseUrl}/Order/CreateOrder?UserId={UserId}";
-            var request = new HttpRequestMessage(HttpMethod.Post, url);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+            var url = $"{ApiBaseUrl}/Order/CreateOrder";
+            var createPayload = new Order
+            {
+                UserId = UserId,
+                TotalAmount = _amount,
+                Method = _selectedPaymentMethod
+            };
 
-            var response = await Http.SendAsync(request);
+            Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+            var response = await Http.PostAsJsonAsync(url, createPayload);
+
             if (response.IsSuccessStatusCode)
             {
                 MudDialog.Close(DialogResult.Ok(true));
             }
             else
             {
-                Console.WriteLine("Error deleting pocket: " + response.ReasonPhrase);
+                Console.WriteLine($"Ошибка при создании заказа: {response.ReasonPhrase}");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error deleting pocket: " + ex.Message);
+            Console.WriteLine($"Исключение при создании заказа: {ex.Message}");
         }
-
-        _isLoading = false;
+        finally
+        {
+            _isLoading = false;
+        }
     }
-
 }

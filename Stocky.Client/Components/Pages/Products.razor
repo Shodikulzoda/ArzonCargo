@@ -23,15 +23,28 @@ else
 {
     <MudText Typo="Typo.h4" GutterBottom="true">Таблица продуктов</MudText>
 
-    <div class="mb-4 d-flex gap-2">
+    <div class="mb-4 d-flex gap-2 flex-wrap">
         <MudTextField @bind-Value="_searchQuery"
-                      Placeholder="Поиск по названию, телефону и т.д..."
+                      Placeholder="Поиск по названию, штрихкоду и т.д..."
                       Adornment="Adornment.Start"
                       AdornmentIcon="@Icons.Material.Filled.Search"
                       Immediate="true"
                       OnKeyDown="HandleKeyDown"
                       Margin="Margin.Dense"/>
         <MudButton OnClick="SearchProduct" Color="Color.Primary" Variant="Variant.Filled">Поиск</MudButton>
+    </div>
+
+    <div class="mb-4 d-flex gap-2 flex-wrap align-center">
+        <MudDatePicker Label="С даты" @bind-Date="_dateFrom" DateFormat="dd.MM.yyyy" Clearable="true" />
+        <MudDatePicker Label="По дату" @bind-Date="_dateTo" DateFormat="dd.MM.yyyy" Clearable="true" />
+
+        <MudButton OnClick="FilterByDate" Color="Color.Info" Variant="Variant.Filled">
+            Фильтр по дате
+        </MudButton>
+
+        <MudButton OnClick="ClearDateFilter" Color="Color.Secondary" Variant="Variant.Text">
+            Сбросить
+        </MudButton>
     </div>
 
     @if (_isLoading)
@@ -61,7 +74,7 @@ else
                     <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
                            DataLabel="Name">@context.BarCode</MudTd>
                     <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
-                           DataLabel="Address">@context.Status</MudTd>
+                           DataLabel="Status">@context.Status</MudTd>
                     <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")">
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                        Color="Color.Primary"
@@ -75,7 +88,7 @@ else
                 {
                     <MudTd DataLabel="Id">@context.Id</MudTd>
                     <MudTd DataLabel="Name">@context.BarCode</MudTd>
-                    <MudTd DataLabel="Address">@context.Status</MudTd>
+                    <MudTd DataLabel="Status">@context.Status</MudTd>
                     <MudTd>
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                        Color="Color.Primary"
@@ -109,13 +122,15 @@ else
     private bool _isAuthorized = false;
     private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
+    private DateTime? _dateFrom;
+    private DateTime? _dateTo;
+
     protected override async Task OnInitializedAsync()
     {
         await AuthService.LoadTokenAsync();
 
         if (string.IsNullOrEmpty(AuthService.Token))
         {
-            // Нет токена — редирект
             NavigationManager.NavigateTo("/Unauthorized", true);
             return;
         }
@@ -139,6 +154,12 @@ else
         try
         {
             var url = $"{ApiBaseUrl}/Product/ProductPagination?Page={_currentPage}&PageSize={_pageSize}";
+
+            if (_dateFrom.HasValue)
+                url += $"&DateFrom={_dateFrom.Value:yyyy-MM-dd}";
+
+            if (_dateTo.HasValue)
+                url += $"&DateTo={_dateTo.Value:yyyy-MM-dd}";
 
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
@@ -176,6 +197,20 @@ else
         }
         _isLoading = false;
         StateHasChanged();
+    }
+
+    private async Task FilterByDate()
+    {
+        _currentPage = 1;
+        await LoadProducts();
+    }
+
+    private async Task ClearDateFilter()
+    {
+        _dateFrom = null;
+        _dateTo = null;
+        _currentPage = 1;
+        await LoadProducts();
     }
 
     private async Task Delete(int productId)
@@ -274,7 +309,6 @@ else
         _isLoading = false;
         StateHasChanged();
     }
-
 
     private async Task Increment()
     {

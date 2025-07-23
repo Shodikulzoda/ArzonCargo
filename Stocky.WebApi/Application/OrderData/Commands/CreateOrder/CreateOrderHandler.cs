@@ -8,6 +8,8 @@ namespace Stocky.WebApi.Application.OrderData.Commands.CreateOrder;
 public record CreateOrderCommand : IRequest<Order>
 {
     public int UserId { get; set; }
+    public double TotalAmount { get; set; }
+    public PaymentMethod Method { get; set; } 
 }
 
 public class CreateOrderHandler(
@@ -48,8 +50,9 @@ public class CreateOrderHandler(
         {
             BarCode = pocketById.BarCode,
             TotalWeight = pocketById.TotalWeight,
-            TotalAmount = pocketById.TotalAmount,
+            TotalAmount = request.TotalAmount,
             UserId = pocketById.UserId,
+            Method = request.Method,    
             OrderItems = orderItems,
             CreatedAt = DateTime.UtcNow
         };

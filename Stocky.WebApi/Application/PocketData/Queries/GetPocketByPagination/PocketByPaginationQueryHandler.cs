@@ -18,15 +18,20 @@ public class GetPocketByPaginationQueryHandler(IPocketRepository pocketRepositor
     public async Task<PaginatedList<Pocket>> Handle(GetPocketByPaginationQuery request,
         CancellationToken cancellationToken)
     {
-          pocketRepository.Queryable
-             .Include(x => x.User);
-        
-        var userPagination = await PaginatedList<Pocket>.CreateAsync(
-            pocketRepository.Queryable,
-            request.Page,
-            request.PageSize, cancellationToken);
+        var query = pocketRepository.Queryable
+            .Include(x => x.User); 
 
-        return new PaginatedList<Pocket>(userPagination.Items, userPagination.TotalCount, userPagination.PageNumber,
+        var userPagination = await PaginatedList<Pocket>.CreateAsync(
+            query,
+            request.Page,
+            request.PageSize,
+            cancellationToken);
+
+        return new PaginatedList<Pocket>(
+            userPagination.Items,
+            userPagination.TotalCount,
+            userPagination.PageNumber,
             userPagination.TotalPages);
     }
+
 }

@@ -42,40 +42,39 @@ else
     <MudTable Items="_pocketPage?.Items" Hover="true" SortLabel="Сортировать по" Elevation="1" Dense="true">
         <HeaderContent>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.Id)">Id</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.User.Name)">Имя пользователя
+                </MudTableSortLabel>
             </MudTh>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.BarCode)">Штрихкод</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalAmount)">Общая сумма
-                </MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalAmount)">Общая сумма</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalWeight)">Общий вес
-                </MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalWeight)">Общий вес</MudTableSortLabel>
             </MudTh>
-            <MudTh>Id пользователя</MudTh>
             <MudTh>Завершить заказ</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="UserName">@context.User?.Name</MudTd>
             <MudTd DataLabel="BarCode">@context.BarCode</MudTd>
             <MudTd DataLabel="TotalAmount">@context.TotalAmount</MudTd>
             <MudTd DataLabel="TotalWeight">@context.TotalWeight</MudTd>
-            <MudTd DataLabel="UserId">@context.UserId</MudTd>
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.Add"
                                Color="Color.Primary"
-                               OnClick="@(() => CreateOrder(context.UserId, context.TotalAmount))"/>
+                               OnClick="@(() => CreateOrder(context.Id, context.UserId, context.TotalAmount))"/>
             </MudTd>
         </RowTemplate>
     </MudTable>
 
+
     <div class="mt-4 d-flex justify-between">
         <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Назад</MudButton>
         <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
-        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Вперёд</MudButton>
+        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Вперёд
+        </MudButton>
     </div>
 }
 
@@ -94,23 +93,19 @@ else
 
         if (string.IsNullOrEmpty(AuthService.Token))
         {
-            // Нет токена — редирект
             NavigationManager.NavigateTo("/Unauthorized", true);
             return;
         }
 
         var role = await AuthService.GetUserRoleAsync();
-
         if (role != "Admin")
         {
-            // Если роль не админ — редирект
             NavigationManager.NavigateTo("/Unauthorized", true);
             return;
         }
 
         await LoadPockets();
     }
-
 
     private async Task LoadPockets()
     {
@@ -122,7 +117,6 @@ else
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
             var response = await Http.SendAsync(request);
-
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync();
@@ -175,10 +169,11 @@ else
         _isLoading = false;
     }
 
-    private async Task CreateOrder(int userId, double totalAmount)
+    private async Task CreateOrder(int pocketId, int userId, double totalAmount)
     {
         var parameters = new DialogParameters
         {
+            { "PocketId", pocketId },
             { "UserId", userId },
             { "TotalAmount", totalAmount }
         };
@@ -204,7 +199,7 @@ else
         var options = new DialogOptions
         {
             NoHeader = false,
-            CloseOnEscapeKey = false,         
+            CloseOnEscapeKey = false,
             Position = DialogPosition.Center,
             MaxWidth = MaxWidth.Medium,
             BackdropClick = false,
@@ -218,13 +213,11 @@ else
             options);
 
         var result = await dialogReference.Result;
-
         if (result is { Canceled: false })
         {
             await LoadPockets();
         }
     }
-
 
     private async Task Increment()
     {
