@@ -1,0 +1,80 @@
+﻿@page "/report"
+@inject HttpClient Http
+
+<PageTitle>Report Summary</PageTitle>
+
+<MudPaper Class="p-4">
+    <MudText Typo="Typo.h5">Report Summary</MudText>
+
+    <MudGrid Class="mt-4">
+        <MudItem xs="12" md="4">
+            <MudDatePicker Label="Start Date" @bind-Date="StartDate" DateFormat="yyyy-MM-dd"/>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudDatePicker Label="End Date" @bind-Date="EndDate" DateFormat="yyyy-MM-dd"/>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="LoadReport">Load Report</MudButton>
+        </MudItem>
+    </MudGrid>
+
+    @if (Report != null)
+    {
+        <MudPaper Class="mt-4 p-4" Elevation="1">
+            <MudText Typo="Typo.h6">Total Earnings: @Report.TotalEarnings</MudText>
+            <MudText>Products Received: @Report.ProductsReceived</MudText>
+            <MudText>Completed Pockets: @Report.CompletedPockets</MudText>
+            <MudText>Cash Amount: @Report.CashAmount</MudText>
+            <MudText>Card Amount: @Report.CardAmount</MudText>
+
+            <MudText Typo="Typo.h6" Class="mt-2">Card Bank Breakdown</MudText>
+            <MudTable Items="@Report.CardBanks" Dense="true">
+                <HeaderContent>
+                    <MudTh>Bank</MudTh>
+                    <MudTh>Amount</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.BankName</MudTd>
+                    <MudTd>@context.Amount</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudPaper>
+    }
+</MudPaper>
+
+@code {
+    private DateTime? StartDate = DateTime.UtcNow.AddDays(-30);
+    private DateTime? EndDate = DateTime.UtcNow;
+
+    private ReportSummaryDto? Report;
+
+    private async Task LoadReport()
+    {
+        if (StartDate is null || EndDate is null)
+            return;
+
+        var start = StartDate.Value.ToString("yyyy-MM-ddTHH:mm:ssZ");
+        var end = EndDate.Value.ToString("yyyy-MM-ddTHH:mm:ssZ");
+
+
+        var url = $"http://localhost:5191/api/reports/summary?start={start}&end={end}";
+        Report = await Http.GetFromJsonAsync<ReportSummaryDto>(url);
+    }
+
+    public class ReportSummaryDto
+    {
+        public double TotalEarnings { get; set; }
+        public int ProductsReceived { get; set; }
+        public int CompletedPockets { get; set; }
+        public double CashAmount { get; set; }
+        public double CardAmount { get; set; }
+        public List<BankBreakdown> CardBanks { get; set; } = new();
+    }
+
+    public class BankBreakdown
+    {
+        public string BankName { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+    }
+
+}

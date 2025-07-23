@@ -22,11 +22,15 @@
         <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Inventory">
             Все продукты
         </MudNavLink>
+        
+        <MudNavLink Href="report" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Inventory">
+            Все продукты
+        </MudNavLink>
     }
     else if (AuthService.IsAdder)
     {
         <MudNavLink Href="adding-product" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PlaylistAdd">
-            Добавление продукта
+            Report Page
         </MudNavLink>
     }
 
