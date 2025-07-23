@@ -5,6 +5,16 @@
 @inject IDialogService DialogService
 
 <MudNavMenu>
+
+    <MudItem Class="d-flex align-center px-4 pt-2 mb-4">
+        <MudAvatar Size="Size.Medium" Color="Color.Primary" Class="mr-2">
+            @GetInitial(AuthService.Username)
+        </MudAvatar>
+        <MudText Typo="Typo.subtitle2" Class="text-primary" Style="font-weight: 600;font-size: 1.1rem;">
+            @AuthService.Username
+        </MudText>
+    </MudItem>
+
     @if (AuthService.IsAdmin)
     {
         <MudNavLink Href="home" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ShoppingCart">
@@ -22,7 +32,7 @@
         <MudNavLink Href="products" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Inventory">
             Все продукты
         </MudNavLink>
-        
+
         <MudNavLink Href="report" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Inventory">
             Все продукты
         </MudNavLink>
@@ -55,6 +65,14 @@
     private async Task Logout()
     {
         await DialogService.ShowAsync<LogOutConfirmDialog>("Создать заказ");
+    }
+
+    private string GetInitial(string? username)
+    {
+        if (string.IsNullOrWhiteSpace(username))
+            return "?";
+
+        return username.Substring(0, 1).ToUpper();
     }
 
 }
