@@ -1,7 +1,7 @@
 @page "/pockets"
 @using System.Net.Http.Headers
 @using System.Text.Json
-@using MudBlazor.Components.DialogWindows.OrderDialogs
+@using MudBlazor.Components.DialogWindows
 @using MudBlazor.Components.DialogWindows.PocketDialogs
 @using MudBlazor.Components.Service
 @using Stocky.Shared.Models
@@ -42,8 +42,7 @@ else
     <MudTable Items="_pocketPage?.Items" Hover="true" SortLabel="Сортировать по" Elevation="1" Dense="true">
         <HeaderContent>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.User.Name)">Имя пользователя
-                </MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.User.Name)">Имя пользователя</MudTableSortLabel>
             </MudTh>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.BarCode)">Штрихкод</MudTableSortLabel>
@@ -54,7 +53,7 @@ else
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalWeight)">Общий вес</MudTableSortLabel>
             </MudTh>
-            <MudTh>Завершить заказ</MudTh>
+            <MudTh>Пакет</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="UserName">@context.User?.Name</MudTd>
@@ -62,19 +61,17 @@ else
             <MudTd DataLabel="TotalAmount">@context.TotalAmount</MudTd>
             <MudTd DataLabel="TotalWeight">@context.TotalWeight</MudTd>
             <MudTd>
-                <MudIconButton Icon="@Icons.Material.Filled.Add"
-                               Color="Color.Primary"
-                               OnClick="@(() => CreateOrder(context.Id, context.UserId, context.TotalAmount))"/>
+                <MudIconButton Icon="@Icons.Material.Filled.Inventory2"
+                               Color="Color.Info"
+                               OnClick="@(() => OpenPocketItemsDialog(context.Id, context.UserId, context.TotalAmount))"/>
             </MudTd>
         </RowTemplate>
     </MudTable>
 
-
     <div class="mt-4 d-flex justify-between">
         <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Назад</MudButton>
         <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
-        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Вперёд
-        </MudButton>
+        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Вперёд</MudButton>
     </div>
 }
 
@@ -169,7 +166,7 @@ else
         _isLoading = false;
     }
 
-    private async Task CreateOrder(int pocketId, int userId, double totalAmount)
+    private async Task OpenPocketItemsDialog(int pocketId, int userId, double totalAmount)
     {
         var parameters = new DialogParameters
         {
@@ -181,17 +178,11 @@ else
         var options = new DialogOptions
         {
             CloseButton = true,
-            MaxWidth = MaxWidth.Medium,
+            MaxWidth = MaxWidth.Large,
             FullWidth = true
         };
 
-        var dialogReference = await DialogService.ShowAsync<CreateOrderDialog>("Создать заказ", parameters, options);
-
-        var result = await dialogReference.Result;
-        if (result is { Canceled: false })
-        {
-            await LoadPockets();
-        }
+        await DialogService.ShowAsync<PocketItemsDialog>("Товары в пакете", parameters, options);
     }
 
     private async Task OpenCreatePocketDialog()
@@ -244,5 +235,4 @@ else
             await SearchPocket();
         }
     }
-
 }

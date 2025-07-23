@@ -1,0 +1,149 @@
+@using System.Net.Http.Headers
+@using System.Text.Json
+@using MudBlazor
+@using MudBlazor.Components.Service
+@using Stocky.Shared.Models
+@using MudBlazor.Components.DialogWindows.OrderDialogs
+@inject HttpClient Http
+@inject AuthService AuthService
+@inject IConfiguration Configuration
+@inject IDialogService DialogService
+
+<MudDialog>
+    <DialogContent>
+        @if (_isLoading)
+        {
+            <div class="d-flex justify-center align-center p-4">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+            </div>
+        }
+        else if (_pocketItems?.Items?.Count() == 0)
+        {
+            <div class="d-flex justify-center align-center p-4">
+                <MudText Typo="Typo.subtitle1" Color="Color.Secondary">Нет товаров в этом пакете</MudText>
+            </div>
+        }
+        else
+        {
+            <MudTable Items="_pocketItems.Items" Hover="true" SortLabel="Сортировать по" Elevation="1" Dense="true">
+                <HeaderContent>
+                    <MudTh>ID</MudTh>
+                    <MudTh>Пакет</MudTh>
+                    <MudTh>Продукт</MudTh>
+                    <MudTh>Дата создания</MudTh>
+                    <MudTh>Статус</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Id</MudTd>
+                    <MudTd>@context.PocketId</MudTd>
+                    <MudTd>@context.ProductId</MudTd>
+                    <MudTd>@context.CreatedAt.ToString("g")</MudTd>
+                    <MudTd>@((context.IsDeleted) ? "Удалён" : "Активен")</MudTd>
+                </RowTemplate>
+            </MudTable>
+
+            <div class="mt-4 d-flex justify-between">
+                <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Назад</MudButton>
+                <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
+                <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Далее</MudButton>
+            </div>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => CreateOrder(PocketId, UserId, TotalAmount))">
+            Создать заказ
+        </MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Outlined" OnClick="Close">Закрыть</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    [Parameter] public int PocketId { get; set; }
+    [Parameter] public int UserId { get; set; }
+    [Parameter] public double TotalAmount { get; set; }
+
+    private PageData<PocketItem>? _pocketItems = new();
+    private int _currentPage = 1;
+    private int _totalPages = 1;
+    private const int PageSize = 15;
+    private bool _isLoading;
+    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPocketItems();
+    }
+
+    private async Task LoadPocketItems()
+    {
+        _isLoading = true;
+        try
+        {
+            var url = $"{ApiBaseUrl}/PocketItem/GetPocketItemsByPocketId?PocketId={PocketId}&Page={_currentPage}&PageSize={PageSize}";
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+            var response = await Http.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                _pocketItems = JsonSerializer.Deserialize<PageData<PocketItem>>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                }) ?? new PageData<PocketItem>();
+                _totalPages = (int)Math.Ceiling((double)(_pocketItems.TotalCount) / PageSize);
+            }
+            else
+            {
+                _pocketItems = new PageData<PocketItem> { Items = new List<PocketItem>(), TotalCount = 0 };
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Не удалось загрузить товары в пакете: " + ex.Message);
+            _pocketItems = new PageData<PocketItem> { Items = new List<PocketItem>(), TotalCount = 0 };
+        }
+        _isLoading = false;
+    }
+
+    private async Task Increment()
+    {
+        if (_currentPage < _totalPages)
+        {
+            _currentPage++;
+            await LoadPocketItems();
+        }
+    }
+
+    private async Task Decrement()
+    {
+        if (_currentPage > 1)
+        {
+            _currentPage--;
+            await LoadPocketItems();
+        }
+    }
+
+    private async Task CreateOrder(int pocketId, int userId, double totalAmount)
+    {
+        var parameters = new DialogParameters
+        {
+            { "PocketId", pocketId },
+            { "UserId", userId },
+            { "TotalAmount", totalAmount }
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        };
+
+        var dialogReference = await DialogService.ShowAsync<CreateOrderDialog>("Создать заказ", parameters, options);
+        await dialogReference.Result;
+    }
+
+    private void Close() => MudDialog.Cancel();
+}
