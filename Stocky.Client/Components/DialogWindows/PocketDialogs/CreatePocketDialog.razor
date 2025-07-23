@@ -56,6 +56,7 @@
                                       Immediate="true"
                                       OnKeyDown="HandleKeyDown"
                                       Class="barcode-text"
+                                      @onfocus="@(() => _autoFocusEnabled = true)"
                                       Variant="Variant.Outlined"/>
 
                         <MudButton OnClick="AddProductToPocket" Color="Color.Warning" Variant="Variant.Filled">
@@ -85,10 +86,20 @@
     window.focusElement = () => {
         const el = document.querySelector('.barcode-text input');
         if (el) {
-            el.value = '';
             el.focus();
         }
     };
+
+    window.disableAutoFocus = () => {
+        DotNet.invokeMethodAsync('YourAssemblyName', 'DisableAutoFocus');
+    };
+
+    document.addEventListener('click', function (e) {
+        const barcodeField = document.querySelector('.barcode-text input');
+        if (barcodeField && !barcodeField.contains(e.target)) {
+            window.disableAutoFocus();
+        }
+    });
 </script>
 
 @code {
@@ -98,52 +109,53 @@
     private string? _message = string.Empty;
     private string? _errorMessage = string.Empty;
     private string? _productBarCode;
-    private string? _pocketId = string.Empty;
     private List<PocketItem> _pocketItems = [];
     private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
-
     private User? _selectedUser;
+    private static bool _autoFocusEnabled = false;
+
+    [JSInvokable]
+    public static void DisableAutoFocus()
+    {
+        _autoFocusEnabled = false;
+    }
 
     private async Task Cancel()
     {
         var url = $"{ApiBaseUrl}/Pocket/DeletePocket?Id={_pocketModel.Id}";
         var request = new HttpRequestMessage(HttpMethod.Delete, url);
-
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
-
         var response = await Http.SendAsync(request);
 
         if (response.IsSuccessStatusCode)
         {
             MudDialog.Close(DialogResult.Ok(true));
         }
-
         MudDialog.Cancel();
     }
 
-    private async Task<IEnumerable<User>> SearchUsers(string text)
+    private async Task<IEnumerable<User>> SearchUsers(string text, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(text) || text.Length < 1)
             return [];
 
         try
         {
-            _pocketId = text;
-
             var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiBaseUrl}/User/Search?Text={text}");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
-            var response = await Http.SendAsync(request);
+            var response = await Http.SendAsync(request, cancellationToken);
             if (!response.IsSuccessStatusCode)
                 return [];
 
-            return await response.Content.ReadFromJsonAsync<List<User>>() ?? [];
+            return await response.Content.ReadFromJsonAsync<List<User>>(cancellationToken: cancellationToken) ?? [];
         }
         catch
         {
             return [];
         }
     }
+
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -161,13 +173,14 @@
         return qrCode.GetGraphic(size);
     }
 
+    private bool _shouldFocusBarcode = false;
+
     private async Task CreatePocket()
     {
         if (_selectedUser is null)
         {
             _errorMessage = "вы не выбрали пользователя";
             _message = string.Empty;
-
             return;
         }
 
@@ -191,22 +204,33 @@
             }
 
             _pocketCreated = true;
+            _autoFocusEnabled = true;
+            _shouldFocusBarcode = true; // Will focus in OnAfterRenderAsync
+            StateHasChanged(); // Force re-render so the barcode field exists
         }
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_shouldFocusBarcode)
+        {
+            _shouldFocusBarcode = false;
+            await Js.InvokeVoidAsync("focusElement"); // Focus after rendering
+        }
+    }
+
 
     private async Task AddProductToPocket()
     {
         if (string.IsNullOrWhiteSpace(_productBarCode) || _pocketModel?.Id == 0)
-        {
             return;
-        }
 
         if (_pocketItems.Any(item => item.ProductBarCode == _productBarCode))
         {
             _message = $"Товар с штрихкодом {_productBarCode} уже добавлен.";
             _errorMessage = string.Empty;
-            await Js.InvokeVoidAsync("focusElement");
-
+            if (_autoFocusEnabled)
+                await Js.InvokeVoidAsync("focusElement");
             return;
         }
 
@@ -214,7 +238,6 @@
         {
             Content = JsonContent.Create(_pocketModel)
         };
-        
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
         var response = await Http.SendAsync(request);
@@ -238,7 +261,8 @@
             {
                 _message = string.Empty;
                 _errorMessage = $"Товар не добавлен.";
-                await Js.InvokeVoidAsync("focusElement"); // Focus because we're staying on the barcode input
+                if (_autoFocusEnabled)
+                    await Js.InvokeVoidAsync("focusElement");
             }
         }
         else if (response.IsSuccessStatusCode)
@@ -273,7 +297,8 @@
             _productBarCode = "";
             _message = "Товар добавлен.";
             _errorMessage = "";
-            await Js.InvokeVoidAsync("focusElement"); // Focus here to quickly scan next barcode
+            if (_autoFocusEnabled)
+                await Js.InvokeVoidAsync("focusElement");
         }
     }
 
@@ -287,9 +312,7 @@
         }
 
         if (_pocketModel?.BarCode is null)
-        {
             return;
-        }
 
         var request = new HttpRequestMessage(HttpMethod.Put, $"{ApiBaseUrl}/Pocket/UpdatePocket")
         {
@@ -322,28 +345,6 @@
         }
     }
 
-    private async Task<IEnumerable<User>> SearchUsers(string text, CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(text) || text.Length < 1)
-            return [];
-
-        try
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiBaseUrl}/User/Search?Text={text}");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
-            var response = await Http.SendAsync(request, cancellationToken);
-
-            if (!response.IsSuccessStatusCode)
-                return [];
-
-            return await response.Content.ReadFromJsonAsync<List<User>>(cancellationToken: cancellationToken) ?? [];
-        }
-        catch
-        {
-            return [];
-        }
-    }
-
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
         if (e.Key is "Enter" or "NumpadEnter")
@@ -351,5 +352,4 @@
             await AddProductToPocket();
         }
     }
-
 }
