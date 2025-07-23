@@ -59,7 +59,7 @@ namespace MudBlazor.Components.Service
             Role = null;
             NotifyStateChanged();
         }
-        
+
         public async Task<string?> GetUserRoleAsync()
         {
             if (string.IsNullOrEmpty(Token))
@@ -74,7 +74,8 @@ namespace MudBlazor.Components.Service
                 Console.WriteLine($"Claim type: {claim.Type}, value: {claim.Value}");
             }
 
-            var roleClaim = jwt.Claims.FirstOrDefault(c => c.Type == "role" || c.Type == ClaimTypes.Role || c.Type == "roles");
+            var roleClaim =
+                jwt.Claims.FirstOrDefault(c => c.Type == "role" || c.Type == ClaimTypes.Role || c.Type == "roles");
             return roleClaim?.Value;
         }
 

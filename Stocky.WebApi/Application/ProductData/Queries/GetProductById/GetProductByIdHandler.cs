@@ -16,12 +16,12 @@ public class GetProductByIdHandler(IProductRepository productRepository)
     public async Task<Product> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
     {
         var product = await productRepository.GetById(request.Id);
-        
+
         if (product == null)
         {
             throw new Exception("Product not found");
         }
-        
+
         return product;
     }
 }

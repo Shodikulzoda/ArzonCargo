@@ -45,9 +45,9 @@ public class CreatePocketItemHandler(
             };
 
             productByBarCode.Status = Status.Completed;
-            
+
             await pocketItemRepository.Add(pocketItem);
-            
+
             productRepository.Update(productByBarCode);
 
             return pocketItem;

@@ -29,7 +29,7 @@ public class OrdersByPaginationQueryHandler(IOrderRepository orderRepository)
                 CreatedAt = x.CreatedAt,
                 OrderItems = x.OrderItems,
             }).ToList();
-        
+
         return new PaginatedList<Order>(orderResponses, totalCount, request.Page, request.PageSize);
     }
 }
