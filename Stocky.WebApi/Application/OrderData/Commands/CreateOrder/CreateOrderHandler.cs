@@ -40,12 +40,12 @@ public class CreateOrderHandler(
             CreatedAt = x.CreatedAt,
             IsDeleted = x.IsDeleted
         }).ToList();
-        
+
         foreach (var item in orderItems)
         {
             item.Product.Status = Status.Completed;
         }
-        
+
         var order = new Order()
         {
             BarCode = pocketById.BarCode,

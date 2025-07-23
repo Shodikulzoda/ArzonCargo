@@ -14,6 +14,6 @@ public class GetOrderItemByIdHandler(IOrderItemRepository orderItemRepository)
 {
     public async Task<OrderItem> Handle(GetOrderItemByIdQuery request, CancellationToken cancellationToken)
     {
-       return await orderItemRepository.GetById(request.Id) ?? throw new Exception("OrderItem not found");
+        return await orderItemRepository.GetById(request.Id) ?? throw new Exception("OrderItem not found");
     }
 }

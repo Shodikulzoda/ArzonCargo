@@ -14,7 +14,7 @@ public class GetAllOrderHandler(IOrderRepository orderRepository)
     public async Task<IEnumerable<Order>> Handle(GetAllOrderQuery request, CancellationToken cancellationToken)
     {
         var orders = await orderRepository.GetAll();
-        
+
         return orders;
     }
 }
