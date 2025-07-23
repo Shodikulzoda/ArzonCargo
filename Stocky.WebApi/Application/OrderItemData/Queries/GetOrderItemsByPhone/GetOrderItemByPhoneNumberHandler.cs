@@ -21,14 +21,19 @@ public class GetOrderItemByPhoneNumberHandler(
     public async Task<PaginatedList<OrderItem>> Handle(GetOrderItemByPhoneNumberQuery request,
         CancellationToken cancellationToken)
     {
+        var normalizedPhone = new string(request.PhoneNumber.Where(char.IsDigit).ToArray());
+        if (normalizedPhone.Length > 9)
+            normalizedPhone = normalizedPhone[^9..];
+
         var paginatedList = await PaginatedList<OrderItem>.CreateAsync(
             orderItemRepository.Queryable
                 .Where(x => x.Order != null
                             && x.Order.User != null
-                            && x.Order.User.Phone == request.PhoneNumber),
+                            && x.Order.User.Phone.EndsWith(normalizedPhone)),
             request.Page,
             request.PageSize,
             cancellationToken);
+
 
         return new PaginatedList<OrderItem>(paginatedList.Items, paginatedList.TotalCount, paginatedList.PageNumber,
             paginatedList.TotalPages);

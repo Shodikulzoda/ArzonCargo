@@ -21,11 +21,15 @@ public class GetPocketItemByPhoneNumberHandler(
     public async Task<PaginatedList<PocketItem>> Handle(GetPocketItemByPhoneNumberQuery request,
         CancellationToken cancellationToken)
     {
+        var normalizedPhone = new string(request.PhoneNumber.Where(char.IsDigit).ToArray());
+        if (normalizedPhone.Length > 9)
+            normalizedPhone = normalizedPhone[^9..]; 
+
         var paginatedList = await PaginatedList<PocketItem>.CreateAsync(
             pocketItemRepository.Queryable
                 .Where(x => x.Pocket != null
                             && x.Pocket.User != null
-                            && x.Pocket.User.Phone == request.PhoneNumber),
+                            && x.Pocket.User.Phone.EndsWith(normalizedPhone)),
             request.Page,
             request.PageSize,
             cancellationToken);
