@@ -14,7 +14,7 @@ public class AuthService : IDisposable
 
     public string Token { get; private set; } = "";
     public string? Username { get; private set; }
-    public string? EmployeeId { get; private set; }
+    public int EmployeeId { get; private set; }
     public string? Role { get; private set; }
 
     public event Action? OnChange;
@@ -74,7 +74,6 @@ public class AuthService : IDisposable
         var handler = new JwtSecurityTokenHandler();
         var jwt = handler.ReadJwtToken(Token);
 
-        // Выведем все claims в лог, чтобы понять, какие там есть
         foreach (var claim in jwt.Claims)
         {
             Console.WriteLine($"Claim type: {claim.Type}, value: {claim.Value}");
@@ -137,12 +136,13 @@ public class AuthService : IDisposable
             var idClaim = jwtToken.Claims.FirstOrDefault(c =>
                 c.Type == "id" || c.Type == ClaimTypes.NameIdentifier);
 
-            EmployeeId = idClaim?.Value;
+            EmployeeId = Convert.ToInt32(idClaim?.Value);
             Console.WriteLine($"Parsed EmployeeId: {EmployeeId}");
         }
-        catch
+        catch (Exception ex)
         {
-            EmployeeId = null;
+            Console.WriteLine($"Error parsing EmployeeId from token: {ex.Message}");
+            EmployeeId = 0;
         }
     }
 }

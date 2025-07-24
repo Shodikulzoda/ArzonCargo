@@ -35,8 +35,8 @@ else
     </div>
 
     <div class="mb-4 d-flex gap-2 flex-wrap align-center">
-        <MudDatePicker Label="С даты" @bind-Date="_dateFrom" DateFormat="dd.MM.yyyy" Clearable="true" />
-        <MudDatePicker Label="По дату" @bind-Date="_dateTo" DateFormat="dd.MM.yyyy" Clearable="true" />
+        <MudDatePicker Label="С даты" @bind-Date="_dateFrom" DateFormat="dd.MM.yyyy" Clearable="true"/>
+        <MudDatePicker Label="По дату" @bind-Date="_dateTo" DateFormat="dd.MM.yyyy" Clearable="true"/>
 
         <MudButton OnClick="FilterByDate" Color="Color.Info" Variant="Variant.Filled">
             Фильтр по дате
@@ -64,8 +64,12 @@ else
                 <MudTh>
                     <MudTableSortLabel SortBy="new Func<Product, object>(x => x.Status)">Статус</MudTableSortLabel>
                 </MudTh>
+                <MudTh>
+                    <MudTableSortLabel SortBy="new Func<Product, object>(x => x.CreatedAt.ToLocalTime())">Дата создания</MudTableSortLabel>
+                </MudTh>
                 <MudTh>Действия</MudTh>
             </HeaderContent>
+
             <RowTemplate>
                 @if (@context.Status == Status.Completed)
                 {
@@ -75,6 +79,8 @@ else
                            DataLabel="Name">@context.BarCode</MudTd>
                     <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
                            DataLabel="Status">@context.Status</MudTd>
+                    <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
+                           DataLabel="Дата создания">@context.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</MudTd>
                     <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")">
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                        Color="Color.Primary"
@@ -89,6 +95,7 @@ else
                     <MudTd DataLabel="Id">@context.Id</MudTd>
                     <MudTd DataLabel="Name">@context.BarCode</MudTd>
                     <MudTd DataLabel="Status">@context.Status</MudTd>
+                    <MudTd DataLabel="Дата создания">@context.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</MudTd>
                     <MudTd>
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                        Color="Color.Primary"
@@ -99,12 +106,14 @@ else
                     </MudTd>
                 }
             </RowTemplate>
+
         </MudTable>
 
         <div class="mt-4 d-flex justify-between">
             <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Назад</MudButton>
             <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
-            <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Вперёд</MudButton>
+            <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Вперёд
+            </MudButton>
         </div>
     }
 }
@@ -195,6 +204,7 @@ else
             Console.WriteLine("Error loading products: " + ex.Message);
             _productPage = new PageData<Product> { Items = new List<Product>(), TotalCount = 0 };
         }
+
         _isLoading = false;
         StateHasChanged();
     }
@@ -244,7 +254,8 @@ else
                 "Product", new Product
                 {
                     Id = product.Id,
-                    Status = product.Status,
+                    BarCode = product.BarCode,
+                    Status = product.Status
                 }
             },
         };
@@ -306,6 +317,7 @@ else
             Console.WriteLine("Ошибка поиска: " + ex.Message);
             _productPage.Items = new List<Product>();
         }
+
         _isLoading = false;
         StateHasChanged();
     }
@@ -335,4 +347,5 @@ else
             await SearchProduct();
         }
     }
+
 }

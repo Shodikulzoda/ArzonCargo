@@ -1,0 +1,145 @@
+@inject HttpClient Http
+
+<MudDialog>
+    <DialogContent>
+
+        @if (IsLoading)
+        {
+            <MudProgressCircular Indeterminate="true" Size="Size.Large" Color="Color.Primary" Class="my-4" />
+            <MudText Typo="Typo.subtitle1">Загружается текущая цена...</MudText>
+        }
+        else if (LoadError != null)
+        {
+            <MudText Color="Color.Error">@LoadError</MudText>
+        }
+        else
+        {
+            <MudPaper Class="pa-4 mb-3" Elevation="1">
+                <MudText Typo="Typo.h6">Текущая цена</MudText>
+                <MudDivider Class="my-2" />
+                <MudText>
+                    <b>Цена за кг:</b> @PriceInfo?.pricePerKg.ToString() TJS<br />
+                    <b>Дата создания:</b> @PriceInfo?.createdAt.ToLocalTime().ToString("g")
+                </MudText>
+            </MudPaper>
+
+            <MudTextField @bind-Value="NewPriceInput"
+                          Label="Новая цена (в сомони)"
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Adornment="Adornment.End"
+                          AdornmentText="сом"
+                          InputType="InputType.Number"
+                          Immediate="true"
+                          Class="mb-3"
+                          Style="max-width: 300px;" />
+
+            <MudStack Row="true" Spacing="2">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           OnClick="@SubmitPrice"
+                           Disabled="@IsSubmitting">
+                    @(IsSubmitting ? "Отправка..." : "Сохранить")
+                </MudButton>
+
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Default"
+                           OnClick="() => MudDialog.Cancel()"
+                           Disabled="@IsSubmitting">
+                    Отмена
+                </MudButton>
+            </MudStack>
+
+            @if (SubmitError != null)
+            {
+                <MudText Color="Color.Error" Class="mt-2">@SubmitError</MudText>
+            }
+        }
+
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+
+    private class PriceResponse
+    {
+        public decimal pricePerKg { get; set; }
+        public int id { get; set; }
+        public DateTime createdAt { get; set; }
+        public bool isDeleted { get; set; }
+    }
+
+    private class PriceChangeRequest
+    {
+        public decimal newPrice { get; set; }
+    }
+
+    private PriceResponse? PriceInfo;
+    private bool IsLoading = true;
+    private bool IsSubmitting = false;
+    private string? LoadError;
+    private string? SubmitError;
+    private string? NewPriceInput;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCurrentPrice();
+    }
+
+    private async Task LoadCurrentPrice()
+    {
+        IsLoading = true;
+        LoadError = null;
+
+        try
+        {
+            PriceInfo = await Http.GetFromJsonAsync<PriceResponse>("http://localhost:5191/api/PriceList/GetPrice");
+        }
+        catch
+        {
+            LoadError = "Не удалось загрузить текущую цену.";
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SubmitPrice()
+    {
+        SubmitError = null;
+
+        if (!decimal.TryParse(NewPriceInput, out var newPrice))
+        {
+            SubmitError = "Введите корректную числовую цену.";
+            return;
+        }
+
+        IsSubmitting = true;
+
+        try
+        {
+            var request = new PriceChangeRequest { newPrice = newPrice };
+            var response = await Http.PostAsJsonAsync("http://localhost:5191/api/PriceList/PriceChanger", request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                MudDialog.Close(DialogResult.Ok(newPrice));
+            }
+            else
+            {
+                SubmitError = $"Ошибка при сохранении: {response.ReasonPhrase}";
+            }
+        }
+        catch (Exception ex)
+        {
+            SubmitError = $"Системная ошибка: {ex.Message}";
+        }
+        finally
+        {
+            IsSubmitting = false;
+        }
+    }
+}

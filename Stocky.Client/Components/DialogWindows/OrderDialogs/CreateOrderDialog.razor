@@ -66,6 +66,7 @@
             var createPayload = new Order
             {
                 UserId = UserId,
+                EmployeeId = AuthService.EmployeeId,
                 TotalAmount = _amount,
                 Method = _selectedPaymentMethod
             };

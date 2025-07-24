@@ -1,20 +1,37 @@
-﻿@inherits LayoutComponentBase
+﻿@using MudBlazor.Components.DialogWindows
+@inherits LayoutComponentBase
+@inject IDialogService DialogService
 
-<MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode"/>
-<MudPopoverProvider/>
-<MudDialogProvider/>
-<MudSnackbarProvider/>
+<MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start"
-                       OnClick="@((e) => DrawerToggle())"/>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h5" Class="ml-3">Stocky</MudText>
-        <MudSpacer/>
-        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
+        <MudSpacer />
+        
+        <!-- Dark Mode Toggle -->
+        <MudIconButton Icon="@DarkLightModeButtonIcon"
+                       Color="Color.Inherit"
+                       OnClick="@DarkModeToggle" />
+
+        <!-- Price Change Button -->
+        <MudIconButton Icon="@Icons.Material.Filled.AttachMoney"
+                       Color="Color.Inherit"
+                       OnClick="@ShowPriceDialog"
+                       Title="Change Price" />
     </MudAppBar>
+
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-        <NavMenu/>
+        <NavMenu />
     </MudDrawer>
+
     <MudMainContent Class="mt-16 pa-4">
         @Body
     </MudMainContent>
@@ -33,9 +50,7 @@
 
     protected override void OnInitialized()
     {
-        base.OnInitialized();
-
-        _theme = new()
+        _theme = new MudTheme()
         {
             PaletteLight = _lightPalette,
             PaletteDark = _darkPalette,
@@ -43,16 +58,23 @@
         };
     }
 
+    private void DrawerToggle() => _drawerOpen = !_drawerOpen;
+    private void DarkModeToggle() => _isDarkMode = !_isDarkMode;
 
-    private void DrawerToggle()
+    private async Task ShowPriceDialog()
     {
-        _drawerOpen = !_drawerOpen;
+        var dialog = await DialogService.ShowAsync<PriceDialog>("Change Price");
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is decimal newPrice)
+        {
+            Console.WriteLine($"New price submitted: {newPrice}");
+        }
     }
 
-    private void DarkModeToggle()
-    {
-        _isDarkMode = !_isDarkMode;
-    }
+    private string DarkLightModeButtonIcon => _isDarkMode
+        ? Icons.Material.Rounded.AutoMode
+        : Icons.Material.Outlined.DarkMode;
 
     private readonly PaletteLight _lightPalette = new()
     {
@@ -92,11 +114,4 @@
         Divider = "#292838",
         OverlayLight = "#1e1e2d80",
     };
-
-    public string DarkLightModeButtonIcon => _isDarkMode switch
-    {
-        true => Icons.Material.Rounded.AutoMode,
-        false => Icons.Material.Outlined.DarkMode,
-    };
-
 }

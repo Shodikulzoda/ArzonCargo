@@ -18,26 +18,17 @@ else
                 <MudTableSortLabel SortBy="new Func<OrderItem, object>(x => x.Id)">Идентификатор</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.OrderId)">Штрихкод</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.Product.BarCode)">Штрихкод</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.ProductId)">Общий вес
+                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.CreatedAt.ToLocalTime())">Дата создания
                 </MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.CreatedAt)">Общая сумма
-                </MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<OrderItem, object?>(x => x.IsDeleted)">Статус</MudTableSortLabel>
             </MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
-            <MudTd DataLabel="Штрихкод">@context.OrderId</MudTd>
-            <MudTd DataLabel="Общий вес">@context.ProductId</MudTd>
-            <MudTd DataLabel="Общая сумма">@context.CreatedAt</MudTd>
-            <MudTd DataLabel="Статус">@context.IsDeleted</MudTd>
+            <MudTd DataLabel="Штрихкод">@context.Product.BarCode</MudTd>
+            <MudTd DataLabel="Дата создания">@context.CreatedAt.ToLocalTime()</MudTd>
         </RowTemplate>
     </MudTable>
 

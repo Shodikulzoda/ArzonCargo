@@ -24,8 +24,8 @@ public class CreateOrderHandler(
 {
     public async Task<Order> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
-        var user = userRepository.GetById(request.UserId);
-        if (user.Result is null)
+        var user =await userRepository.GetById(request.UserId);
+        if (user is null)
             throw new Exception("User not found");
 
         var pocketById = await pocketRepository.GetByUserId(request.UserId);

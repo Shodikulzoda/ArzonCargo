@@ -8,6 +8,7 @@ namespace Stocky.WebApi.Application.ProductData.Commands.UpdateProduct;
 public record UpdateProductCommand : IRequest<Product>
 {
     public int Id { get; set; }
+    public string BarCode { get; set; }
     public Status Status { get; set; }
 }
 
@@ -28,6 +29,7 @@ public class UpdateProductHandler(IProductRepository productRepository)
         }
 
         product.Status = request.Status;
+        product.BarCode = request.BarCode;
 
         await productRepository.Update(product);
 

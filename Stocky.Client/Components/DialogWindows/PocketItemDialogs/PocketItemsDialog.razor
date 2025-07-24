@@ -28,17 +28,24 @@
             <MudTable Items="_pocketItems.Items" Hover="true" SortLabel="Сортировать по" Elevation="1" Dense="true">
                 <HeaderContent>
                     <MudTh>ID</MudTh>
-                    <MudTh>Пакет</MudTh>
-                    <MudTh>Продукт</MudTh>
+                    <MudTh>Штрихкод</MudTh>
                     <MudTh>Дата создания</MudTh>
-                    <MudTh>Статус</MudTh>
+                    <MudTh>Удалить</MudTh>
+
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd>@context.Id</MudTd>
-                    <MudTd>@context.PocketId</MudTd>
-                    <MudTd>@context.ProductId</MudTd>
-                    <MudTd>@context.CreatedAt.ToString("g")</MudTd>
-                    <MudTd>@(context.IsDeleted ? "Удалён" : "Активен")</MudTd>
+                    <MudTd>@(context.ProductBarCode)</MudTd>
+                    <MudTd>@context.CreatedAt.ToLocalTime().ToString("g")</MudTd>
+                    <MudTd>
+                        <MudButton Color="Color.Error"
+                                   Variant="Variant.Outlined"
+                                   Size="Size.Small"
+                                   OnClick="@(() => ConfirmDelete(context.Id))">
+                            <MudIcon Icon="@Icons.Material.Filled.Delete" />
+                        </MudButton>
+                    </MudTd>
+
                 </RowTemplate>
             </MudTable>
 
@@ -73,6 +80,41 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadPocketItems();
+    }
+    private async Task ConfirmDelete(int id)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            title: "Подтверждение",
+            markupMessage: (MarkupString)$"Вы уверены, что хотите удалить товар с ID <b>{id}</b>?",
+            yesText: "Удалить", cancelText: "Отмена", options: new DialogOptions { CloseButton = true });
+
+        if (result == true)
+        {
+            await DeleteItem(id);
+        }
+    }
+    private async Task DeleteItem(int id)
+    {
+        try
+        {
+            var url = $"{ApiBaseUrl}/PocketItem/Delete?Id={id}";
+            var request = new HttpRequestMessage(HttpMethod.Delete, url);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+            var response = await Http.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadPocketItems(); // Refresh the list
+            }
+            else
+            {
+                Console.WriteLine($"Ошибка при удалении товара ID {id}: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка при удалении товара ID {id}: {ex.Message}");
+        }
     }
 
     private async Task LoadPocketItems()

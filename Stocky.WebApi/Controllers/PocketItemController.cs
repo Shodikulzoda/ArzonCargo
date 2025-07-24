@@ -22,9 +22,10 @@ public class PocketItemController(IMediator mediator) : ControllerBase
     {
         return Ok(await mediator.Send(createPocketItemCommand));
     }
-    
+
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PocketItem>>> GetPocketItemByPhoneNumber([FromQuery] GetPocketItemByPhoneNumberQuery query)
+    public async Task<ActionResult<IEnumerable<PocketItem>>> GetPocketItemByPhoneNumber(
+        [FromQuery] GetPocketItemByPhoneNumberQuery query)
     {
         return Ok(await mediator.Send(query));
     }
@@ -53,7 +54,7 @@ public class PocketItemController(IMediator mediator) : ControllerBase
 
     [Authorize(Roles = "Admin")]
     [HttpDelete]
-    public async Task<IActionResult> Delete(DeletePocketItemCommand deletePocketItemCommand)
+    public async Task<IActionResult> Delete([FromQuery] DeletePocketItemCommand deletePocketItemCommand)
     {
         return Ok(await mediator.Send(deletePocketItemCommand));
     }

@@ -10,6 +10,7 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
     public DbSet<Product> Products { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<PriceList> PriceLists { get; set; }
     public DbSet<AuthenticationData> AuthenticationData { get; set; }
     public DbSet<Pocket> Pockets { get; set; }
     public DbSet<PocketItem> PocketItem { get; set; }

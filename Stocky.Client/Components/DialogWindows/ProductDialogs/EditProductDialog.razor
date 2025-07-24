@@ -6,6 +6,34 @@
 @inject IConfiguration Configuration
 @inject AuthService AuthService
 
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">Редактировать продукт</MudText>
+        
+        <MudTextField Label="Штрихкод"
+                      Variant="Variant.Outlined"
+                      @bind-Value="Product.BarCode"
+                      Margin="Margin.Dense"
+                      ReadOnly="false"/>
+
+        <MudSelect T="Status"
+                   Label="Статус"
+                   @bind-Value="Product.Status"
+                   Variant="Variant.Outlined"
+                   Margin="Margin.Dense">
+            @foreach (var status in Enum.GetValues<Status>())
+            {
+                <MudSelectItem Value="status">@status</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Color="Color.Secondary" OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit" Variant="Variant.Filled">Сохранить</MudButton>
+    </DialogActions>
+</MudDialog>
+
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
     [Parameter] public Product Product { get; set; }
@@ -37,31 +65,3 @@
 
     private void Cancel() => MudDialog.Cancel();
 }
-
-<MudDialog>
-    <DialogContent>
-        <MudText Typo="Typo.h6">Редактировать продукт</MudText>
-
-        <MudTextField Label="ID продукта"
-                      Variant="Variant.Outlined"
-                      @bind-Value="Product.Id"
-                      Margin="Margin.Dense"
-                      ReadOnly="false"/>
-
-        <MudSelect T="Status"
-                   Label="Статус"
-                   @bind-Value="Product.Status"
-                   Variant="Variant.Outlined"
-                   Margin="Margin.Dense">
-            @foreach (var status in Enum.GetValues<Status>())
-            {
-                <MudSelectItem Value="status">@status</MudSelectItem>
-            }
-        </MudSelect>
-    </DialogContent>
-
-    <DialogActions>
-        <MudButton Color="Color.Secondary" OnClick="Cancel">Отмена</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit" Variant="Variant.Filled">Сохранить</MudButton>
-    </DialogActions>
-</MudDialog>

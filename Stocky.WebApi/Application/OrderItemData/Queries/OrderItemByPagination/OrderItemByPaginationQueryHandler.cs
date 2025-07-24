@@ -22,6 +22,7 @@ public class OrdersByPaginationQueryHandler(IOrderItemRepository orderItemReposi
         {
             OrderId = x.OrderId,
             ProductId = x.ProductId,
+            Product = x.Product,
             CreatedAt = x.CreatedAt
         }).ToList();
 

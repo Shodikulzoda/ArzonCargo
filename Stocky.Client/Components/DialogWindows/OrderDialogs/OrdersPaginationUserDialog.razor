@@ -64,7 +64,6 @@ else
     private const int PageSize = 15;
     private bool _isLoading;
 
-    // Cache to store EmployeeId -> Username mappings
     private Dictionary<int, string> _usernamesCache = new();
 
     protected override async Task OnInitializedAsync()
@@ -177,13 +176,7 @@ else
             return $"Ошибка {employeeId}";
         }
     }
-
-
-
-
-
-    // This method is called by MudTable to display the username synchronously
-    // It returns cached username or "Загрузка..." while loading
+    
     private string GetUsername(int employeeId)
     {
         if (employeeId == 0)

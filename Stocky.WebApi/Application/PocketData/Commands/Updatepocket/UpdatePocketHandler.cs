@@ -11,12 +11,13 @@ public record UpdatePocketCommand : IRequest<Pocket>
     public int UserId { get; set; }
 }
 
-public class UpdatePocketHandler(IPocketRepository pocketRepository, IConfiguration configuration)
+public class UpdatePocketHandler(IPocketRepository pocketRepository, IPriceListRepository priceListRepository)
     : IRequestHandler<UpdatePocketCommand, Pocket?>
 {
     public async Task<Pocket?> Handle(UpdatePocketCommand request, CancellationToken cancellationToken)
     {
-        var t = configuration.GetValue<int>("SumOfKg:SumOfPerKg");
+        // needs to change
+        var pricePerKg = await priceListRepository.GetPriceAsync();
         var pocket = await pocketRepository.GetById(request.Id);
         if (pocket is null)
         {
@@ -25,7 +26,7 @@ public class UpdatePocketHandler(IPocketRepository pocketRepository, IConfigurat
 
         pocket.TotalWeight = request.TotalWeight;
         pocket.UserId = request.UserId;
-        pocket.TotalAmount = request.TotalWeight * t;
+        pocket.TotalAmount = request.TotalWeight * pricePerKg.PricePerKg;
 
         await pocketRepository.Update(pocket);
 

@@ -3,6 +3,7 @@
 @using System.Text.Json
 @using MudBlazor.Components.DialogWindows
 @using MudBlazor.Components.DialogWindows.PocketDialogs
+@using MudBlazor.Components.DialogWindows.PocketItemDialogs
 @using MudBlazor.Components.Service
 @using Stocky.Shared.Models
 @inject HttpClient Http
@@ -54,6 +55,10 @@ else
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.TotalWeight)">Общий вес</MudTableSortLabel>
             </MudTh>
+            <MudTh>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.CreatedAt.ToLocalTime())">Дата создания
+                </MudTableSortLabel>
+            </MudTh>
             <MudTh>Пакет</MudTh>
         </HeaderContent>
         <RowTemplate>
@@ -61,6 +66,7 @@ else
             <MudTd DataLabel="BarCode">@context.BarCode</MudTd>
             <MudTd DataLabel="TotalAmount">@context.TotalAmount</MudTd>
             <MudTd DataLabel="TotalWeight">@context.TotalWeight</MudTd>
+            <MudTd DataLabel="CreatedAt">@context.CreatedAt.ToLocalTime()</MudTd>
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.Inventory2"
                                Color="Color.Info"
@@ -182,7 +188,7 @@ else
         var options = new DialogOptions
         {
             CloseButton = true,
-            MaxWidth = MaxWidth.Large,
+            MaxWidth = MaxWidth.Small,
             FullWidth = true
         };
 

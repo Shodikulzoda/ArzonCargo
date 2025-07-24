@@ -48,8 +48,12 @@ public static class JwtTokenExtension
         {
             x.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = false,
-                ValidateAudience = false,
+                ValidateIssuer = true,
+                ValidIssuer = builder.Configuration["Jwt:Issuer"] ??
+                              throw new InvalidOperationException("Issuer is not configured"),
+                ValidateAudience = true,
+                ValidAudience = builder.Configuration["Jwt:Audience"] ??
+                                throw new InvalidOperationException("Audience is not configured"),
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero,
                 ValidateIssuerSigningKey = true,

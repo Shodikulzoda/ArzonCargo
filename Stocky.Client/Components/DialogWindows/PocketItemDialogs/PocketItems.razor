@@ -5,6 +5,7 @@
 @inject HttpClient Http
 @inject AuthService AuthService
 @inject IConfiguration Configuration
+@inject IDialogService DialogService
 
 @if (_isLoading)
 {
@@ -18,25 +19,28 @@ else
                 <MudTableSortLabel SortBy="new Func<PocketItem, object>(x => x.Id)">ID</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.PocketId)">Пакет</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.ProductBarCode)">Штрихкод</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.ProductId)">Продукт</MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.CreatedAt)">Дата создания
+                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.CreatedAt.ToLocalTime())">Дата создания
                 </MudTableSortLabel>
             </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.IsDeleted)">Статус</MudTableSortLabel>
-            </MudTh>
+            <MudTh>Удалить</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="ID">@context.Id</MudTd>
-            <MudTd DataLabel="Пакет">@context.PocketId</MudTd>
-            <MudTd DataLabel="Продукт">@context.ProductId</MudTd>
-            <MudTd DataLabel="Дата создания">@context.CreatedAt.ToString("g")</MudTd>
-            <MudTd DataLabel="Статус">@((context.IsDeleted) ? "Удалён" : "Активен")</MudTd>
+            <MudTd DataLabel="Статус">@context.ProductBarCode</MudTd>
+            <MudTd DataLabel="Дата создания">@context.CreatedAt.ToLocalTime().ToString("g")</MudTd>
+            <MudTd>
+                <MudButton Color="Color.Error"
+                           Variant="Variant.Outlined"
+                           Size="Size.Small"
+                           OnClick="@(() => ConfirmDelete(context.Id))">
+                    <MudIcon Icon="@Icons.Material.Filled.Delete" />
+                </MudButton>
+            </MudTd>
+
+
         </RowTemplate>
     </MudTable>
 
@@ -62,6 +66,43 @@ else
     {
         await LoadPocketItems();
     }
+    
+    private async Task ConfirmDelete(int id)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            title: "Подтверждение",
+            markupMessage: (MarkupString)$"Вы уверены, что хотите удалить товар с ID <b>{id}</b>?",
+            yesText: "Удалить", cancelText: "Отмена", options: new DialogOptions { CloseButton = true });
+
+        if (result == true)
+        {
+            await DeleteItem(id);
+        }
+    }
+    private async Task DeleteItem(int id)
+    {
+        try
+        {
+            var url = $"{ApiBaseUrl}/PocketItem/Delete?Id={id}";
+            var request = new HttpRequestMessage(HttpMethod.Delete, url);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+            var response = await Http.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadPocketItems(); // Refresh the list
+            }
+            else
+            {
+                Console.WriteLine($"Ошибка при удалении товара ID {id}: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка при удалении товара ID {id}: {ex.Message}");
+        }
+    }
+
 
     private async Task LoadPocketItems()
     {

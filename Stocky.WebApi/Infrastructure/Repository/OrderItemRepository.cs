@@ -24,7 +24,7 @@ public class OrderItemRepository(ApplicationContext context) : BaseRepository<Or
 
     public async Task<OrderItem?> GetById(int id)
     {
-        return await _context1.OrderItems.FirstOrDefaultAsync(o => o.Id == id);
+        return await _context1.OrderItems.Include(x=>x.Product).FirstOrDefaultAsync(o => o.Id == id);
     }
 
     public async Task<OrderItem> Update(OrderItem order)
@@ -58,6 +58,7 @@ public class OrderItemRepository(ApplicationContext context) : BaseRepository<Or
         CancellationToken cancellationToken)
     {
         return await _context1.OrderItems
+            .Include(x=> x.Product)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

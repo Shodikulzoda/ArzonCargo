@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Stocky.Shared.Models;
 using Stocky.WebApi.Application.Common;
 using Stocky.WebApi.Application.Interfaces;
@@ -18,7 +19,7 @@ public class GetOrdersByUserIdHandler(IOrderItemRepository orderItemRepository)
     public async Task<PaginatedList<OrderItem>> Handle(GetByOrderIdQuery request, CancellationToken cancellationToken)
     {
         var ordersByUserId = await PaginatedList<OrderItem>.CreateAsync(
-            orderItemRepository.Queryable.Where(x => x.OrderId == request.OrderId),
+            orderItemRepository.Queryable.Include(x=>x.Product).Where(x => x.OrderId == request.OrderId),
             request.Page,
             request.PageSize, cancellationToken);
 
