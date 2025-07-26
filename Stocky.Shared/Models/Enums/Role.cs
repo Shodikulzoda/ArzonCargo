@@ -4,5 +4,6 @@ public enum Role
 {
     Admin,
     Adder,
+    Cashier,
     User 
 }

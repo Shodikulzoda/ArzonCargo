@@ -53,7 +53,6 @@
         if (role != "Admin")
         {
             NavigationManager.NavigateTo("/Unauthorized", true);
-            return;
         }
     }
 
@@ -71,20 +70,7 @@
             var qrCodeBytes = qrCode.GetGraphic(20);
 
             var qr = Convert.ToBase64String(qrCodeBytes);
-            var rawHtml = string.Join(
-                Environment.NewLine,
-                "<div style='width:60mm;height:60mm;text-align:center;font-family:sans-serif;position:relative;'>",
-                "<h2 style='margin:0;'>ArzonCargo</h2>",
-                "<div style='font-size:3mm;margin:0'><b>+992 92 788 0989</b></div>",
-                "<div style='position:relative; display:inline-block; width:40mm; height:40mm; margin-top:-5mm;'>",
-                "<div style='position:absolute; top:0; right:-3mm; writing-mode:vertical-lr; font-size:5mm; color:black;'><b>@arzoncargo</b></div>",
-                $"<img src='data:image/png;base64,{qr}' style='width:40mm;height:40mm; z-index:-1;' />",
-                "</div>",
-                $"<div style='margin-top: -3mm; z-index:3;'><b>Номер uytrew: 928113006</b></div>",
-                $"<div style='font-size:3mm;'><b>Номер клиента: 928113006</b></div>",
-                $"<div style='font-size:3mm;'><b>Сумма: 535.2 сомони</b></div>",
-                $"<div style='font-size:3mm;'><b>Вес: 23.5 кг</b></div>",
-                "</div>");
+            var rawHtml = $"""<img src="data:image/png;base64,{qr}" style="width:55mm;height:55mm;"/>""";
 
             await Task.Delay(00);
             await PrintingService.Print(rawHtml, PrintType.RawHtml);

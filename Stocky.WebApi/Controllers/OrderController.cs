@@ -12,29 +12,32 @@ using Stocky.WebApi.Application.OrderData.Queries.OrderByPagination;
 
 namespace Stocky.WebApi.Controllers;
 
-[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("[controller]/[action]")]
 public class OrderController(IMediator mediator) : ControllerBase
 {
+    [Authorize(Roles = "Admin,Cashier")]
     [HttpPost]
     public async Task<IActionResult> CreateOrder([FromBody] CreateOrderCommand order)
     {
         return Ok(await mediator.Send(order));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetOrders()
     {
         return Ok(await mediator.Send(new GetAllOrderQuery()));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetOrderById([FromQuery] GetOrderByIdQuery query)
     {
         return Ok(await mediator.Send(query));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<ActionResult<PageData<Order>>> GetOrdersByUserId(
         [FromQuery] GetOrdersByUserIdQuery getOrdersByUserIdQuery)
@@ -42,18 +45,21 @@ public class OrderController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(getOrdersByUserIdQuery));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> OrderByPagination(OrderByPaginationQuery query)
     {
         return Ok(await mediator.Send(query));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut]
     public async Task<IActionResult> UpdateOrder(UpdateOrderCommand order)
     {
         return Ok(await mediator.Send(order));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete]
     public async Task<IActionResult> DeleteOrder([FromQuery] DeleteOrderCommand order)
     {

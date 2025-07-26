@@ -46,14 +46,14 @@ public class PocketController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(getPocketsByUserIdQuery));
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Adder,Cashier")]
     [HttpGet]
     public async Task<IActionResult> GetPocketBySearch([FromQuery] SearchPocketQuery query)
     {
         return Ok(await mediator.Send(query));
     }
 
-    [Authorize(Roles = "Admin, Adder")]
+    [Authorize(Roles = "Admin, Adder,Cashier")]
     [HttpGet]
     public async Task<ActionResult<PageData<Pocket>>> PocketPagination(
         [FromQuery] GetPocketByPaginationQuery getPocketByPaginationQuery)

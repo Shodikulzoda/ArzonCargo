@@ -33,9 +33,14 @@
             Все продукты
         </MudNavLink>
 
-        <MudNavLink Href="report" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Inventory">
-            Все продукты
+        <MudNavLink Href="report" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Assessment">
+            Отчёты
         </MudNavLink>
+        
+        <MudNavLink Href="qrGenerator" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.QrCode">
+            QR для сотрудников
+        </MudNavLink>
+
     }
     else if (AuthService.IsAdder)
     {
@@ -43,6 +48,12 @@
             Добавление продукта
         </MudNavLink>
 
+        <MudNavLink Href="pockets" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Inventory">
+            Пакеты
+        </MudNavLink>
+    }
+    else if (AuthService.IsCashier)
+    {
         <MudNavLink Href="pockets" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Inventory">
             Пакеты
         </MudNavLink>
@@ -61,10 +72,10 @@
         await AuthService.LoadTokenAsync();
     }
 
-    public void Dispose()
-    {
-        AuthService.OnChange -= StateHasChanged;
-    }
+    // public void Dispose()
+    // {
+    //     AuthService.OnChange -= StateHasChanged;
+    // }
 
     private async Task Logout()
     {
