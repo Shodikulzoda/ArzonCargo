@@ -3,8 +3,8 @@ using Stocky.WebApi.Application.Interfaces;
 using Stocky.WebApi.Application.Services;
 using Stocky.WebApi.Application.Services.Interfaces;
 using Stocky.WebApi.Infrastructure.Repository;
-using Stocky.WebApi.Report.Repository;
-using Stocky.WebApi.Report.Repository.Interface;
+using Stocky.WebApi.Report.RepositoryReport;
+using Stocky.WebApi.Report.RepositoryReport.Interface;
 using Stocky.WebApi.Report.ServiceReport;
 using Stocky.WebApi.Report.ServiceReport.Interface;
 

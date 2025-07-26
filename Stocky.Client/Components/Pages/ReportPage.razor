@@ -1,5 +1,9 @@
 ﻿@page "/report"
+@using System.Net.Http.Headers
+@using MudBlazor.Components.Service
+@using Stocky.Shared.Dtos
 @inject HttpClient Http
+@inject AuthService AuthService
 
 <PageTitle>Report Summary</PageTitle>
 
@@ -22,27 +26,26 @@
     {
         <MudPaper Class="mt-4 p-4" Elevation="1">
             <MudText Typo="Typo.h6">Total Earnings: @Report.TotalEarnings</MudText>
+            <MudText>New Product: @Report.NewProducts</MudText>
             <MudText>Products Received: @Report.ProductsReceived</MudText>
-            <MudText>Completed Pockets: @Report.CompletedPockets</MudText>
-            <MudText>Cash Amount: @Report.CashAmount</MudText>
-            <MudText>Card Amount: @Report.CardAmount</MudText>
 
             <MudText Typo="Typo.h6" Class="mt-2">Card Bank Breakdown</MudText>
-            <MudTable Items="@Report.CardBanks" Dense="true">
+            <MudTable Items="@Report.PaymentBreakdown" Dense="true">
                 <HeaderContent>
                     <MudTh>Bank</MudTh>
                     <MudTh>Amount</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd>@context.BankName</MudTd>
-                    <MudTd>@context.Amount</MudTd>
+                    <MudTd>@context.Method</MudTd>
+                    <MudTd>@context.Total</MudTd>
                 </RowTemplate>
             </MudTable>
         </MudPaper>
     }
 </MudPaper>
 
-@code {
+@code
+{
     private DateTime? StartDate = DateTime.UtcNow.AddDays(-30);
     private DateTime? EndDate = DateTime.UtcNow;
 
@@ -58,23 +61,14 @@
 
 
         var url = $"http://localhost:5191/api/reports/summary?start={start}&end={end}";
-        Report = await Http.GetFromJsonAsync<ReportSummaryDto>(url);
-    }
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+        
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
-    public class ReportSummaryDto
-    {
-        public double TotalEarnings { get; set; }
-        public int ProductsReceived { get; set; }
-        public int CompletedPockets { get; set; }
-        public double CashAmount { get; set; }
-        public double CardAmount { get; set; }
-        public List<BankBreakdown> CardBanks { get; set; } = new();
+        var response = await Http.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            Report = await Http.GetFromJsonAsync<ReportSummaryDto>(url);
+        }
     }
-
-    public class BankBreakdown
-    {
-        public string BankName { get; set; } = string.Empty;
-        public decimal Amount { get; set; }
-    }
-
 }

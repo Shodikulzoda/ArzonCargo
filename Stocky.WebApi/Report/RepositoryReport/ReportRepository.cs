@@ -1,38 +1,42 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Stocky.Shared.Models.Enums;
+using Stocky.Shared.Dtos;
 using Stocky.WebApi.Infrastructure.Databases;
-using Stocky.WebApi.Report.Dtos;
-using Stocky.WebApi.Report.Repository.Interface;
+using Stocky.WebApi.Report.RepositoryReport.Interface;
 
-namespace Stocky.WebApi.Report.Repository;
+namespace Stocky.WebApi.Report.RepositoryReport;
 
 public class ReportRepository(ApplicationContext context) : IReportRepository
 {
     public async Task<double> GetTotalEarnings(DateTime start, DateTime end)
     {
-        return await context.Orders
+        var sumAsync = await context.Orders
             .Where(o => !o.IsDeleted && o.CreatedAt >= start && o.CreatedAt <= end)
             .SumAsync(o => o.TotalAmount);
+
+        return sumAsync;
     }
 
     public async Task<int> GetTotalProductsReceived(DateTime start, DateTime end)
     {
-        return await context.OrderItems
+        var countAsync = await context.OrderItems
             .Where(i => !i.IsDeleted && i.CreatedAt >= start && i.CreatedAt <= end)
             .CountAsync();
+
+        return countAsync;
     }
 
-    public async Task<int> GetCompletedPocketsCount(DateTime start, DateTime end)
+    public async Task<int> NewProducts(DateTime start, DateTime end)
     {
-        return await context.Pockets
-            .Where(p => !p.IsDeleted && p.CreatedAt >= start && p.CreatedAt <= end
-                        && p.PocketItems.Any(i => !i.IsDeleted))
+        var countAsync = await context.Products
+            .Where(i => !i.IsDeleted && i.CreatedAt >= start && i.CreatedAt <= end)
             .CountAsync();
+
+        return countAsync;
     }
 
     public async Task<List<PaymentBreakdownDto>> GetPaymentBreakdown(DateTime start, DateTime end)
     {
-        return await context.Orders
+        var paymentBreakdownDtos = await context.Orders
             .Where(o => !o.IsDeleted && o.CreatedAt >= start && o.CreatedAt <= end)
             .GroupBy(o => o.Method)
             .Select(g => new PaymentBreakdownDto
@@ -40,5 +44,7 @@ public class ReportRepository(ApplicationContext context) : IReportRepository
                 Method = g.Key,
                 Total = g.Sum(x => x.TotalAmount)
             }).ToListAsync();
+
+        return paymentBreakdownDtos;
     }
 }

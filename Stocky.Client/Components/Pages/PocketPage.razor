@@ -121,6 +121,7 @@ else
         {
             var url = $"{ApiBaseUrl}/Pocket/PocketPagination?Page={_currentPage}&PageSize={_pageSize}";
             var request = new HttpRequestMessage(HttpMethod.Get, url);
+
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
             var response = await Http.SendAsync(request);

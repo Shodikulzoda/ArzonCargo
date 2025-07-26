@@ -1,4 +1,4 @@
-﻿using Stocky.WebApi.Report.Dtos;
+﻿using Stocky.Shared.Dtos;
 
 namespace Stocky.WebApi.Report.ServiceReport.Interface;
 

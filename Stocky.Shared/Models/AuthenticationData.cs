@@ -5,7 +5,7 @@ namespace Stocky.Shared.Models;
 
 public class AuthenticationData : BaseEntity
 {
-    public string UserName { get; set; }
+    public string? UserName { get; set; }
     public Role Role { get; set; }
-    [JsonPropertyName("password")] public string PasswordHash { get; set; }
+    [JsonPropertyName("password")] public string? PasswordHash { get; set; }
 }
