@@ -104,13 +104,6 @@ else
             return;
         }
 
-        var role = await AuthService.GetUserRoleAsync();
-        if (role != "Admin")
-        {
-            NavigationManager.NavigateTo("/Unauthorized", true);
-            return;
-        }
-
         await LoadPockets();
     }
 

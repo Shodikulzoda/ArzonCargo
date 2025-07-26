@@ -1,6 +1,5 @@
 @using System.Net.Http.Headers
 @using System.Text.Json
-@using MudBlazor
 @using MudBlazor.Components.Service
 @using Stocky.Shared.Models
 @using MudBlazor.Components.DialogWindows.OrderDialogs
@@ -10,11 +9,15 @@
 @inject IDialogService DialogService
 
 <MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">Товары в пакете</MudText>
+    </TitleContent>
+
     <DialogContent>
         @if (_isLoading)
         {
             <div class="d-flex justify-center align-center p-4">
-                <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/>
             </div>
         }
         else if (_pocketItems?.Items?.Count() == 0)
@@ -30,168 +33,221 @@
                     <MudTh>ID</MudTh>
                     <MudTh>Штрихкод</MudTh>
                     <MudTh>Дата создания</MudTh>
-                    <MudTh>Удалить</MudTh>
-
+                    @if (!_isAdder)
+                    {
+                        <MudTh>Удалить</MudTh>
+                    }
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd>@context.Id</MudTd>
-                    <MudTd>@(context.ProductBarCode)</MudTd>
+                    <MudTd>@context.ProductBarCode</MudTd>
                     <MudTd>@context.CreatedAt.ToLocalTime().ToString("g")</MudTd>
-                    <MudTd>
-                        <MudButton Color="Color.Error"
-                                   Variant="Variant.Outlined"
-                                   Size="Size.Small"
-                                   OnClick="@(() => ConfirmDelete(context.ProductBarCode,context.Id))">
-                            <MudIcon Icon="@Icons.Material.Filled.Delete" />
-                        </MudButton>
-                    </MudTd>
-
+                    @if (!_isAdder)
+                    {
+                        <MudTd>
+                            <MudButton Color="Color.Error"
+                                       Variant="Variant.Outlined"
+                                       Size="Size.Small"
+                                       OnClick="@(() => ConfirmDelete(context.ProductBarCode, context.Id))">
+                                <MudIcon Icon="@Icons.Material.Filled.Delete"/>
+                            </MudButton>
+                        </MudTd>
+                    }
                 </RowTemplate>
             </MudTable>
 
             <div class="mt-4 d-flex justify-between">
                 <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Назад</MudButton>
                 <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
-                <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Далее</MudButton>
+                <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Далее
+                </MudButton>
             </div>
         }
     </DialogContent>
-    <DialogActions>
-        <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Variant="Variant.Filled" OnClick="@OpenCreateOrderDialog">
+
+
+<DialogActions>
+    @if (!_isAdder)
+    {
+        <MudButton StartIcon="@Icons.Material.Filled.Add"
+                   Color="Color.Primary"
+                   OnClick="@OpenCreateOrderDialog">
             Создать заказ
         </MudButton>
-        <MudButton Color="Color.Error" Variant="Variant.Outlined" OnClick="Close">Закрыть</MudButton>
-    </DialogActions>
-</MudDialog>
 
-@code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
-    [Parameter] public int PocketId { get; set; }
-    [Parameter] public int UserId { get; set; }
-    [Parameter] public double TotalAmount { get; set; }
-
-    private PageData<PocketItem>? _pocketItems = new();
-    private int _currentPage = 1;
-    private int _totalPages = 1;
-    private const int PageSize = 15;
-    private bool _isLoading;
-    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadPocketItems();
+        <MudButton Color="Color.Error"
+                   Variant="Variant.Outlined"
+                   OnClick="Close">
+            Закрыть
+        </MudButton>
     }
-    private async Task ConfirmDelete(string name,int id)
-    {
-        bool? result = await DialogService.ShowMessageBox(
-            title: "Подтверждение",
-            markupMessage: (MarkupString)$"Вы уверены, что хотите удалить товар <b>{name}</b>?",
-            yesText: "Удалить", cancelText: "Отмена", options: new DialogOptions { CloseButton = true });
 
-        if (result == true)
+</DialogActions>
+
+
+    @code {
+        [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+        [Parameter] public int PocketId { get; set; }
+        [Parameter] public int UserId { get; set; }
+        [Parameter] public double TotalAmount { get; set; }
+        [Parameter] public bool IsAdder { get; set; }
+
+        private PageData<PocketItem>? _pocketItems = new();
+        private int _currentPage = 1;
+        private int _totalPages = 1;
+        private const int PageSize = 15;
+        private bool _isLoading;
+        private bool _isAdder;
+        private string ApiBaseUrl => Configuration["ApiBaseUrl"];
+
+        protected override async Task OnInitializedAsync()
         {
-            await DeleteItem(id);
+            _isAdder = AuthService.IsAdder;
+            await LoadPocketItems();
         }
-    }
-    private async Task DeleteItem(int id)
-    {
-        try
-        {
-            var url = $"{ApiBaseUrl}/PocketItem/Delete?Id={id}";
-            var request = new HttpRequestMessage(HttpMethod.Delete, url);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
-            var response = await Http.SendAsync(request);
-            if (response.IsSuccessStatusCode)
+        private async Task ConfirmDelete(string name, int id)
+        {
+            bool? result = await DialogService.ShowMessageBox(
+                title: "Подтверждение",
+                markupMessage: (MarkupString)$"Вы уверены, что хотите удалить товар <b>{name}</b>?",
+                yesText: "Удалить", cancelText: "Отмена", options: new DialogOptions { CloseButton = true });
+
+            if (result == true)
             {
-                await LoadPocketItems(); // Refresh the list
-            }
-            else
-            {
-                Console.WriteLine($"Ошибка при удалении товара ID {id}: {response.StatusCode}");
+                await DeleteItem(id);
             }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Ошибка при удалении товара ID {id}: {ex.Message}");
-        }
-    }
 
-    private async Task LoadPocketItems()
-    {
-        _isLoading = true;
-        try
+        private async Task DeleteItem(int id)
         {
-            var url = $"{ApiBaseUrl}/PocketItem/GetPocketItemsByPocketId?PocketId={PocketId}&Page={_currentPage}&PageSize={PageSize}";
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
-
-            var response = await Http.SendAsync(request);
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var json = await response.Content.ReadAsStringAsync();
-                _pocketItems = JsonSerializer.Deserialize<PageData<PocketItem>>(json, new JsonSerializerOptions
+                var url = $"{ApiBaseUrl}/PocketItem/Delete?Id={id}";
+                var request = new HttpRequestMessage(HttpMethod.Delete, url);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+                var response = await Http.SendAsync(request);
+                if (response.IsSuccessStatusCode)
                 {
-                    PropertyNameCaseInsensitive = true
-                }) ?? new PageData<PocketItem>();
-                _totalPages = (int)Math.Ceiling((double)(_pocketItems.TotalCount) / PageSize);
+                    await LoadPocketItems();
+
+                    if (_pocketItems?.Items?.Count() == 0)
+                    {
+                        await DeletePocket();
+                        MudDialog.Close(DialogResult.Ok(true));
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Ошибка при удалении товара ID {id}: {response.StatusCode}");
+                }
             }
-            else
+            catch (Exception ex)
             {
+                Console.WriteLine($"Ошибка при удалении товара ID {id}: {ex.Message}");
+            }
+        }
+
+
+        private async Task LoadPocketItems()
+        {
+            _isLoading = true;
+            try
+            {
+                var url = $"{ApiBaseUrl}/PocketItem/GetPocketItemsByPocketId?PocketId={PocketId}&Page={_currentPage}&PageSize={PageSize}";
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+                var response = await Http.SendAsync(request);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    _pocketItems = JsonSerializer.Deserialize<PageData<PocketItem>>(json, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    }) ?? new PageData<PocketItem>();
+                    _totalPages = (int)Math.Ceiling((double)(_pocketItems.TotalCount) / PageSize);
+                }
+                else
+                {
+                    _pocketItems = new PageData<PocketItem> { Items = new List<PocketItem>(), TotalCount = 0 };
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Не удалось загрузить товары в пакете: " + ex.Message);
                 _pocketItems = new PageData<PocketItem> { Items = new List<PocketItem>(), TotalCount = 0 };
             }
+
+            _isLoading = false;
         }
-        catch (Exception ex)
+        
+        private async Task DeletePocket()
         {
-            Console.WriteLine("Не удалось загрузить товары в пакете: " + ex.Message);
-            _pocketItems = new PageData<PocketItem> { Items = new List<PocketItem>(), TotalCount = 0 };
+            try
+            {
+                var url = $"{ApiBaseUrl}/Pocket/DeletePocket?Id={PocketId}";
+                var request = new HttpRequestMessage(HttpMethod.Delete, url);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+                var response = await Http.SendAsync(request);
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"Ошибка при удалении пакета ID {PocketId}: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при удалении пакета ID {PocketId}: {ex.Message}");
+            }
         }
-        _isLoading = false;
+
+
+        private async Task Increment()
+        {
+            if (_currentPage < _totalPages)
+            {
+                _currentPage++;
+                await LoadPocketItems();
+            }
+        }
+
+        private async Task Decrement()
+        {
+            if (_currentPage > 1)
+            {
+                _currentPage--;
+                await LoadPocketItems();
+            }
+        }
+
+        private async Task OpenCreateOrderDialog()
+        {
+            var parameters = new DialogParameters
+            {
+                { "PocketId", PocketId },
+                { "UserId", UserId },
+                { "TotalAmount", TotalAmount }
+            };
+
+            var options = new DialogOptions
+            {
+                CloseButton = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true
+            };
+
+            var dialogReference = await DialogService.ShowAsync<CreateOrderDialog>("Создать заказ", parameters, options);
+            var result = await dialogReference.Result;
+
+            if (result is { Canceled: false, Data: true })
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+        }
+
+        private void Close() => MudDialog.Cancel();
     }
 
-    private async Task Increment()
-    {
-        if (_currentPage < _totalPages)
-        {
-            _currentPage++;
-            await LoadPocketItems();
-        }
-    }
-
-    private async Task Decrement()
-    {
-        if (_currentPage > 1)
-        {
-            _currentPage--;
-            await LoadPocketItems();
-        }
-    }
-
-    private async Task OpenCreateOrderDialog()
-    {
-        var parameters = new DialogParameters
-        {
-            { "PocketId", PocketId },
-            { "UserId", UserId },
-            { "TotalAmount", TotalAmount }
-        };
-
-        var options = new DialogOptions
-        {
-            CloseButton = true,
-            MaxWidth = MaxWidth.Medium,
-            FullWidth = true
-        };
-
-        var dialogReference = await DialogService.ShowAsync<CreateOrderDialog>("Создать заказ", parameters, options);
-        var result = await dialogReference.Result;
-
-        // If CreateOrderDialog closed successfully, close this dialog too
-        if (result is { Canceled: false, Data: true })
-        {
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-    }
-
-    private void Close() => MudDialog.Cancel();
-}
+</MudDialog>

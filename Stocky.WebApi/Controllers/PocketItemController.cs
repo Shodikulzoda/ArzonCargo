@@ -16,7 +16,7 @@ namespace Stocky.WebApi.Controllers;
 [Route("[controller]/[action]")]
 public class PocketItemController(IMediator mediator) : ControllerBase
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Adder")]
     [HttpPost]
     public async Task<IActionResult> Add(CreatePocketItemCommand createPocketItemCommand)
     {
@@ -37,7 +37,7 @@ public class PocketItemController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(new GetAllPocketItemQuery()));
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Adder")]
     [HttpGet]
     public async Task<ActionResult<PageData<PocketItem>>> GetPocketItemsByPocketId(
         [FromQuery] GetByPocketIdQuery getByPocketIdQuery)

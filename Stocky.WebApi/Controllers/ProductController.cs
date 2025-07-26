@@ -38,7 +38,7 @@ public class ProductController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(getProductByIdQuery));
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Adder")]
     [HttpGet]
     public async Task<IActionResult> GetByBarCode([FromQuery] GetByBarCodeQuery query)
     {

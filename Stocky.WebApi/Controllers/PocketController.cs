@@ -13,29 +13,32 @@ using Stocky.WebApi.Application.PocketData.Queries.GetPocketByUserId;
 
 namespace Stocky.WebApi.Controllers;
 
-[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("[controller]/[action]")]
 public class PocketController(IMediator mediator) : ControllerBase
 {
+    [Authorize(Roles = "Admin, Adder")]
     [HttpPost]
     public async Task<IActionResult> CreatePocket(CreatePocketCommand pocketCommand)
     {
         return Ok(await mediator.Send(pocketCommand));
     }
-
+    
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetPockets()
     {
         return Ok(await mediator.Send(new GetAllPocketQuery()));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetPocketById([FromQuery] GetPocketByIdQuery pocketByIdQuery)
     {
         return Ok(await mediator.Send(pocketByIdQuery));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<ActionResult<PageData<Pocket>>> GetPocketsByUserId(
         [FromQuery] GetPocketsByUserIdQuery getPocketsByUserIdQuery)
@@ -43,25 +46,29 @@ public class PocketController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(getPocketsByUserIdQuery));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetPocketBySearch([FromQuery] SearchPocketQuery query)
     {
         return Ok(await mediator.Send(query));
     }
 
+    [Authorize(Roles = "Admin, Adder")]
     [HttpGet]
     public async Task<ActionResult<PageData<Pocket>>> PocketPagination(
         [FromQuery] GetPocketByPaginationQuery getPocketByPaginationQuery)
     {
         return Ok(await mediator.Send(getPocketByPaginationQuery));
     }
-
+    
+    [Authorize(Roles = "Admin, Adder")]
     [HttpPut]
     public async Task<IActionResult> UpdatePocket(UpdatePocketCommand updatePocketCommand)
     {
         return Ok(await mediator.Send(updatePocketCommand));
     }
-
+    
+    [Authorize(Roles = "Admin, Adder")]
     [HttpDelete]
     public async Task<IActionResult> DeletePocket([FromQuery] DeletePocketCommand deletePocketCommand)
     {

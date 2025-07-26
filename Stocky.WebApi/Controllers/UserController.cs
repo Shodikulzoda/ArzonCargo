@@ -16,7 +16,7 @@ namespace Stocky.WebApi.Controllers;
 [Route("[controller]/[action]")]
 public class UserController(IMediator mediator) : ControllerBase
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Adder")]
     [HttpPost]
     public async Task<IActionResult> CreateUser(CreateUserCommand? user)
     {

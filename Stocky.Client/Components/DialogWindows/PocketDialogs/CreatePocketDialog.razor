@@ -37,7 +37,7 @@
                               Required="true"
                               RequiredError="Общий вес обязателен"
                               Immediate="true"
-                              Validation="@( (double? value) => ValidateTotalWeight(value) )" />
+                              Validation="@((double? value) => ValidateTotalWeight(value))"/>
 
 
 
@@ -298,6 +298,7 @@
                 await Js.InvokeVoidAsync("focusElement");
         }
     }
+
     private string? ValidateTotalWeight(double? value)
     {
         if (value is null || value == 0)
@@ -314,12 +315,14 @@
             _message = string.Empty;
             return;
         }
+
         if (_pocketModel?.TotalWeight is null || _pocketModel.TotalWeight == 0)
         {
             _errorMessage = "Общий вес должен быть больше 0";
             _message = string.Empty;
             return;
         }
+
         if (_pocketModel?.BarCode is null)
             return;
 
