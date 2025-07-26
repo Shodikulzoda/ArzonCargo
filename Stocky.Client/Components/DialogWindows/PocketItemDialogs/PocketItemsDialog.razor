@@ -7,6 +7,7 @@
 @inject AuthService AuthService
 @inject IConfiguration Configuration
 @inject IDialogService DialogService
+@inject NavigationManager NavigationManager
 
 <MudDialog>
     <TitleContent>
@@ -33,7 +34,7 @@
                     <MudTh>ID</MudTh>
                     <MudTh>Штрихкод</MudTh>
                     <MudTh>Дата создания</MudTh>
-                    @if (!_isAdder)
+                    @if (_isAdmin || _isCashier)
                     {
                         <MudTh>Удалить</MudTh>
                     }
@@ -42,7 +43,7 @@
                     <MudTd>@context.Id</MudTd>
                     <MudTd>@context.ProductBarCode</MudTd>
                     <MudTd>@context.CreatedAt.ToLocalTime().ToString("g")</MudTd>
-                    @if (!_isAdder)
+                    @if (_isAdmin || _isCashier)
                     {
                         <MudTd>
                             <MudButton Color="Color.Error"
@@ -66,23 +67,23 @@
     </DialogContent>
 
 
-<DialogActions>
-    @if (!_isAdder)
-    {
-        <MudButton StartIcon="@Icons.Material.Filled.Add"
-                   Color="Color.Primary"
-                   OnClick="@OpenCreateOrderDialog">
-            Создать заказ
-        </MudButton>
+    <DialogActions>
+        @if (_isAdmin || _isCashier)
+        {
+            <MudButton StartIcon="@Icons.Material.Filled.Add"
+                       Color="Color.Primary"
+                       OnClick="@OpenCreateOrderDialog">
+                Создать заказ
+            </MudButton>
 
-        <MudButton Color="Color.Error"
-                   Variant="Variant.Outlined"
-                   OnClick="Close">
-            Закрыть
-        </MudButton>
-    }
+            <MudButton Color="Color.Error"
+                       Variant="Variant.Outlined"
+                       OnClick="Close">
+                Закрыть
+            </MudButton>
+        }
 
-</DialogActions>
+    </DialogActions>
 
 
     @code {
@@ -98,11 +99,15 @@
         private const int PageSize = 15;
         private bool _isLoading;
         private bool _isAdder;
+        private bool _isAdmin;
+        private bool _isCashier;
         private string ApiBaseUrl => Configuration["ApiBaseUrl"];
 
         protected override async Task OnInitializedAsync()
         {
+            _isAdmin = AuthService.IsAdmin;
             _isAdder = AuthService.IsAdder;
+            _isCashier = AuthService.IsCashier;
             await LoadPocketItems();
         }
 
@@ -137,6 +142,8 @@
                         await DeletePocket();
                         MudDialog.Close(DialogResult.Ok(true));
                     }
+
+                    NavigationManager.NavigateTo("/pockets", true);
                 }
                 else
                 {
@@ -182,7 +189,7 @@
 
             _isLoading = false;
         }
-        
+
         private async Task DeletePocket()
         {
             try
@@ -192,7 +199,11 @@
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
                 var response = await Http.SendAsync(request);
-                if (!response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
+                {
+                    NavigationManager.NavigateTo("/pockets", true);
+                }
+                else
                 {
                     Console.WriteLine($"Ошибка при удалении пакета ID {PocketId}: {response.StatusCode}");
                 }
@@ -202,7 +213,6 @@
                 Console.WriteLine($"Ошибка при удалении пакета ID {PocketId}: {ex.Message}");
             }
         }
-
 
         private async Task Increment()
         {

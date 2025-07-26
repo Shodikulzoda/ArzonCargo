@@ -90,8 +90,8 @@
 </script>
 
 @code {
-    private bool _isSubmitting = false;
-    private bool _isLoged = false;
+    private bool _isSubmitting;
+    private bool _isLoged;
     private MudTextField<string> usernameField;
     private string ApiBaseUrl => Configuration["ApiBaseUrl"];
     private AuthenticationData loginModel = new();
@@ -132,12 +132,14 @@
                 {
                     await AuthService.SetTokenAsync(token);
 
-                    if (AuthService.IsAdder)
-                        Navigation.NavigateTo("/adding-product", true);
-                    else
+                    if (AuthService.IsAdmin)
                         Navigation.NavigateTo("/home", true);
-
-                    return;
+                    else if (AuthService.IsAdder)
+                        Navigation.NavigateTo("/adding-product", true);
+                    else if (AuthService.IsCashier)
+                        Navigation.NavigateTo("/pockets", true);
+                    else
+                        return;
                 }
             }
 

@@ -1,7 +1,6 @@
 @page "/pockets"
 @using System.Net.Http.Headers
 @using System.Text.Json
-@using MudBlazor.Components.DialogWindows
 @using MudBlazor.Components.DialogWindows.PocketDialogs
 @using MudBlazor.Components.DialogWindows.PocketItemDialogs
 @using MudBlazor.Components.Service
@@ -28,10 +27,13 @@
     <MudButton OnClick="SearchPocket" Color="Color.Primary" Variant="Variant.Filled">
         Поиск
     </MudButton>
+    @if (!_isCashier)
+    {
+        <MudButton OnClick="OpenCreatePocketDialog" Color="Color.Success" Variant="Variant.Filled">
+            Создать Пакет
+        </MudButton>
+    }
 
-    <MudButton OnClick="OpenCreatePocketDialog" Color="Color.Success" Variant="Variant.Filled">
-        Создать Пакет
-    </MudButton>
 </div>
 
 @if (_isLoading)
@@ -89,6 +91,7 @@ else
     private int _totalPages = 1;
     private readonly int _pageSize = 15;
     private bool _isLoading;
+    private bool _isCashier;
     private string _searchQuery = "";
     private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
@@ -97,7 +100,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         await AuthService.LoadTokenAsync();
-
+        _isCashier = AuthService.IsCashier;
         if (string.IsNullOrEmpty(AuthService.Token))
         {
             NavigationManager.NavigateTo("/Unauthorized", true);

@@ -2,6 +2,7 @@
 @inject HttpClient Http
 @inject AuthService AuthService
 @inject IConfiguration Configuration
+@inject NavigationManager NavigationManager
 @using MudBlazor.Components.Service
 @using Stocky.Shared.Models
 @using Stocky.Shared.Models.Enums
@@ -45,7 +46,6 @@
     private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
     private bool _isLoading;
 
-    // Local binding fields
     private double _amount;
     private PaymentMethod _selectedPaymentMethod = PaymentMethod.Cash;
 
@@ -77,6 +77,7 @@
             if (response.IsSuccessStatusCode)
             {
                 MudDialog.Close(DialogResult.Ok(true));
+                NavigationManager.NavigateTo("/pockets", true);
             }
             else
             {

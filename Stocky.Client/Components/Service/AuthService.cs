@@ -21,6 +21,7 @@ public class AuthService : IDisposable
 
     public bool IsAdmin => string.Equals(Role, "admin", StringComparison.OrdinalIgnoreCase);
     public bool IsAdder => string.Equals(Role, "adder", StringComparison.OrdinalIgnoreCase);
+    public bool IsCashier => string.Equals(Role, "cashier", StringComparison.OrdinalIgnoreCase);
 
     public AuthService(IJSRuntime jsRuntime)
     {

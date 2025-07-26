@@ -47,6 +47,12 @@
             Пакеты
         </MudNavLink>
     }
+    else if (AuthService.IsCashier)
+    {
+        <MudNavLink Href="pockets" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Inventory">
+            Пакеты
+        </MudNavLink>
+    }
 
     <MudNavLink OnClick="Logout" Icon="@Icons.Material.Filled.ExitToApp" Color="Color.Error">
         Выйти
@@ -61,10 +67,10 @@
         await AuthService.LoadTokenAsync();
     }
 
-    public void Dispose()
-    {
-        AuthService.OnChange -= StateHasChanged;
-    }
+    // public void Dispose()
+    // {
+    //     AuthService.OnChange -= StateHasChanged;
+    // }
 
     private async Task Logout()
     {

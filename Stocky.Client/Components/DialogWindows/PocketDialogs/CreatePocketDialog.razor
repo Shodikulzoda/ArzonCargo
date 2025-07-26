@@ -38,16 +38,15 @@
                               RequiredError="Общий вес обязателен"
                               Immediate="true"
                               Validation="@((double? value) => ValidateTotalWeight(value))"/>
-
-
-
-                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreatePocket">
+                
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreatePocket" @onmousedown="e => DisableAutoFocus(e)">
                     Создать пакет
                 </MudButton>
 
-                <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="FinishPocket">
+                <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="FinishPocket" @onmousedown="e => DisableAutoFocus(e)">
                     Завершить продажу
                 </MudButton>
+
 
                 <MudText Color="Color.Success" Class="mt-3">@_message</MudText>
                 <MudText Color="Color.Error" Class="mt-3">@_errorMessage</MudText>
@@ -63,10 +62,10 @@
                                       Label="Сканировать штрихкод товара"
                                       Immediate="true"
                                       OnKeyDown="HandleKeyDown"
+                                      @onfocus="@EnableAutoFocus"
                                       Class="barcode-text"
-                                      @onfocus="@(() => _autoFocusEnabled = true)"
                                       Variant="Variant.Outlined"/>
-
+                        
                         <MudButton OnClick="AddProductToPocket" Color="Color.Warning" Variant="Variant.Filled">
                             Добавить товар
                         </MudButton>
@@ -132,7 +131,33 @@
 
         MudDialog.Cancel();
     }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_shouldFocusBarcode && _autoFocusEnabled)
+        {
+            _shouldFocusBarcode = false;
+            await Js.InvokeVoidAsync("focusElement");
+        }
+        
+        if (_selectedUser != null)
+        {
+            _pocketModel.UserId = _selectedUser.Id;
+        }
+    }
 
+
+    private void EnableAutoFocus(FocusEventArgs args)
+    {
+        _autoFocusEnabled = true;
+    }
+    
+    private void DisableAutoFocus(MouseEventArgs e)
+    {
+        _autoFocusEnabled = false;
+    }
+
+    
     private async Task<IEnumerable<User>> SearchUsers(string text, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(text) || text.Length < 1)
@@ -152,14 +177,6 @@
         catch
         {
             return [];
-        }
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (_selectedUser != null)
-        {
-            _pocketModel.UserId = _selectedUser.Id;
         }
     }
 
@@ -205,15 +222,6 @@
             _autoFocusEnabled = true;
             _shouldFocusBarcode = true; // Will focus in OnAfterRenderAsync
             StateHasChanged(); // Force re-render so the barcode field exists
-        }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (_shouldFocusBarcode)
-        {
-            _shouldFocusBarcode = false;
-            await Js.InvokeVoidAsync("focusElement"); // Focus after rendering
         }
     }
 

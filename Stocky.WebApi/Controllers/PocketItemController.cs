@@ -37,7 +37,7 @@ public class PocketItemController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(new GetAllPocketItemQuery()));
     }
 
-    [Authorize(Roles = "Admin, Adder")]
+    [Authorize(Roles = "Admin, Adder, Cashier")]
     [HttpGet]
     public async Task<ActionResult<PageData<PocketItem>>> GetPocketItemsByPocketId(
         [FromQuery] GetByPocketIdQuery getByPocketIdQuery)
@@ -52,7 +52,7 @@ public class PocketItemController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(updatePocketItemCommand));
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Cashier")]
     [HttpDelete]
     public async Task<IActionResult> Delete([FromQuery] DeletePocketItemCommand deletePocketItemCommand)
     {
