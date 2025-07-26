@@ -33,7 +33,13 @@
 
                 <MudTextField @bind-Value="_pocketModel.TotalWeight"
                               Label="Общий вес"
-                              Variant="Variant.Outlined"/>
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              RequiredError="Общий вес обязателен"
+                              Immediate="true"
+                              Validation="@( (double? value) => ValidateTotalWeight(value) )" />
+
+
 
                 <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreatePocket">
                     Создать пакет
@@ -123,6 +129,7 @@
         {
             MudDialog.Close(DialogResult.Ok(true));
         }
+
         MudDialog.Cancel();
     }
 
@@ -291,6 +298,13 @@
                 await Js.InvokeVoidAsync("focusElement");
         }
     }
+    private string? ValidateTotalWeight(double? value)
+    {
+        if (value is null || value == 0)
+            return "Вес должен быть больше 0";
+        return null;
+    }
+
 
     private async Task FinishPocket()
     {
@@ -300,7 +314,12 @@
             _message = string.Empty;
             return;
         }
-
+        if (_pocketModel?.TotalWeight is null || _pocketModel.TotalWeight == 0)
+        {
+            _errorMessage = "Общий вес должен быть больше 0";
+            _message = string.Empty;
+            return;
+        }
         if (_pocketModel?.BarCode is null)
             return;
 
@@ -347,7 +366,7 @@
         if (e.Key is "Enter" or "NumpadEnter")
         {
             await AddProductToPocket();
-            
         }
     }
+
 }
