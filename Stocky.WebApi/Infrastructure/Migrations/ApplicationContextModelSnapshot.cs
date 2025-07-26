@@ -8,7 +8,7 @@ using Stocky.WebApi.Infrastructure.Databases;
 
 #nullable disable
 
-namespace Stocky.WebApi.Migrations
+namespace Stocky.WebApi.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
     partial class ApplicationContextModelSnapshot : ModelSnapshot

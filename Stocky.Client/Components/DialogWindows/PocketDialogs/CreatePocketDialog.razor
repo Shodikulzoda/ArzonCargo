@@ -88,20 +88,10 @@
     window.focusElement = () => {
         const el = document.querySelector('.barcode-text input');
         if (el) {
+            el.value = '';
             el.focus();
         }
     };
-
-    window.disableAutoFocus = () => {
-        DotNet.invokeMethodAsync('YourAssemblyName', 'DisableAutoFocus');
-    };
-
-    document.addEventListener('click', function (e) {
-        const barcodeField = document.querySelector('.barcode-text input');
-        if (barcodeField && !barcodeField.contains(e.target)) {
-            window.disableAutoFocus();
-        }
-    });
 </script>
 
 @code {
@@ -347,7 +337,6 @@
 
             MudDialog.Cancel();
 
-            // ✅ Force page refresh
             Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
         }
     }
@@ -358,6 +347,7 @@
         if (e.Key is "Enter" or "NumpadEnter")
         {
             await AddProductToPocket();
+            
         }
     }
 }

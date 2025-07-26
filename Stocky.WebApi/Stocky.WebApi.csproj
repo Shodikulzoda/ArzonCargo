@@ -34,4 +34,8 @@
     <ItemGroup>
       <Compile Remove="Report\Dtos\PaymentBreakdownDto.cs" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Infrastructure\Migrations\20250725153757_Initial.Designer.cs" />
+    </ItemGroup>
 </Project>
