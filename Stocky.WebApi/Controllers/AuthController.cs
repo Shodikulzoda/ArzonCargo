@@ -10,7 +10,7 @@ namespace Stocky.WebApi.Controllers;
 [Route("api/[controller]/[action]")]
 public class AuthController(IMediator mediator) : ControllerBase
 {
-    // [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> CreateUsersLogin(CreateLoginCommand? request)
     {
@@ -32,6 +32,7 @@ public class AuthController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(request));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> GetUserById([FromBody] GetUserNameByIdQuery query)
     {

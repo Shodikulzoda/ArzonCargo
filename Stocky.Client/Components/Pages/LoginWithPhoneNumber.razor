@@ -3,6 +3,7 @@
 @using MudBlazor.Components.Layout
 @inject NavigationManager Navigation
 @inject HttpClient Http
+@inject IConfiguration Configuration
 @layout NoNavbar
 
 <PageTitle>Вход</PageTitle>
@@ -43,6 +44,8 @@
     private PhoneModel phoneModel = new();
     private bool _hasError;
     private string _errorMessage = "";
+    private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
+
 
     private void ValidatePhoneNumber()
     {
@@ -63,7 +66,7 @@
 
         try
         {
-            var response = await Http.GetAsync($"http://localhost:5191/User/Search?Text={digits}");
+            var response = await Http.GetAsync($"{ApiBaseUrl}/User/Search?Text={digits}");
 
             if (!response.IsSuccessStatusCode)
             {

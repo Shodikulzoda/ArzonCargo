@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Stocky.Shared.Models.Enums;
 using Stocky.WebApi.Application.Interfaces;
 
 namespace Stocky.WebApi.Application.AuthenticationData.Commands;
@@ -8,6 +9,7 @@ public record CreateLoginCommand : IRequest<Shared.Models.AuthenticationData>
 {
     public string? UserName { get; set; }
     public string? Password { get; set; }
+    public Role UserRole { get; set; }
 }
 
 public class CreateLoginHandler(IAuthRepository authRepository)
@@ -33,6 +35,7 @@ public class CreateLoginHandler(IAuthRepository authRepository)
 
         var auth = new Shared.Models.AuthenticationData
         {
+            Role = request.UserRole,
             UserName = request.UserName,
             PasswordHash = hashedPassword
         };

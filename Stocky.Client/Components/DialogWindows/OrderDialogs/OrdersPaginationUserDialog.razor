@@ -134,7 +134,7 @@ else
     {
         try
         {
-            var url = "http://localhost:5191/api/Auth/GetUserById";
+            var url = $"{ApiBaseUrl}/api/Auth/GetUserById";
 
             var jsonContent = JsonSerializer.Serialize(new { id = employeeId });
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");

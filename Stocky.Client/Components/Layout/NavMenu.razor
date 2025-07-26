@@ -36,11 +36,16 @@
         <MudNavLink Href="report" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Assessment">
             Отчёты
         </MudNavLink>
-        
+
         <MudNavLink Href="qrGenerator" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.QrCode">
             QR для сотрудников
         </MudNavLink>
 
+        <MudNavLink Href="/create-login"
+                    Match="NavLinkMatch.Prefix"
+                    Icon="@Icons.Material.Filled.PersonAdd">
+            Создать логин
+        </MudNavLink>
     }
     else if (AuthService.IsAdder)
     {

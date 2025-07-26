@@ -1,4 +1,5 @@
 @inject HttpClient Http
+@inject IConfiguration Configuration
 
 <MudDialog>
     <DialogContent>
@@ -81,6 +82,8 @@
     private string? LoadError;
     private string? SubmitError;
     private string? NewPriceInput;
+    private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -94,7 +97,7 @@
 
         try
         {
-            PriceInfo = await Http.GetFromJsonAsync<PriceResponse>("http://localhost:5191/api/PriceList/GetPrice");
+            PriceInfo = await Http.GetFromJsonAsync<PriceResponse>($"{ApiBaseUrl}/api/PriceList/GetPrice");
         }
         catch
         {
@@ -126,7 +129,7 @@
         try
         {
             var request = new PriceChangeRequest { newPrice = newPrice };
-            var response = await Http.PostAsJsonAsync("http://localhost:5191/api/PriceList/PriceChanger", request);
+            var response = await Http.PostAsJsonAsync($"{ApiBaseUrl}/api/PriceList/PriceChanger", request);
 
             if (response.IsSuccessStatusCode)
             {
