@@ -5,7 +5,7 @@
 
         @if (IsLoading)
         {
-            <MudProgressCircular Indeterminate="true" Size="Size.Large" Color="Color.Primary" Class="my-4" />
+            <MudProgressCircular Indeterminate="true" Size="Size.Large" Color="Color.Primary" Class="my-4"/>
             <MudText Typo="Typo.subtitle1">Загружается текущая цена...</MudText>
         }
         else if (LoadError != null)
@@ -16,9 +16,9 @@
         {
             <MudPaper Class="pa-4 mb-3" Elevation="1">
                 <MudText Typo="Typo.h6">Текущая цена</MudText>
-                <MudDivider Class="my-2" />
+                <MudDivider Class="my-2"/>
                 <MudText>
-                    <b>Цена за кг:</b> @PriceInfo?.pricePerKg.ToString() TJS<br />
+                    <b>Цена за кг:</b> @PriceInfo?.pricePerKg.ToString() TJS<br/>
                     <b>Дата создания:</b> @PriceInfo?.createdAt.ToLocalTime().ToString("g")
                 </MudText>
             </MudPaper>
@@ -32,7 +32,7 @@
                           InputType="InputType.Number"
                           Immediate="true"
                           Class="mb-3"
-                          Style="max-width: 300px;" />
+                          Style="max-width: 300px;"/>
 
             <MudStack Row="true" Spacing="2">
                 <MudButton Variant="Variant.Filled"
@@ -64,7 +64,7 @@
 
     private class PriceResponse
     {
-        public decimal pricePerKg { get; set; }
+        public double pricePerKg { get; set; }
         public int id { get; set; }
         public DateTime createdAt { get; set; }
         public bool isDeleted { get; set; }
@@ -98,7 +98,11 @@
         }
         catch
         {
-            LoadError = "Не удалось загрузить текущую цену.";
+            PriceInfo = new PriceResponse()
+            {
+                createdAt = default,
+                pricePerKg = 0.0
+            };
         }
         finally
         {
@@ -142,4 +146,5 @@
             IsSubmitting = false;
         }
     }
+
 }

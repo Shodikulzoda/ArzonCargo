@@ -3,79 +3,118 @@
 @inject NavigationManager Navigation
 @using System.Text.Json
 @using MudBlazor.Components.Layout
+@inject IConfiguration Configuration
 @layout NoNavbar
 
 <PageTitle>Мои заказы</PageTitle>
 
-<MudPaper Class="pa-4">
-    <MudText Typo="Typo.h5" Class="mb-4">Мои заказы</MudText>
+<MudContainer MaxWidth="MaxWidth.Medium" Class="px-2 px-sm-3 px-md-4">
+    <MudPaper Class="pa-3 mb-4" Style="border-radius:12px; background-color:rgba(255,255,255,0.05);">
+        <MudText Typo="Typo.h4" Class="font-weight-bold" Color="Color.Primary">ArzonCargo</MudText>
+    </MudPaper>
 
-    @if (string.IsNullOrWhiteSpace(phoneNumber))
-    {
-        <MudAlert Severity="Severity.Error">Телефон не найден в URL.</MudAlert>
-    }
-    else if (isLoading)
-    {
-        <MudProgressCircular Indeterminate Color="Color.Primary"/>
-    }
-    else
-    {
-        @if (currentUser != null)
+    <MudPaper Class="pa-4" Style="min-height: 60vh;">
+        <MudText Typo="Typo.h5" Class="mb-4">Мои заказы</MudText>
+
+        @if (string.IsNullOrWhiteSpace(phoneNumber))
         {
-            <MudPaper Class="pa-2 mb-3 d-flex align-center shadow-sm"
-                      Style="border-radius:12px; background-color:rgba(255,255,255,0.08);">
-                <MudAvatar Color="Color.Primary" Size="Size.Medium" Class="mr-3">
-                    @currentUser.Name.Substring(0, 1).ToUpper()
-                </MudAvatar>
-                <div>
-                    <MudText Typo="Typo.subtitle1" Class="font-weight-bold"
-                             Color="Color.Primary">@currentUser.Name</MudText>
-                    <MudText Typo="Typo.body2" Color="Color.Info">
-                        @phoneNumber (@currentUser.Address)
-                    </MudText>
-                </div>
-            </MudPaper>
+            <MudAlert Severity="Severity.Error">Телефон не найден в URL.</MudAlert>
         }
+        else if (isLoading)
+        {
+            <div class="d-flex justify-center my-6">
+                <MudProgressCircular Indeterminate Color="Color.Primary" Size="Size.Large"/>
+            </div>
+        }
+        else
+        {
+            @if (currentUser != null)
+            {
+                <MudPaper Class="pa-3 mb-4 d-flex align-center shadow-sm flex-wrap"
+                          Style="border-radius:12px; background-color:rgba(255,255,255,0.08);">
+                    <MudAvatar Color="Color.Primary" Size="Size.Large" Class="mr-3"
+                               Style="font-size:24px; font-weight:bold;">
+                        @currentUser.Name.Substring(0, 1).ToUpper()
+                    </MudAvatar>
+                    <div>
+                        <MudText Typo="Typo.h6" Class="font-weight-bold"
+                                 Color="Color.Primary">@currentUser.Name</MudText>
+                        <MudText Typo="Typo.subtitle2" Color="Color.Info">@phoneNumber (@currentUser.Address)</MudText>
+                    </div>
+                </MudPaper>
+            }
 
-        <MudTable Items="allItems" Hover="true" Dense="true" Elevation="1">
-            <HeaderContent>
-                <MudTh>№</MudTh>
-                <MudTh>Штрихкод</MudTh>
-                <MudTh>Продукт ID</MudTh>
-                <MudTh>Дата</MudTh>
-                <MudTh>Статус</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd>@context.Id</MudTd>
-                <MudTd>@context.ProductBarCode</MudTd>
-                <MudTd>@context.ProductId</MudTd>
-                <MudTd>@context.CreatedAt.ToLocalTime().ToString("g")</MudTd>
-                <MudTd>
-                    @if (context.IsCompleted)
+            @if (allItems.Count == 0)
+            {
+                <MudText Typo="Typo.subtitle1" Class="text-center mt-6" Color="Color.Secondary">Заказы не найдены.
+                </MudText>
+            }
+            else
+            {
+                <div class="d-flex flex-column" style="gap:1rem;">
+                    @foreach (var item in allItems)
                     {
-                        <MudChip T="string" Color="Color.Success" Variant="Variant.Outlined">Завершен</MudChip>
+                        <MudPaper Class="pa-3"
+                                  Style="border-radius:12px; background-color:rgba(255,255,255,0.05); box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+                            <div class="d-flex justify-between align-center flex-wrap">
+                                <MudText Typo="Typo.subtitle1" Class="font-weight-bold mb-1" Color="Color.Primary">
+                                    #@item.Id
+                                </MudText>
+                                <MudChip T="string" Color="@((item.IsCompleted) ? Color.Success : Color.Info)"
+                                         Variant="Variant.Outlined" Class="mb-1">
+                                    @(item.IsCompleted ? "Завершен" : "Готов к выдаче")
+                                </MudChip>
+                            </div>
+                            <MudText Typo="Typo.body1" Class="mb-1"><b>Штрихкод:</b> @item.ProductBarCode</MudText>
+                            <MudText Typo="Typo.body1" Class="mb-1"><b>Продукт ID:</b> @item.ProductId</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                Дата: @item.CreatedAt.ToLocalTime().ToString("g")</MudText>
+                        </MudPaper>
                     }
-                    else
-                    {
-                        <MudChip T="string" Color="Color.Info" Variant="Variant.Filled">Готов к выдаче</MudChip>
-                    }
-                </MudTd>
-            </RowTemplate>
-        </MudTable>
+                </div>
 
-        <div class="d-flex justify-between mt-4">
-            <MudButton Variant="Variant.Text" Disabled="!HasPreviousPage" OnClick="LoadPreviousPage">Назад</MudButton>
-            <MudButton Variant="Variant.Text" Disabled="!HasNextPage" OnClick="LoadNextPage">Далее</MudButton>
+                <div class="d-flex justify-between mt-6">
+                    <MudButton Variant="Variant.Filled" Disabled="!HasPreviousPage" OnClick="LoadPreviousPage"
+                               Style="min-width:100px;">
+                        Назад
+                    </MudButton>
+                    <MudButton Variant="Variant.Filled" Disabled="!HasNextPage" OnClick="LoadNextPage"
+                               Style="min-width:100px;">
+                        Далее
+                    </MudButton>
+                </div>
+            }
+        }
+    </MudPaper>
+
+    <MudPaper Class="pa-4 mt-4 mb-4" Style="border-radius:12px; background-color:rgba(255,255,255,0.05);">
+        <div class="d-flex justify-center flex-wrap" style="gap: 1.5rem;">
+            <MudTooltip Text="Instagram">
+                <MudIconButton Color="Color.Primary" Icon="@Icons.Custom.Brands.Instagram" Size="Size.Large"
+                               OnClick='@(() => OpenLink("https://instagram.com/arzoncargo"))'>
+                    <MudImage Src="instaicon.webp" Alt="Instagram" Width="28" Height="28"/>
+                </MudIconButton>
+            </MudTooltip>
+
+            <MudTooltip Text="Telegram">
+                <MudIconButton Icon="@Icons.Custom.Brands.Telegram" Color="Color.Primary" Size="Size.Large"
+                               OnClick="@(() => OpenLink("https://t.me/arzoncargo"))"/>
+            </MudTooltip>
+
+            <MudTooltip Text="Позвонить">
+                <MudIconButton Icon="@Icons.Material.Filled.Phone" Color="Color.Primary" Size="Size.Large"
+                               OnClick="@(() => OpenLink("tel:+998901234567"))"/>
+            </MudTooltip>
         </div>
-    }
-</MudPaper>
+    </MudPaper>
+</MudContainer>
 
 @code {
     private string? phoneNumber;
     private int currentPage = 1;
     private const int pageSize = 10;
     private bool isLoading = true;
-
+    private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
     private User? currentUser;
     private PaginatedResult<PocketItem>? pocketPage;
     private PaginatedResult<OrderItem>? orderPage;
@@ -101,53 +140,45 @@
 
         if (string.IsNullOrWhiteSpace(phoneNumber))
         {
-            Console.WriteLine("Phone number missing.");
             isLoading = false;
             return;
         }
 
         try
         {
-            var userResponse = await Http.GetAsync($"http://localhost:5191/User/Search?Text={phoneNumber}");
+            var userResponse = await Http.GetAsync($"{ApiBaseUrl}/User/Search?Text={phoneNumber}");
             var userJson = await userResponse.Content.ReadAsStringAsync();
-            Console.WriteLine("User JSON: " + userJson);
 
-            if (string.IsNullOrWhiteSpace(userJson) || userJson == "null")
+            if (string.IsNullOrWhiteSpace(userJson) || userJson == "[]")
             {
-                Console.WriteLine("User not found.");
                 isLoading = false;
+                Navigation.NavigateTo("/UnAuthorized", true);
                 return;
             }
 
-            try
+            if (userJson.TrimStart().StartsWith("["))
             {
-                if (userJson.TrimStart().StartsWith("["))
-                {
-                    var users = JsonSerializer.Deserialize<List<User>>(userJson, _jsonOptions);
-                    currentUser = users?.FirstOrDefault();
-                }
-                else
-                {
-                    currentUser = JsonSerializer.Deserialize<User>(userJson, _jsonOptions);
-                }
+                var users = JsonSerializer.Deserialize<List<User>>(userJson, _jsonOptions);
+                if (!users.Any())
+                    Navigation.NavigateTo("/UnAuthorized", true);
+                
+                currentUser = users?.FirstOrDefault();
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine("Deserialization error: " + ex.Message);
+                currentUser = JsonSerializer.Deserialize<User>(userJson, _jsonOptions);
             }
 
             if (currentUser == null)
             {
-                Console.WriteLine("User is null after deserialization.");
                 isLoading = false;
                 return;
             }
 
             await LoadData();
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine("Failed to load user: " + ex.Message);
             isLoading = false;
         }
     }
@@ -161,11 +192,11 @@
         {
             var encodedPhone = Uri.EscapeDataString(phoneNumber!);
 
-            var pocketResponse = await Http.GetAsync($"http://localhost:5191/PocketItem/GetPocketItemByPhoneNumber?Page={currentPage}&PageSize={pageSize}&PhoneNumber={encodedPhone}");
+            var pocketResponse = await Http.GetAsync($"{ApiBaseUrl}/PocketItem/GetPocketItemByPhoneNumber?Page={currentPage}&PageSize={pageSize}&PhoneNumber={encodedPhone}");
             var pocketJson = await pocketResponse.Content.ReadAsStringAsync();
             pocketPage = JsonSerializer.Deserialize<PaginatedResult<PocketItem>>(pocketJson, _jsonOptions);
 
-            var orderResponse = await Http.GetAsync($"http://localhost:5191/OrderItem/GetOrderItemByPhoneNumber?Page={currentPage}&PageSize={pageSize}&PhoneNumber={encodedPhone}");
+            var orderResponse = await Http.GetAsync($"{ApiBaseUrl}/OrderItem/GetOrderItemByPhoneNumber?Page={currentPage}&PageSize={pageSize}&PhoneNumber={encodedPhone}");
             var orderJson = await orderResponse.Content.ReadAsStringAsync();
             orderPage = JsonSerializer.Deserialize<PaginatedResult<OrderItem>>(orderJson, _jsonOptions);
 
@@ -195,9 +226,9 @@
                 .ThenByDescending(item => item.CreatedAt)
                 .ToList();
         }
-        catch (Exception ex)
+        catch
         {
-            Console.WriteLine("Error loading data: " + ex.Message);
+            // Handle errors if needed
         }
 
         isLoading = false;
@@ -216,6 +247,11 @@
             currentPage--;
             await LoadData();
         }
+    }
+
+    private void OpenLink(string url)
+    {
+        Navigation.NavigateTo(url, forceLoad: true);
     }
 
     public class OrderViewItem
