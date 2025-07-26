@@ -1,6 +1,6 @@
 ﻿using Stocky.Shared.Models.Enums;
 
-namespace Stocky.WebApi.Report.Dtos;
+namespace Stocky.Shared.Dtos;
 
 public class PaymentBreakdownDto
 {

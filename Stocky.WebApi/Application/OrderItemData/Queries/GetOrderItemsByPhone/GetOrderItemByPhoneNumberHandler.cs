@@ -10,7 +10,7 @@ public record GetOrderItemByPhoneNumberQuery : IRequest<PaginatedList<OrderItem>
 {
     public int Page { get; set; }
     public int PageSize { get; set; }
-    public string PhoneNumber { get; init; }
+    public string? PhoneNumber { get; init; }
 }
 
 public class GetOrderItemByPhoneNumberHandler(

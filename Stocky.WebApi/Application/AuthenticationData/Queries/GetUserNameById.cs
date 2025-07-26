@@ -11,7 +11,7 @@ public record GetUserNameByIdQuery : IRequest<UsernameResponse>
 }
 public class UsernameResponse
 {
-    public string UserName { get; set; }
+    public string? UserName { get; set; }
 }
 
 public class GetUserNameById( IAuthRepository authRepository)

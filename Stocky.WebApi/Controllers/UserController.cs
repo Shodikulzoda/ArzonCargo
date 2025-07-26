@@ -20,7 +20,7 @@ public class UserController(IMediator mediator) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateUser(CreateUserCommand? user)
     {
-        if (string.IsNullOrEmpty(user.Name))
+        if (string.IsNullOrEmpty(user?.Name))
         {
             return BadRequest("User cannot be null");
         }

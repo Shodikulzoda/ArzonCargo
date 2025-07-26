@@ -30,4 +30,8 @@
     <ItemGroup>
       <ProjectReference Include="..\Stocky.Shared\Stocky.Shared.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Report\Dtos\PaymentBreakdownDto.cs" />
+    </ItemGroup>
 </Project>
