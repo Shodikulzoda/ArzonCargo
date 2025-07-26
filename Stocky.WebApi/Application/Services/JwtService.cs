@@ -35,7 +35,7 @@ public class JwtService(IConfiguration configuration) : IJwtService
             configuration["Jwt:Issuer"],
             configuration["Jwt:Audience"],
             claims,
-            expires: DateTime.UtcNow.AddHours(1),
+            expires: DateTime.UtcNow.AddHours(24),
             signingCredentials: credentials
         );
 

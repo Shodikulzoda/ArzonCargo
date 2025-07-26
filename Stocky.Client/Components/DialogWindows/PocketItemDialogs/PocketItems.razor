@@ -19,7 +19,8 @@ else
                 <MudTableSortLabel SortBy="new Func<PocketItem, object>(x => x.Id)">ID</MudTableSortLabel>
             </MudTh>
             <MudTh>
-                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.ProductBarCode)">Штрихкод</MudTableSortLabel>
+                <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.ProductBarCode)">Штрихкод
+                </MudTableSortLabel>
             </MudTh>
             <MudTh>
                 <MudTableSortLabel SortBy="new Func<PocketItem, object?>(x => x.CreatedAt.ToLocalTime())">Дата создания
@@ -35,12 +36,10 @@ else
                 <MudButton Color="Color.Error"
                            Variant="Variant.Outlined"
                            Size="Size.Small"
-                           OnClick="@(() => ConfirmDelete(context.Id))">
-                    <MudIcon Icon="@Icons.Material.Filled.Delete" />
+                           OnClick="@(() => ConfirmDelete(context.ProductBarCode, context.Id))">
+                    <MudIcon Icon="@Icons.Material.Filled.Delete"/>
                 </MudButton>
             </MudTd>
-
-
         </RowTemplate>
     </MudTable>
 
@@ -66,12 +65,12 @@ else
     {
         await LoadPocketItems();
     }
-    
-    private async Task ConfirmDelete(int id)
+
+    private async Task ConfirmDelete(string name, int id)
     {
         bool? result = await DialogService.ShowMessageBox(
             title: "Подтверждение",
-            markupMessage: (MarkupString)$"Вы уверены, что хотите удалить товар с ID <b>{id}</b>?",
+            markupMessage: (MarkupString)$"Вы уверены, что хотите удалить товар <b>{name}</b>?",
             yesText: "Удалить", cancelText: "Отмена", options: new DialogOptions { CloseButton = true });
 
         if (result == true)
@@ -79,6 +78,7 @@ else
             await DeleteItem(id);
         }
     }
+
     private async Task DeleteItem(int id)
     {
         try
