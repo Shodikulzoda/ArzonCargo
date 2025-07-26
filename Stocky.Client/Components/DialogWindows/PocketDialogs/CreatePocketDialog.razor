@@ -38,12 +38,14 @@
                               RequiredError="Общий вес обязателен"
                               Immediate="true"
                               Validation="@((double? value) => ValidateTotalWeight(value))"/>
-                
-                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreatePocket" @onmousedown="e => DisableAutoFocus(e)">
+
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreatePocket"
+                           @onmousedown="e => DisableAutoFocus(e)">
                     Создать пакет
                 </MudButton>
 
-                <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="FinishPocket" @onmousedown="e => DisableAutoFocus(e)">
+                <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="FinishPocket"
+                           @onmousedown="e => DisableAutoFocus(e)">
                     Завершить продажу
                 </MudButton>
 
@@ -65,7 +67,7 @@
                                       @onfocus="@EnableAutoFocus"
                                       Class="barcode-text"
                                       Variant="Variant.Outlined"/>
-                        
+
                         <MudButton OnClick="AddProductToPocket" Color="Color.Warning" Variant="Variant.Filled">
                             Добавить товар
                         </MudButton>
@@ -131,7 +133,7 @@
 
         MudDialog.Cancel();
     }
-    
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (_shouldFocusBarcode && _autoFocusEnabled)
@@ -139,7 +141,7 @@
             _shouldFocusBarcode = false;
             await Js.InvokeVoidAsync("focusElement");
         }
-        
+
         if (_selectedUser != null)
         {
             _pocketModel.UserId = _selectedUser.Id;
@@ -151,13 +153,13 @@
     {
         _autoFocusEnabled = true;
     }
-    
+
     private void DisableAutoFocus(MouseEventArgs e)
     {
         _autoFocusEnabled = false;
     }
 
-    
+
     private async Task<IEnumerable<User>> SearchUsers(string text, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(text) || text.Length < 1)
@@ -341,6 +343,13 @@
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
         var response = await Http.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
+        {
+            _errorMessage = "Не удалось завершить пакет";
+            _message = string.Empty;
+            return;
+        }
+        
         if (response.IsSuccessStatusCode)
         {
             _message = "Создано успешно";
@@ -353,21 +362,22 @@
             var rawHtml = string.Join(
                 Environment.NewLine,
                 "<div style='width:60mm;height:60mm;padding:2mm;margin:auto; text-align:center;font-family:sans-serif;'>",
-                "<h2 style='margin:0;'>ArzonCargo</h2>",
+                "<h3 style='margin:0;'>ArzonCargo</h3>",
                 "<div style='font-size:3mm;margin:0'><b>+992 92 788 0989</b></div>",
                 $"<img src='data:image/png;base64,{base64Qr}' style='width:40mm;height:40mm;margin:1mm 0;' />",
                 $"<div style='font-size:3mm;'><b>Номер клиента: {_selectedUser?.Phone}</b></div>",
                 $"<div style='font-size:3mm;'><b>Сумма: {_pocketModel.TotalAmount} сомони</b></div>",
                 $"<div style='font-size:3mm;'><b>Вес: {_pocketModel.TotalWeight} кг</b></div>",
-                "<div style='font-size:3mm;'><b>Instagram: @arzoncargo</b></div>",
                 "</div>"
             );
-
+            
+              Task.Delay(300);
+            
             await PrintingService.Print(rawHtml, PrintType.RawHtml);
 
             MudDialog.Cancel();
 
-            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+            // Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
         }
     }
 

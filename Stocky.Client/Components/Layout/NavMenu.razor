@@ -33,9 +33,14 @@
             Все продукты
         </MudNavLink>
 
-        <MudNavLink Href="report" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Inventory">
-            Все продукты
+        <MudNavLink Href="report" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Assessment">
+            Отчёты
         </MudNavLink>
+        
+        <MudNavLink Href="qrGenerator" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.QrCode">
+            QR для сотрудников
+        </MudNavLink>
+
     }
     else if (AuthService.IsAdder)
     {
