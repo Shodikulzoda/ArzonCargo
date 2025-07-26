@@ -46,7 +46,7 @@ public class OrderRepository(ApplicationContext context) : BaseRepository<Order>
 
     public async Task<IEnumerable<Order>> GetOrdersByUserId(int id)
     {
-        var orders = context.Orders.Where(x => x.UserId == id).AsEnumerable();
+        var orders = context.Orders.Include(x=>x.Employee).Where(x => x.UserId == id).AsEnumerable();
         if (orders is null)
         {
             return null;
@@ -64,6 +64,7 @@ public class OrderRepository(ApplicationContext context) : BaseRepository<Order>
         CancellationToken cancellationToken)
     {
         return await context.Orders
+            .Include(x=>x.Employee)
             .Skip((page) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

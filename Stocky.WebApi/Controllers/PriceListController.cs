@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stocky.WebApi.Application.Services;
 
@@ -8,6 +9,7 @@ namespace Stocky.WebApi.Controllers;
 [Route("api/[controller]/[action]")]
 public class PriceListController(IMediator mediator) : ControllerBase
 {
+    [Authorize(Roles = "Admin,Cashier")]
     [HttpPost]
     public async Task<IActionResult> PriceChanger(PriceChangerCommand? newPrice)
     {
@@ -31,6 +33,7 @@ public class PriceListController(IMediator mediator) : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin,Cashier")]
     [HttpGet]
     public async Task<IActionResult> GetPrice()
     {
@@ -38,6 +41,7 @@ public class PriceListController(IMediator mediator) : ControllerBase
         return Ok(priceList);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetAllPrices()
     {

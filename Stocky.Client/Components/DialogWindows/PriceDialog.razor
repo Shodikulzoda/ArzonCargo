@@ -1,5 +1,8 @@
+@using System.Net.Http.Headers
+@using MudBlazor.Components.Service
 @inject HttpClient Http
 @inject IConfiguration Configuration
+@inject AuthService AuthService
 
 <MudDialog>
     <DialogContent>
@@ -30,7 +33,6 @@
                           Margin="Margin.Dense"
                           Adornment="Adornment.End"
                           AdornmentText="сом"
-                          InputType="InputType.Number"
                           Immediate="true"
                           Class="mb-3"
                           Style="max-width: 300px;"/>
@@ -73,7 +75,7 @@
 
     private class PriceChangeRequest
     {
-        public decimal newPrice { get; set; }
+        public double newPrice { get; set; }
     }
 
     private PriceResponse? PriceInfo;
@@ -97,11 +99,27 @@
 
         try
         {
-            PriceInfo = await Http.GetFromJsonAsync<PriceResponse>($"{ApiBaseUrl}/api/PriceList/GetPrice");
+            var token = AuthService.Token; 
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiBaseUrl}/api/PriceList/GetPrice");
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                PriceInfo = await response.Content.ReadFromJsonAsync<PriceResponse>();
+            }
+            else
+            {
+                LoadError = $"Ошибка загрузки цены: {response.StatusCode}";
+                PriceInfo = new PriceResponse(); // Fallback
+            }
         }
-        catch
+        catch (Exception ex)
         {
-            PriceInfo = new PriceResponse()
+            LoadError = $"Ошибка: {ex.Message}";
+            PriceInfo = new PriceResponse
             {
                 createdAt = default,
                 pricePerKg = 0.0
@@ -118,7 +136,7 @@
     {
         SubmitError = null;
 
-        if (!decimal.TryParse(NewPriceInput, out var newPrice))
+        if (!double.TryParse(NewPriceInput, out var newPrice))
         {
             SubmitError = "Введите корректную числовую цену.";
             return;
@@ -128,8 +146,16 @@
 
         try
         {
-            var request = new PriceChangeRequest { newPrice = newPrice };
-            var response = await Http.PostAsJsonAsync($"{ApiBaseUrl}/api/PriceList/PriceChanger", request);
+            var requestContent = JsonContent.Create(new PriceChangeRequest { newPrice = newPrice });
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, $"{ApiBaseUrl}/api/PriceList/PriceChanger")
+            {
+                Content = requestContent
+            };
+
+            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+            var response = await Http.SendAsync(httpRequest);
 
             if (response.IsSuccessStatusCode)
             {

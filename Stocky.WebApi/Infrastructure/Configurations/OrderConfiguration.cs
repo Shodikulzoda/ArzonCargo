@@ -8,9 +8,9 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 {
     public void Configure(EntityTypeBuilder<Order> builder)
     {
-        builder.Property(x=>x.Id)
+        builder.Property(x => x.Id)
             .ValueGeneratedOnAdd();
-        
+
         builder.HasOne(o => o.User)
             .WithMany(u => u.Orders)
             .HasForeignKey(o => o.UserId)

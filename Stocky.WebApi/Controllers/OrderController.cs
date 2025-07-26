@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stocky.Shared.Models;
+using Stocky.WebApi.Application;
 using Stocky.WebApi.Application.OrderData.Commands.CreateOrder;
 using Stocky.WebApi.Application.OrderData.Commands.DeleteOrder;
 using Stocky.WebApi.Application.OrderData.Commands.UpdateOrder;
@@ -64,5 +65,18 @@ public class OrderController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> DeleteOrder([FromQuery] DeleteOrderCommand order)
     {
         return Ok(await mediator.Send(order));
+    }
+
+    [Authorize(Roles = "Admin,Cashier")]
+    [HttpGet]
+    public async Task<IActionResult> GetSummary([FromQuery] int userId, [FromQuery] DateTime? date)
+    {
+        var result = await mediator.Send(new GetUserOrdersSummaryQuery
+        {
+            UserId = userId,
+            Date = date
+        });
+
+        return Ok(result);
     }
 }

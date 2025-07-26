@@ -8,7 +8,6 @@ public interface IOrderRepository : IBaseRepository<Order>
     Task<IEnumerable<Order>> GetAll();
     Task<Order> Update(Order order);
     Task<bool> Delete(int id);
-    
     Task<Order?> GetById(int id);
     Task<IEnumerable<Order>> GetOrdersByUserId(int id);
     Task<int> Count();

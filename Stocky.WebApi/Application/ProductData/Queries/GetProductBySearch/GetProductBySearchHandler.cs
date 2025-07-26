@@ -24,6 +24,7 @@ public class GetProductBySearchHandler(IProductRepository productRepository)
         var products = await productRepository.Queryable
             .Where(x =>
                 EF.Functions.Like(x.BarCode.ToLower(), $"%{request.Text}%") ||
+                EF.Functions.Like(x.Id.ToString(), $"%{request.Text}%") ||
                 EF.Functions.Like(x.Status.ToString().ToLower(), $"%{request.Text}%"))
             .ToListAsync(cancellationToken);
 

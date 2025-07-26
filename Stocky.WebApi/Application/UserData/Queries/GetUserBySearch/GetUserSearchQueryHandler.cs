@@ -20,6 +20,16 @@ public class GetUserSearchQueryHandler(IUserRepository userRepository)
             return [];
         }
 
+        if (userQuery.Text.Contains("@"))
+        {
+            var id = Convert.ToInt32(userQuery.Text.TrimStart('@'));
+
+            var user = await userRepository.Queryable
+                .Where(x => x.Id == id)
+                .ToListAsync(cancellationToken);
+            return user;
+        }
+
         var text = userQuery.Text.ToLower();
 
         var listUser = await userRepository.Queryable

@@ -58,6 +58,9 @@ else
     <MudTable Items="_pocketPage?.Items" Hover="true" SortLabel="Сортировать по" Elevation="1" Dense="true">
         <HeaderContent>
             <MudTh>
+                <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.User.Id)">ID</MudTableSortLabel>
+            </MudTh>
+            <MudTh>
                 <MudTableSortLabel SortBy="new Func<Pocket, object>(x => x.User.Name)">Имя пользователя
                 </MudTableSortLabel>
             </MudTh>
@@ -77,6 +80,7 @@ else
             <MudTh>Пакет</MudTh>
         </HeaderContent>
         <RowTemplate>
+            <MudTd DataLabel="ID">@context.User.Id</MudTd>
             <MudTd DataLabel="UserName">@context.User?.Name</MudTd>
             <MudTd DataLabel="BarCode">@context.BarCode</MudTd>
             <MudTd DataLabel="TotalAmount">@context.TotalAmount</MudTd>
@@ -178,11 +182,24 @@ else
         try
         {
             var url = $"{ApiBaseUrl}/Pocket/GetPocketBySearch?Text={Uri.EscapeDataString(_searchQuery)}";
-            var results = await Http.GetFromJsonAsync<IEnumerable<Pocket>>(url);
-            _pocketPage.Items = results?.ToList() ?? [];
 
-            _totalPages = 1;
-            _currentPage = 1;
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
+
+            var response = await Http.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var results = await response.Content.ReadFromJsonAsync<IEnumerable<Pocket>>();
+                _pocketPage.Items = results?.ToList() ?? [];
+                _totalPages = 1;
+                _currentPage = 1;
+            }
+            else
+            {
+                Console.WriteLine($"Search failed: {response.StatusCode}");
+                _pocketPage.Items = [];
+            }
         }
         catch (Exception ex)
         {
@@ -192,6 +209,7 @@ else
 
         _isLoading = false;
     }
+
 
     private async Task OpenPocketItemsDialog(int pocketId, int userId, double totalAmount)
     {
