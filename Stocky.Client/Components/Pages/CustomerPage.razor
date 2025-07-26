@@ -16,7 +16,7 @@
     }
     else if (isLoading)
     {
-        <MudProgressCircular Indeterminate Color="Color.Primary" />
+        <MudProgressCircular Indeterminate Color="Color.Primary"/>
     }
     else
     {
@@ -25,17 +25,16 @@
             <MudPaper Class="pa-2 mb-3 d-flex align-center shadow-sm"
                       Style="border-radius:12px; background-color:rgba(255,255,255,0.08);">
                 <MudAvatar Color="Color.Primary" Size="Size.Medium" Class="mr-3">
-                    @currentUser.Name.Substring(0,1).ToUpper()
+                    @currentUser.Name.Substring(0, 1).ToUpper()
                 </MudAvatar>
                 <div>
-                    <MudText Typo="Typo.subtitle1" Class="font-weight-bold" Color="Color.Primary">@currentUser.Name</MudText>
+                    <MudText Typo="Typo.subtitle1" Class="font-weight-bold"
+                             Color="Color.Primary">@currentUser.Name</MudText>
                     <MudText Typo="Typo.body2" Color="Color.Info">
                         @phoneNumber (@currentUser.Address)
                     </MudText>
                 </div>
             </MudPaper>
-
-
         }
 
         <MudTable Items="allItems" Hover="true" Dense="true" Elevation="1">
@@ -264,4 +263,5 @@
         public DateTime CreatedAt { get; set; }
         public bool IsDeleted { get; set; }
     }
+
 }

@@ -6,32 +6,44 @@ using Stocky.WebApi.Application.Interfaces;
 
 namespace Stocky.WebApi.Application.PocketData.Queries.GetPocketByPagination;
 
-public record GetPocketByPaginationQuery : IRequest<PaginatedList<Pocket>>
-{
-    public int Page { get; set; }
-    public int PageSize { get; set; }
-}
+public record GetPocketByPaginationQuery(
+    int Page,
+    int PageSize,
+    DateTime? DateFrom,
+    DateTime? DateTo) : IRequest<PaginatedList<Pocket>>;
 
 public class GetPocketByPaginationQueryHandler(IPocketRepository pocketRepository)
     : IRequestHandler<GetPocketByPaginationQuery, PaginatedList<Pocket>>
 {
     public async Task<PaginatedList<Pocket>> Handle(GetPocketByPaginationQuery request,
         CancellationToken cancellationToken)
-    {
-        var query = pocketRepository.Queryable
-            .Include(x => x.User); 
 
-        var userPagination = await PaginatedList<Pocket>.CreateAsync(
+    {
+        var query = pocketRepository.Queryable;
+
+        query = pocketRepository.Queryable
+            .Include(x => x.User);
+
+        if (request.DateFrom.HasValue)
+        {
+            query = query.Where(x => x.CreatedAt >= request.DateFrom.Value);
+        }
+
+        if (request.DateTo.HasValue)
+        {
+            query = query.Where(x => x.CreatedAt <= request.DateTo.Value);
+        }
+
+        var productPagination = await PaginatedList<Pocket>.CreateAsync(
             query,
             request.Page,
             request.PageSize,
             cancellationToken);
 
         return new PaginatedList<Pocket>(
-            userPagination.Items,
-            userPagination.TotalCount,
-            userPagination.PageNumber,
-            userPagination.TotalPages);
+            productPagination.Items,
+            productPagination.TotalCount,
+            productPagination.PageNumber,
+            productPagination.TotalPages);
     }
-
 }

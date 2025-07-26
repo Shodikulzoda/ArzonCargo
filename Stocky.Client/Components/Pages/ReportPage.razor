@@ -2,6 +2,7 @@
 @using System.Net.Http.Headers
 @using MudBlazor.Components.Service
 @using Stocky.Shared.Dtos
+@inject IConfiguration Configuration
 @inject HttpClient Http
 @inject AuthService AuthService
 
@@ -46,6 +47,8 @@
 
 @code
 {
+    private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
+
     private DateTime? StartDate = DateTime.UtcNow.AddDays(-30);
     private DateTime? EndDate = DateTime.UtcNow;
 
@@ -60,9 +63,9 @@
         var end = EndDate.Value.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
 
-        var url = $"http://localhost:5191/api/reports/summary?start={start}&end={end}";
+        var url = $"{ApiBaseUrl}/Report/GetReportSummary?StartDate={start}&EndDate={end}";
         var request = new HttpRequestMessage(HttpMethod.Get, url);
-        
+
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
         var response = await Http.SendAsync(request);

@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Stocky.Shared.Dtos;
+using Stocky.WebApi.Application.Interfaces;
 using Stocky.WebApi.Infrastructure.Databases;
-using Stocky.WebApi.Report.RepositoryReport.Interface;
 
-namespace Stocky.WebApi.Report.RepositoryReport;
+namespace Stocky.WebApi.Infrastructure.Repository;
 
 public class ReportRepository(ApplicationContext context) : IReportRepository
 {

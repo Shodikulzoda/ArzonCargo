@@ -1,6 +1,6 @@
 ﻿using Stocky.Shared.Dtos;
 
-namespace Stocky.WebApi.Report.RepositoryReport.Interface;
+namespace Stocky.WebApi.Application.Interfaces;
 
 public interface IReportRepository
 {

@@ -1,7 +1,6 @@
 @page "/pockets"
 @using System.Net.Http.Headers
 @using System.Text.Json
-@using MudBlazor.Components.DialogWindows
 @using MudBlazor.Components.DialogWindows.PocketDialogs
 @using MudBlazor.Components.DialogWindows.PocketItemDialogs
 @using MudBlazor.Components.Service
@@ -31,6 +30,19 @@
 
     <MudButton OnClick="OpenCreatePocketDialog" Color="Color.Success" Variant="Variant.Filled">
         Создать Пакет
+    </MudButton>
+</div>
+
+<div class="mb-4 d-flex gap-2 flex-wrap align-center">
+    <MudDatePicker Label="С даты" @bind-Date="_startDate" DateFormat="dd.MM.yyyy" Clearable="true"/>
+    <MudDatePicker Label="По дату" @bind-Date="_endDate" DateFormat="dd.MM.yyyy" Clearable="true"/>
+
+    <MudButton OnClick="FilterByDate" Color="Color.Info" Variant="Variant.Filled">
+        Фильтр по дате
+    </MudButton>
+
+    <MudButton OnClick="ClearDateFilter" Color="Color.Secondary" Variant="Variant.Text">
+        Сбросить
     </MudButton>
 </div>
 
@@ -87,12 +99,14 @@ else
     private PageData<Pocket>? _pocketPage = new();
     private int _currentPage = 1;
     private int _totalPages = 1;
-    private readonly int _pageSize = 15;
+    private const int PageSize = 15;
     private bool _isLoading;
     private string _searchQuery = "";
     private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
 
+    private DateTime? _startDate = DateTime.UtcNow.AddDays(-30);
+    private DateTime? _endDate = DateTime.UtcNow;
 
     protected override async Task OnInitializedAsync()
     {
@@ -112,9 +126,14 @@ else
         _isLoading = true;
         try
         {
-            var url = $"{ApiBaseUrl}/Pocket/PocketPagination?Page={_currentPage}&PageSize={_pageSize}";
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            var url = $"{ApiBaseUrl}/Pocket/PocketPagination?Page={_currentPage}&PageSize={PageSize}";
+            if (_startDate.HasValue)
+                url += $"&DateFrom={_startDate.Value:yyyy-MM-ddTHH:mm:ssZ}";
 
+            if (_endDate.HasValue)
+                url += $"&DateTo={_endDate.Value:yyyy-MM-ddTHH:mm:ssZ}";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
 
             var response = await Http.SendAsync(request);
@@ -127,7 +146,7 @@ else
                 });
 
                 _pocketPage ??= new PageData<Pocket> { Items = new List<Pocket>(), TotalCount = 0 };
-                _totalPages = (int)Math.Ceiling((double)(_pocketPage.TotalCount) / _pageSize);
+                _totalPages = (int)Math.Ceiling((double)(_pocketPage.TotalCount) / PageSize);
             }
             else
             {
@@ -239,6 +258,20 @@ else
         {
             await SearchPocket();
         }
+    }
+
+    private async Task FilterByDate()
+    {
+        _currentPage = 1;
+        await LoadPockets();
+    }
+
+    private async Task ClearDateFilter()
+    {
+        _startDate = null;
+        _endDate = null;
+        _currentPage = 1;
+        await LoadPockets();
     }
 
 }

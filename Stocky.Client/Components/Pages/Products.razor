@@ -1,7 +1,6 @@
 @page "/products"
 @using System.Net.Http.Headers
 @using System.Text.Json
-@using Microsoft.AspNetCore.Components.Authorization
 @using MudBlazor.Components.DialogWindows.ProductDialogs
 @using MudBlazor.Components.Service
 @using Stocky.Shared.Models
@@ -10,7 +9,6 @@
 @inject IDialogService DialogService
 @inject IConfiguration Configuration
 @inject NavigationManager NavigationManager
-@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject AuthService AuthService
 
 <PageTitle>Продукты</PageTitle>
@@ -35,8 +33,8 @@ else
     </div>
 
     <div class="mb-4 d-flex gap-2 flex-wrap align-center">
-        <MudDatePicker Label="С даты" @bind-Date="_dateFrom" DateFormat="dd.MM.yyyy" Clearable="true"/>
-        <MudDatePicker Label="По дату" @bind-Date="_dateTo" DateFormat="dd.MM.yyyy" Clearable="true"/>
+        <MudDatePicker Label="С даты" @bind-Date="_startDate" DateFormat="dd.MM.yyyy" Clearable="true"/>
+        <MudDatePicker Label="По дату" @bind-Date="_endDate" DateFormat="dd.MM.yyyy" Clearable="true"/>
 
         <MudButton OnClick="FilterByDate" Color="Color.Info" Variant="Variant.Filled">
             Фильтр по дате
@@ -59,13 +57,15 @@ else
                     <MudTableSortLabel SortBy="new Func<Product, object>(x => x.Id)">Id</MudTableSortLabel>
                 </MudTh>
                 <MudTh>
-                    <MudTableSortLabel SortBy="new Func<Product, object>(x => x.BarCode)">Штрихкод</MudTableSortLabel>
+                    <MudTableSortLabel SortBy="new Func<Product, object>(x => x.BarCode ?? string.Empty)">Штрихкод</MudTableSortLabel>
                 </MudTh>
                 <MudTh>
                     <MudTableSortLabel SortBy="new Func<Product, object>(x => x.Status)">Статус</MudTableSortLabel>
                 </MudTh>
                 <MudTh>
-                    <MudTableSortLabel SortBy="new Func<Product, object>(x => x.CreatedAt.ToLocalTime())">Дата создания</MudTableSortLabel>
+                    <MudTableSortLabel SortBy="new Func<Product, object>(x => x.CreatedAt.ToLocalTime())">Дата
+                        создания
+                    </MudTableSortLabel>
                 </MudTh>
                 <MudTh>Действия</MudTh>
             </HeaderContent>
@@ -73,15 +73,20 @@ else
             <RowTemplate>
                 @if (@context.Status == Status.Completed)
                 {
-                    <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
-                           DataLabel="Id">@context.Id</MudTd>
-                    <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
-                           DataLabel="Name">@context.BarCode</MudTd>
-                    <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
-                           DataLabel="Status">@context.Status</MudTd>
-                    <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
-                           DataLabel="Дата создания">@context.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</MudTd>
-                    <MudTd Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")">
+                    <MudTd
+                        Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
+                        DataLabel="Id">@context.Id</MudTd>
+                    <MudTd
+                        Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
+                        DataLabel="Name">@context.BarCode</MudTd>
+                    <MudTd
+                        Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
+                        DataLabel="Status">@context.Status</MudTd>
+                    <MudTd
+                        Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")"
+                        DataLabel="Дата создания">@context.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</MudTd>
+                    <MudTd
+                        Style="@($"color:{_theme.PaletteLight.White};background:{_theme.PaletteLight.SuccessDarken};")">
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                        Color="Color.Primary"
                                        OnClick="@(() => Update(context))"/>
@@ -95,7 +100,8 @@ else
                     <MudTd DataLabel="Id">@context.Id</MudTd>
                     <MudTd DataLabel="Name">@context.BarCode</MudTd>
                     <MudTd DataLabel="Status">@context.Status</MudTd>
-                    <MudTd DataLabel="Дата создания">@context.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</MudTd>
+                    <MudTd
+                        DataLabel="Дата создания">@context.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</MudTd>
                     <MudTd>
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                        Color="Color.Primary"
@@ -119,20 +125,20 @@ else
 }
 
 @code {
-    private MudTheme _theme = new();
+    private readonly MudTheme _theme = new();
 
     private PageData<Product>? _productPage = new();
 
     private int _currentPage = 1;
     private int _totalPages = 1;
-    private readonly int _pageSize = 15;
+    private const int PageSize = 15;
     private bool _isLoading;
     private string _searchQuery = "";
-    private bool _isAuthorized = false;
-    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
+    private bool _isAuthorized;
+    private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
 
-    private DateTime? _dateFrom;
-    private DateTime? _dateTo;
+    private DateTime? _startDate = DateTime.UtcNow.AddDays(-30);
+    private DateTime? _endDate = DateTime.UtcNow;
 
     protected override async Task OnInitializedAsync()
     {
@@ -162,13 +168,13 @@ else
         _isLoading = true;
         try
         {
-            var url = $"{ApiBaseUrl}/Product/ProductPagination?Page={_currentPage}&PageSize={_pageSize}";
+            var url = $"{ApiBaseUrl}/Product/ProductPagination?Page={_currentPage}&PageSize={PageSize}";
 
-            if (_dateFrom.HasValue)
-                url += $"&DateFrom={_dateFrom.Value:yyyy-MM-dd}";
+            if (_startDate.HasValue)
+                url += $"&DateFrom={_startDate.Value:yyyy-MM-ddTHH:mm:ssZ}";
 
-            if (_dateTo.HasValue)
-                url += $"&DateTo={_dateTo.Value:yyyy-MM-dd}";
+            if (_endDate.HasValue)
+                url += $"&DateTo={_endDate.Value:yyyy-MM-ddTHH:mm:ssZ}";
 
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AuthService.Token);
@@ -186,11 +192,14 @@ else
                 if (_productPage?.Items != null)
                 {
                     _productPage.Items = _productPage.Items.OrderByDescending(x => x.Status == Status.Created).ToList();
-                    _totalPages = (int)Math.Ceiling((double)_productPage.TotalCount / _pageSize);
+                    _totalPages = (int)Math.Ceiling((double)_productPage.TotalCount / PageSize);
                 }
                 else
                 {
-                    _productPage.Items = new List<Product>();
+                    if (_productPage != null)
+                    {
+                        _productPage.Items = new List<Product>();
+                    }
                 }
             }
             else
@@ -217,8 +226,8 @@ else
 
     private async Task ClearDateFilter()
     {
-        _dateFrom = null;
-        _dateTo = null;
+        _startDate = null;
+        _endDate = null;
         _currentPage = 1;
         await LoadProducts();
     }
@@ -302,20 +311,32 @@ else
                     PropertyNameCaseInsensitive = true
                 });
 
-                _productPage.Items = searchResult?.ToList() ?? new List<Product>();
+                if (_productPage != null)
+                {
+                    _productPage.Items = searchResult?.ToList() ?? new List<Product>();
+                }
+
                 _totalPages = 1;
                 _currentPage = 1;
             }
             else
             {
                 Console.WriteLine($"Ошибка поиска продуктов: {response.StatusCode}");
-                _productPage.Items = new List<Product>();
+
+                if (_productPage != null)
+                {
+                    _productPage.Items = new List<Product>();
+                }
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine("Ошибка поиска: " + ex.Message);
-            _productPage.Items = new List<Product>();
+
+            if (_productPage != null)
+            {
+                _productPage.Items = new List<Product>();
+            }
         }
 
         _isLoading = false;
