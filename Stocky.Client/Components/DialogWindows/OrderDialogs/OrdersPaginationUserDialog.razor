@@ -13,86 +13,57 @@
 {
     <MudProgressCircular Color="Color.Default" Indeterminate="true"/>
 }
-else
-{
-    @if (_orders?.Items is not null)
-    {
-        var totalCount = _orders.Items.Count();
-        var totalAmount = _orders.Items.Sum(x => x.TotalAmount) * PriceInfo?.pricePerKg ?? 0;
-        var totalWeight = _orders.Items.Sum(x => x.TotalWeight);
 
-        var selectedCount = _selectedOrderIds.Count;
-        var selectedAmount = TotalSelectedAmount;
-        var selectedWeight = TotalSelectedWeight;
+<MudTable Items="_orders?.Items" Hover="true" SortLabel="Сортировать по" Elevation="1" Dense="true">
+    <HeaderContent>
+        <MudTh>
+            <MudTableSortLabel SortBy="new Func<Order, object>(x => x.Id)">Идентификатор</MudTableSortLabel>
+        </MudTh>
+        <MudTh>Пользователь</MudTh>
+        <MudTh>
+            <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.BarCode)">Штрихкод</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.TotalWeight)">Общий вес</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.TotalAmount)">Общая сумма</MudTableSortLabel>
+        </MudTh>
+        <MudTh>Действия</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
+        <MudTd DataLabel="Пользователь">@_employeeName</MudTd>
+        <MudTd DataLabel="Штрихкод">@context.BarCode</MudTd>
+        <MudTd DataLabel="Общий вес">@context.TotalWeight</MudTd>
+        <MudTd DataLabel="Общая сумма">@context.TotalAmount</MudTd>
+        <MudTd>
+            <MudIconButton Icon="@Icons.Material.Filled.ViewList"
+                           Color="Color.Success"
+                           OnClick="@(() => UserOrderItems(context.Id))"/>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
 
-        <MudPaper Class="pa-3 mb-3" Style="background-color:rgba(255,255,255,0.07); border-radius:8px;">
-            <MudText Typo="Typo.h6">
-                Всего заказов: @totalCount (@selectedCount выбрано) |
-                Общая сумма: @totalAmount (@selectedAmount выбрано) |
-                Общий вес: @totalWeight (@selectedWeight выбрано)
-            </MudText>
-        </MudPaper>
-    }
-
-    <MudTable Items="_orders.Items" Hover="true" SortLabel="Сортировать по" Elevation="1" Dense="true">
-        <HeaderContent>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<Order, object>(x => x.Id)">Идентификатор</MudTableSortLabel>
-            </MudTh>
-            <MudTh>Пользователь</MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.BarCode)">Штрихкод</MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.TotalWeight)">Общий вес</MudTableSortLabel>
-            </MudTh>
-            <MudTh>
-                <MudTableSortLabel SortBy="new Func<Order, object?>(x => x.TotalAmount)">Общая сумма</MudTableSortLabel>
-            </MudTh>
-            <MudTh>Действия</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Идентификатор">@context.Id</MudTd>
-            <MudTd DataLabel="Пользователь">@EmployeeName</MudTd>
-            <MudTd DataLabel="Штрихкод">@context.BarCode</MudTd>
-            <MudTd DataLabel="Общий вес">@context.TotalWeight</MudTd>
-            <MudTd DataLabel="Общая сумма">@context.TotalAmount</MudTd>
-            <MudTd>
-                <MudIconButton Icon="@Icons.Material.Filled.ViewList"
-                               Color="Color.Success"
-                               OnClick="@(() => UserOrderItems(context.Id))"/>
-            </MudTd>
-        </RowTemplate>
-    </MudTable>
-
-    <div class="mt-4 d-flex justify-between">
-        <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Назад</MudButton>
-        <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
-        <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Далее</MudButton>
-    </div>
+<div class="mt-4 d-flex justify-between">
+    <MudButton OnClick="Decrement" Disabled="@(_currentPage <= 1)" Color="Color.Secondary">Назад</MudButton>
+    <MudText Class="mx-2">@_currentPage / @_totalPages</MudText>
+    <MudButton OnClick="Increment" Disabled="@(_currentPage >= _totalPages)" Color="Color.Primary">Далее</MudButton>
+</div>
 }
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
     [Parameter] public int UserId { get; set; }
-    private string ApiBaseUrl => Configuration["ApiBaseUrl"];
+    private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
 
     private PageData<Order>? _orders = new();
 
     private int _currentPage = 1;
     private int _totalPages = 1;
-    private string EmployeeName = "";
+    private string? _employeeName = "";
     private const int PageSize = 15;
     private bool _isLoading;
-    private PriceResponse? PriceInfo;
-
-    private Dictionary<int, string> _usernamesCache = new();
-    private HashSet<int> _selectedOrderIds = new();
-
-    private double TotalSelectedAmount => _orders?.Items?.Where(x => _selectedOrderIds.Contains(x.Id)).Sum(x => x.TotalAmount) ?? 0;
-    private double TotalSelectedWeight => _orders?.Items?.Where(x => _selectedOrderIds.Contains(x.Id)).Sum(x => x.TotalWeight) ?? 0;
-
-    private bool IsAllSelected => _orders?.Items?.All(x => _selectedOrderIds.Contains(x.Id)) ?? false;
 
     private async Task LoadCurrentPrice()
     {
@@ -107,19 +78,19 @@ else
 
             if (response.IsSuccessStatusCode)
             {
-                PriceInfo = await response.Content.ReadFromJsonAsync<PriceResponse>();
+                await response.Content.ReadFromJsonAsync<PriceResponse>();
             }
             else
             {
-                PriceInfo = new PriceResponse();
+                new PriceResponse();
             }
         }
         catch (Exception ex)
         {
-            PriceInfo = new PriceResponse
+            new PriceResponse
             {
-                createdAt = default,
-                pricePerKg = 0.0
+                CreatedAt = default,
+                PricePerKg = 0.0
             };
         }
         finally
@@ -131,7 +102,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        EmployeeName = AuthService.Username;
+        _employeeName = AuthService.Username;
         await LoadCurrentPrice();
         await LoadOrders();
     }
@@ -164,27 +135,23 @@ else
                     var uniqueEmployeeIds = _orders.Items
                         .Select(o => o.EmployeeId)
                         .Distinct()
-                        .Where(id => id != 0 && !_usernamesCache.ContainsKey(id))
+                        .Where(id => id != 0)
                         .ToList();
 
-                    var usernameTasks = uniqueEmployeeIds.Select(async empId =>
-                    {
-                        var username = await GetUsernameFromApi(empId);
-                        _usernamesCache[empId] = username;
-                    });
+                    var usernameTasks = uniqueEmployeeIds.Select(async empId => { await GetUsernameFromApi(empId); });
 
                     await Task.WhenAll(usernameTasks);
                 }
             }
             else
             {
-                _orders = new PageData<Order> { Items = Array.Empty<Order>(), TotalCount = 0 };
+                _orders = new PageData<Order> { Items = [], TotalCount = 0 };
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine("Failed to load orders: " + ex.Message);
-            _orders = new PageData<Order> { Items = Array.Empty<Order>(), TotalCount = 0 };
+            _orders = new PageData<Order> { Items = [], TotalCount = 0 };
         }
 
         _isLoading = false;
@@ -215,46 +182,13 @@ else
 
                 return userResponse?.UserName ?? $"Пользователь {employeeId}";
             }
-            else
-            {
-                return $"Пользователь {employeeId}";
-            }
+
+            return $"Пользователь {employeeId}";
         }
         catch
         {
             return $"Ошибка {employeeId}";
         }
-    }
-
-    private string GetUsername(int employeeId)
-    {
-        if (employeeId == 0)
-            return "Не указан";
-
-        return _usernamesCache.TryGetValue(employeeId, out var username) ? username : $"Пользователь {employeeId}";
-    }
-
-    private void ToggleRowSelection(int orderId)
-    {
-        if (_selectedOrderIds.Contains(orderId))
-            _selectedOrderIds.Remove(orderId);
-        else
-            _selectedOrderIds.Add(orderId);
-
-        StateHasChanged();
-    }
-
-    private void ToggleSelectAll(ChangeEventArgs args)
-    {
-        if (IsAllSelected)
-            _selectedOrderIds.Clear();
-        else
-        {
-            foreach (var order in _orders.Items)
-                _selectedOrderIds.Add(order.Id);
-        }
-
-        StateHasChanged();
     }
 
     private async Task UserOrderItems(int orderId)
@@ -300,17 +234,17 @@ else
 
     private void Close() => MudDialog.Cancel();
 
-    public class UserResponse
+    public class UserResponse(string userName)
     {
-        public string UserName { get; set; }
+        public string UserName { get; init; } = userName;
     }
 
     private class PriceResponse
     {
-        public double pricePerKg { get; set; }
-        public int id { get; set; }
-        public DateTime createdAt { get; set; }
-        public bool isDeleted { get; set; }
+        public double PricePerKg { get; init; }
+        public int Id { get; init; }
+        public DateTime CreatedAt { get; init; }
+        public bool IsDeleted { get; init; }
     }
 
 }

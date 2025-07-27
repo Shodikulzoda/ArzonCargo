@@ -12,7 +12,6 @@
 @inject IPrintingService PrintingService
 @inject IConfiguration Configuration
 @inject IDialogService DialogService
-@inject NavigationManager Navigation
 @layout NoNavbar
 
 <MudDialog>
@@ -24,7 +23,7 @@
                 <MudAutocomplete T="User"
                                  Label="Поиск клиента"
                                  Variant="Variant.Outlined"
-                                 SearchFunc="SearchUsers"
+                                 SearchFunc="@SearchUsers"
                                  ToStringFunc='u => u != null ? $"{u.Name} - {u.Phone}" : string.Empty'
                                  @bind-Value="_selectedUser"
                                  DebounceInterval="300"
@@ -63,12 +62,12 @@
                         <MudTextField @bind-Value="_productBarCode"
                                       Label="Сканировать штрихкод товара"
                                       Immediate="true"
-                                      OnKeyDown="HandleKeyDown"
+                                      OnKeyDown="@HandleKeyDown"
                                       @onfocus="@EnableAutoFocus"
                                       Class="barcode-text"
                                       Variant="Variant.Outlined"/>
 
-                        <MudButton OnClick="AddProductToPocket" Color="Color.Warning" Variant="Variant.Filled">
+                        <MudButton OnClick="@AddProductToPocket" Color="Color.Warning" Variant="Variant.Filled">
                             Добавить товар
                         </MudButton>
                     </MudStack>
@@ -87,7 +86,7 @@
     </DialogContent>
 
     <DialogActions>
-        <MudButton Color="Color.Secondary" Variant="Variant.Outlined" OnClick="Cancel">Закрыть</MudButton>
+        <MudButton Color="Color.Secondary" Variant="Variant.Outlined" OnClick="@Cancel">Закрыть</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -108,11 +107,12 @@
     private string? _message = string.Empty;
     private string? _errorMessage = string.Empty;
     private string? _productBarCode;
-    private List<PocketItem> _pocketItems = [];
+    private readonly List<PocketItem> _pocketItems = [];
     private string? ApiBaseUrl => Configuration["ApiBaseUrl"];
     private User? _selectedUser;
-    private static bool _autoFocusEnabled = false;
-
+    private static bool _autoFocusEnabled;
+    private bool _shouldFocusBarcode;
+    
     [JSInvokable]
     public static void DisableAutoFocus()
     {
@@ -189,8 +189,6 @@
         using var qrCode = new PngByteQRCode(qrCodeData);
         return qrCode.GetGraphic(size);
     }
-
-    private bool _shouldFocusBarcode = false;
 
     private async Task CreatePocket()
     {
@@ -316,7 +314,6 @@
         return null;
     }
 
-
     private async Task FinishPocket()
     {
         if (_pocketItems.Count <= 0)
@@ -349,7 +346,7 @@
             _message = string.Empty;
             return;
         }
-        
+
         if (response.IsSuccessStatusCode)
         {
             _message = "Создано успешно";
@@ -370,9 +367,9 @@
                 $"<div style='font-size:3mm;'><b>Вес: {_pocketModel.TotalWeight} кг</b></div>",
                 "</div>"
             );
-            
-              Task.Delay(300);
-            
+
+            await Task.Delay(300);
+
             await PrintingService.Print(rawHtml, PrintType.RawHtml);
 
             MudDialog.Cancel();
@@ -380,7 +377,6 @@
             // Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
         }
     }
-
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
