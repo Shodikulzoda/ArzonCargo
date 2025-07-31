@@ -139,8 +139,7 @@
         if (_shouldFocusBarcode && _autoFocusEnabled)
         {
             _shouldFocusBarcode = false;
-            await Js.InvokeVoidAsync("focusElement");
-        }
+         }
 
         if (_selectedUser != null)
         {
@@ -220,6 +219,7 @@
 
             _pocketCreated = true;
             _autoFocusEnabled = true;
+            await Js.InvokeVoidAsync("focusElement");
             _shouldFocusBarcode = true; // Will focus in OnAfterRenderAsync
             StateHasChanged(); // Force re-render so the barcode field exists
         }
@@ -235,7 +235,6 @@
             _message = $"Товар с штрихкодом {_productBarCode} уже добавлен.";
             _errorMessage = string.Empty;
             if (_autoFocusEnabled)
-                await Js.InvokeVoidAsync("focusElement");
             return;
         }
 
@@ -266,8 +265,6 @@
             {
                 _message = string.Empty;
                 _errorMessage = $"Товар не добавлен.";
-                if (_autoFocusEnabled)
-                    await Js.InvokeVoidAsync("focusElement");
             }
         }
         else if (response.IsSuccessStatusCode)
@@ -302,8 +299,6 @@
             _productBarCode = "";
             _message = "Товар добавлен.";
             _errorMessage = "";
-            if (_autoFocusEnabled)
-                await Js.InvokeVoidAsync("focusElement");
         }
     }
 

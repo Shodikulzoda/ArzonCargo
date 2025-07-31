@@ -27,7 +27,7 @@ public class AuthController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> Verify([FromBody] VerifyLoginCommand request)
     {
         if (string.IsNullOrWhiteSpace(request.UserName))
-            return BadRequest("Invalid login datax.");
+            return BadRequest("Invalid login data.");
 
         return Ok(await mediator.Send(request));
     }
